@@ -5,7 +5,6 @@ function Sprite(size, texture, sourceRect) {
 	this.texture = texture;
 	this.sourceRect = sourceRect || new Rect(0, 0, texture.width, texture.height);
 }
-
 Sprite.prototype.render = function(node, context) {
 	var sRect = this.sourceRect;
 	var size = this.size;

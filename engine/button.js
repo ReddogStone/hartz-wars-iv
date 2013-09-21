@@ -127,7 +127,9 @@ Button.prototype.pressed = function() {
 // SETTERS	
 Button.prototype.setEnabled = function(value) {
 	this._enabled = value;
-	this._setState(ButtonState.INACTIVE);
+	if (!value) {
+		this._setState(ButtonState.INACTIVE);
+	}
 };
 Button.prototype.addEffect = function(effect) {
 	this.effects.push(effect);
