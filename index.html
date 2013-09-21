@@ -4,6 +4,7 @@
 <script src="engine/utils.js" type="text/javascript;version=1.8"></script>
 <script src="engine/vectorutils.js" type="text/javascript;version=1.8"></script>
 <script src="engine/loc.js" type="text/javascript;version=1.8"></script>
+<script src="engine/renderutils.js" type="text/javascript;version=1.8"></script>
 <script src="engine/node.js" type="text/javascript;version=1.8"></script>
 <script src="engine/renderlist.js" type="text/javascript;version=1.8"></script>
 <script src="engine/scene.js" type="text/javascript;version=1.8"></script>
@@ -41,7 +42,7 @@
 	var g_camera;
 	var g_clock = new Clock(new Date());
 	
-	var [g_root, g_sprite, g_animation] = createRoomScene();
+	var g_root, g_sprite, g_animation;
 	
 	function animate(lastTime, canvas, context){
 		// update
@@ -70,7 +71,7 @@
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
 		// draw scene
-		g_root.renderable.render(g_root, context);
+		RenderUtils.renderNode(g_root, context);
 		
 		// draw fps
 		context.font = "20pt Calibri";
@@ -152,6 +153,8 @@
 		canvas.addEventListener('mousedown', handleMouseDown, false);
 		canvas.addEventListener('mousemove', handleMouseMove, false);
 		canvas.addEventListener('mouseup', handleMouseUp, false);
+		
+		[g_root, g_sprite, g_animation] = createRoomScene(context);
 		
 		animate(window.performance.now(), canvas, context);
 	};

@@ -1,4 +1,4 @@
-function createRoomScene() {
+function createRoomScene(context) {
 	'use strict';
 
 	var image = new Image();
@@ -23,7 +23,8 @@ function createRoomScene() {
 	root.mouseHandler.addHandler(foreground);
 	
 	var sprite = createSpriteNode(new Size(150, 300), image, new Rect(30, 30, 100, 200));
-	sprite.pos = new Pos(350, 300);
+	sprite.pos = new Pos(350, 670);
+	sprite.anchor = new Point(0, 1.0);
 	var animation = new FrameAnimation(0.4);
 	animation.addFrame(new Rect(30, 30, 100, 200));
 	animation.addFrame(new Rect(155, 30, 100, 200));
@@ -31,17 +32,12 @@ function createRoomScene() {
 	animation.addFrame(new Rect(442, 30, 100, 200));
 	foreground.renderable.addChild(sprite);
 	
-	var button = createButtonNode(new Size(215, 72), buttonImg);
+	var buttonEffects = [new JumpingLabel(2, 2), new ChangingColor('#382A1D', '#810C05', '#38503A')];
+	var button = createButtonNode(context, new Size(215, 72), buttonImg, buttonEffects);
 	button.pos = new Pos(590, 100);
-	button.mouseHandler.setLabelColor(ButtonState.ACTIVE, '#382A1D');
-	button.mouseHandler.setLabelColor(ButtonState.PRESSED, '#810C05');
-	button.mouseHandler.setLabelColor(ButtonState.HOVERED, '#38503A');
-	
 	var label = button.label;
 	label.text = 'Rausgehen';
-	label.font = new Font('Comic Sans MS', '24pt', '900', 'italic');
-//	label.color = '#382A1D';
-	
+	label.font = new Font('Comic Sans MS', 24, '900', 'italic');
 	foreground.renderable.addChild(button);
 	foreground.mouseHandler.addHandler(button);
 	
