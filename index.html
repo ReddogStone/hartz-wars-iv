@@ -1,0 +1,164 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<script src="engine/utils.js" type="text/javascript;version=1.8"></script>
+<script src="engine/vectorutils.js" type="text/javascript;version=1.8"></script>
+<script src="engine/loc.js" type="text/javascript;version=1.8"></script>
+<script src="engine/node.js" type="text/javascript;version=1.8"></script>
+<script src="engine/renderlist.js" type="text/javascript;version=1.8"></script>
+<script src="engine/scene.js" type="text/javascript;version=1.8"></script>
+<script src="engine/camera.js" type="text/javascript;version=1.8"></script>
+<script src="engine/clock.js" type="text/javascript;version=1.8"></script>
+<script src="engine/sprite.js" type="text/javascript;version=1.8"></script>
+<script src="engine/frameanimation.js" type="text/javascript;version=1.8"></script>
+<script src="engine/button.js" type="text/javascript;version=1.8"></script>
+<script src="engine/label.js" type="text/javascript;version=1.8"></script>
+
+<script src="game/roomscene.js" type="text/javascript;version=1.8"></script>
+
+<script type="text/javascript;version=1.8">
+	'use strict';
+	
+	window.requestAnimFrame = (function () {
+		return window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function(callback){
+				window.setTimeout(callback, 1000 / 60);
+			};
+	}) ();
+
+    var g_canvas;
+
+	var g_fps = 0;
+	var g_frames = 0;
+	var g_framesTime = 0.0;
+	
+	var g_mouse = {x: 0, y: 0, down: false};
+	
+	var g_camera;
+	var g_clock = new Clock(new Date());
+	
+	var [g_root, g_sprite, g_animation] = createRoomScene();
+	
+	function animate(lastTime, canvas, context){
+		// update
+		var time = window.performance.now();
+		var timeDiff = (time - lastTime) * 0.001;
+		lastTime = time;
+		
+		// update fps
+		g_framesTime += timeDiff;
+		g_frames++;
+		if (g_framesTime > 1.0) {
+			g_framesTime -= 1.0;
+			g_fps = g_frames;
+			g_frames = 0;
+		}
+		
+		// update
+		g_clock.advance(10 * timeDiff / 60);
+		g_animation.update(timeDiff);
+		g_animation.apply(g_sprite.renderable.sourceRect);
+		
+        var worldMousePos = g_camera.screenToWorld(g_mouse);
+
+		// clear
+		context.fillStyle = "#003000";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		
+		// draw scene
+		g_root.renderable.render(g_root, context);
+		
+		// draw fps
+		context.font = "20pt Calibri";
+		context.fillStyle = "#FF0000";
+		context.strokeStyle = "#FF0000";
+		context.lineWidth = 1;
+		var fpsText = "FPS: " + g_fps;
+		context.fillText(fpsText, 5, 25);
+		
+		// draw mouse coordinates
+		var mouseText = g_mouse.x + "," + g_mouse.y;
+		context.fillText(mouseText, 900, 25);
+		
+		// draw clock
+		context.fillStyle = "#000000";
+		context.fillText(g_clock.toString(), 712, 752);
+		context.fillStyle = "#FFFFFF";
+		context.fillText(g_clock.toString(), 710, 750);
+		
+		// request new frame
+		requestAnimFrame(function(){
+			animate(lastTime, canvas, context);
+		});
+	}
+
+    function extractMouseCoords(canvas, evt){
+        // get canvas position
+        var obj = canvas;
+        var top = 0;
+        var left = 0;
+        while (obj && obj.tagName != 'BODY') {
+            top += obj.offsetTop;
+            left += obj.offsetLeft;
+            obj = obj.offsetParent;
+        }
+
+        // return relative mouse position
+        var mouseX = evt.clientX - left + window.pageXOffset;
+        var mouseY = evt.clientY - top + window.pageYOffset;
+        return {
+            x: mouseX,
+            y: mouseY
+        };
+    }
+
+	function handleMouseDown(event) {
+		var coords = extractMouseCoords(g_canvas, event);
+		g_mouse.x = coords.x;
+		g_mouse.y = coords.y;
+		g_mouse.down = true;
+
+		g_root.mouseHandler.mouseDown(g_root, g_mouse);
+	}
+
+	function handleMouseUp(event) {
+		var coords = extractMouseCoords(g_canvas, event);
+		g_mouse.x = coords.x;
+		g_mouse.y = coords.y;
+		g_mouse.down = false;
+		
+		g_root.mouseHandler.mouseUp(g_root, g_mouse);
+	}
+
+	function handleMouseMove(event) {
+		var coords = extractMouseCoords(g_canvas, event);
+		g_mouse.x = coords.x;
+		g_mouse.y = coords.y;
+		
+		g_root.mouseHandler.mouseMove(g_root, g_mouse);
+	}
+
+	window.onload = function() {
+		g_canvas = document.getElementById("myCanvas");
+        var canvas = g_canvas;
+		var context = canvas.getContext("2d");
+
+		g_camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
+		
+		canvas.addEventListener('mousedown', handleMouseDown, false);
+		canvas.addEventListener('mousemove', handleMouseMove, false);
+		canvas.addEventListener('mouseup', handleMouseUp, false);
+		
+		animate(window.performance.now(), canvas, context);
+	};
+
+</script>
+</head>
+<body>
+	<canvas id="myCanvas" width="1024" height="768"></canvas>
+</body>
+</html>
