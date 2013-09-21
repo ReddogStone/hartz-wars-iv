@@ -3,32 +3,33 @@
 function MouseDispatcher() {
 	this.handlers = [];
 }
-MouseDispatcher.prototype.addHandler = function(handler) {
-	this.handlers.unshift(handler);
-};
-MouseDispatcher.prototype.removeHandler = function(handler) {
-	this.handlers.remove(handler);
-};
-MouseDispatcher.prototype.mouseDown = function(node, event) {
-	this.handlers.some(function(element, index, array) {
-		return !element.mouseHandler.mouseDown(element, event);
-	});
-};
-MouseDispatcher.prototype.mouseUp = function(node, event) {
-	this.handlers.some(function(element, index, array) {
-		return element.mouseHandler.mouseUp(element, event);
-	});
-};
-MouseDispatcher.prototype.mouseMove = function(node, event) {
-	this.handlers.some(function(element, index, array) {
-		return element.mouseHandler.mouseMove(element, event);
-	});
-};
+MouseDispatcher.extends(Object, {
+	addHandler: function(handler) {
+		this.handlers.unshift(handler);
+	},
+	removeHandler: function(handler) {
+		this.handlers.remove(handler);
+	},
+	mouseDown: function(event) {
+		this.handlers.some(function(element, index, array) {
+			return !element.mouseHandler.mouseDown(event);
+		});
+	},
+	mouseUp: function(event) {
+		this.handlers.some(function(element, index, array) {
+			return element.mouseHandler.mouseUp(event);
+		});
+	},
+	mouseMove: function(event) {
+		this.handlers.some(function(element, index, array) {
+			return element.mouseHandler.mouseMove(event);
+		});
+	}
+});
 
-function createSceneNode() {
-	var node = new Node();
-	node.debug = 'Scene';
-	node.mouseHandler = new MouseDispatcher();
-	node.renderable = new RenderList();
-	return node;
+function Scene() {
+	Node.apply(this);
+	
+	this.mouseHandler = new MouseDispatcher();
 }
+Scene.extends(Node);

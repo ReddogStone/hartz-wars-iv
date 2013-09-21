@@ -62,7 +62,7 @@
 		// update
 		g_clock.advance(10 * timeDiff / 60);
 		g_animation.update(timeDiff);
-		g_animation.apply(g_sprite.renderable.sourceRect);
+		g_animation.apply(g_sprite.sourceRect);
 		
         var worldMousePos = g_camera.screenToWorld(g_mouse);
 
@@ -71,7 +71,7 @@
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
 		// draw scene
-		RenderUtils.renderNode(g_root, context);
+		g_root.render(context);
 		
 		// draw fps
 		context.font = "20pt Calibri";
@@ -123,7 +123,7 @@
 		g_mouse.y = coords.y;
 		g_mouse.down = true;
 
-		g_root.mouseHandler.mouseDown(g_root, g_mouse);
+		g_root.mouseHandler.mouseDown(g_mouse);
 	}
 
 	function handleMouseUp(event) {
@@ -132,7 +132,7 @@
 		g_mouse.y = coords.y;
 		g_mouse.down = false;
 		
-		g_root.mouseHandler.mouseUp(g_root, g_mouse);
+		g_root.mouseHandler.mouseUp(g_mouse);
 	}
 
 	function handleMouseMove(event) {
@@ -140,7 +140,7 @@
 		g_mouse.x = coords.x;
 		g_mouse.y = coords.y;
 		
-		g_root.mouseHandler.mouseMove(g_root, g_mouse);
+		g_root.mouseHandler.mouseMove(g_mouse);
 	}
 
 	window.onload = function() {

@@ -11,31 +11,28 @@ Font.prototype.toString = function() {
 };
 
 function Label(context, text, font, color) {
+	Node.apply(this);
+	
 	this._context = context;
 	this.text = text || '';
 	
 	this.font = font || new Font();
 	this.color = color || '#000000';
 	
-	Object.defineProperty(this, 'size', {get: this._getSize});
+	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize});
 }
-Label.prototype._getSize = function() {
-	this._context.font = this.font.toString();
-	var sx = this._context.measureText(this.text).width;
-	var sy = this.font.size;
-	return new Size(sx, sy);
-};
-Label.prototype.render = function(node, context) {
-	context.font = this.font.toString();
-	context.fillStyle = this.color;
-	context.textAlign = 'start';
-	var sy = this.font.size;
-	context.fillText(this.text, 0, sy);
-};
-
-function createLabelNode(text, font, color) {
-	var node = new Node();
-	node.renderable = new Label(text, font, color);
-	node.debug = 'Label';
-	return node;
-}
+Label.extends(Node, {
+	getSize: function() {
+		this._context.font = this.font.toString();
+		var sx = this._context.measureText(this.text).width;
+		var sy = this.font.size;
+		return new Size(sx, sy);
+	},
+	renderSelf: function(context) {
+		context.font = this.font.toString();
+		context.fillStyle = this.color;
+		context.textAlign = 'start';
+		var sy = this.font.size;
+		context.fillText(this.text, 0, sy);
+	}
+});
