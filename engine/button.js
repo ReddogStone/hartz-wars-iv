@@ -13,7 +13,7 @@ function JumpingLabel(offsetX, offsetY) {
 }
 JumpingLabel.prototype.apply = function(button) {
 	var state = button.getState();
-	var offset = button._labelOffset;
+	var offset = button.getLabelOffset();
 	if (state == ButtonState.PRESSED) {
 		offset.x = this.offsetX;
 		offset.y = this.offsetY;
@@ -59,15 +59,28 @@ ChangingFrames.prototype.setRect = function(state, value) {
 function Button(context, size, texture, effects) {
 	Node.apply(this);
 	
-	this._sprite = new Sprite(size, texture);
+	var sprite = new Sprite(size, texture);
+	
 	var label = new Label(context);
-	label.align = 'center';
-	this.label = label;
-	var labelSize = label.size;
-	this._labelOffset = new Point();
+	label.anchor = new Point(0.5, 0.5);
+	label.pos = new Pos(0.5 * size.x, 0.5 * size.y);
+	
+	var labelOffsetter = new Node();
+	labelOffsetter.addChild(label);
 	
 	this._enabled = true;
 	this._state = ButtonState.ACTIVE;
+	
+	this.parent.size = size;
+	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize, set: this.setSize});
+	
+	this.mouseHandler = this;
+	this.addChild(sprite);
+	this.addChild(labelOffsetter);
+	
+	this.label = label;
+	this._sprite = sprite;
+	this._labelOffsetter = labelOffsetter;
 	
 	this._effects = [];
 	if (effects) {
@@ -78,10 +91,8 @@ function Button(context, size, texture, effects) {
 		this.addEffect(new ChangingColor('#000000', '#0000FF', '#FF0000', '#909090'));
 	}
 	
-	this.parent.size = size;
-	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize, set: this.setSize});
-	
-	this.mouseHandler = this;
+	this.onPressed = null;
+	this.onReleased = null;
 }
 Button.extends(Node, {
 	_adjust: function() {
@@ -106,6 +117,9 @@ Button.extends(Node, {
 	getSize: function() {
 		return this.parent.size;
 	},
+	getLabelOffset: function() {
+		return this._labelOffsetter.pos;
+	},
 	setSize: function(value) {
 		this.parent.size = value;
 		this._sprite.setSize(value);
@@ -113,7 +127,9 @@ Button.extends(Node, {
 	setEnabled: function(value) {
 		this._enabled = value;
 	},
-	// METHODS	
+	setLabelOffset: function(value) {
+		this._labelOffsetter.pos = clonePos(value);
+	},
 	addEffect: function(effect) {
 		this._effects.push(effect);
 		this._adjust();
@@ -121,6 +137,9 @@ Button.extends(Node, {
 	mouseDown: function(event) {
 		if (this._enabled && this.getRect().containsPoint(event)) {
 			this._setState(ButtonState.PRESSED);
+			if (this.onPressed) {
+				this.onPressed();
+			}
 		}
 	},
 	mouseUp: function(event) {
@@ -129,6 +148,9 @@ Button.extends(Node, {
 				this._setState(ButtonState.HOVERED);
 			} else {
 				this._setState(ButtonState.ACTIVE);
+			}
+			if (this.onReleased) {
+				this.onReleased();
 			}
 		}
 	},
@@ -143,22 +165,4 @@ Button.extends(Node, {
 			}
 		}
 	},
-	renderSelf: function(context) {
-		var sprite = this._sprite;
-		var label = this.label;
-		var size = this.size;
-		var labelSize = label.size;
-		var labelOff = this._labelOffset;
-		var labelPos = Vec.add(Vec.mul(Vec.sub(size, labelSize), 0.5), labelOff);
-		sprite.render(context);
-		
-		context.save();
-		RenderUtils.transform(context, labelPos);
-
-	//	context.fillRect(0, 0, labelSize.x, labelSize.y);
-		
-		label.render(context);
-		
-		context.restore();
-	}
 });
