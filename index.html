@@ -42,7 +42,7 @@
 	var g_camera;
 	var g_clock = new Clock(new Date());
 	
-	var g_root, g_sprite, g_animation;
+	var g_root;
 	
 	function animate(lastTime, canvas, context){
 		// update
@@ -61,8 +61,7 @@
 		
 		// update
 		g_clock.advance(10 * timeDiff / 60);
-		g_animation.update(timeDiff);
-		g_animation.apply(g_sprite.sourceRect);
+		g_root.update(timeDiff);
 		
         var worldMousePos = g_camera.screenToWorld(g_mouse);
 
@@ -154,7 +153,7 @@
 		canvas.addEventListener('mousemove', handleMouseMove, false);
 		canvas.addEventListener('mouseup', handleMouseUp, false);
 		
-		[g_root, g_sprite, g_animation] = createRoomScene(context);
+		g_root = createRoomScene(context);
 		
 		animate(window.performance.now(), canvas, context);
 	};

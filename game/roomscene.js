@@ -25,11 +25,12 @@ function createRoomScene(context) {
 	var sprite = new Sprite(new Size(150, 300), image, new Rect(30, 30, 100, 200));
 	sprite.pos = new Pos(350, 670);
 	sprite.anchor = new Point(0, 1.0);
-	var animation = new FrameAnimation(0.4);
+	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
 	animation.addFrame(new Rect(30, 30, 100, 200));
 	animation.addFrame(new Rect(155, 30, 100, 200));
 	animation.addFrame(new Rect(292, 30, 100, 200));
 	animation.addFrame(new Rect(442, 30, 100, 200));
+	sprite.action = animation;
 	foreground.addChild(sprite);
 	
 	var buttonEffects = [new JumpingLabel(2, 2), new ChangingColor('#382A1D', '#810C05', '#38503A')];
@@ -41,5 +42,5 @@ function createRoomScene(context) {
 	foreground.addChild(button);
 	foreground.mouseHandler.addHandler(button);
 	
-	return [root, sprite, animation];
+	return root;
 };

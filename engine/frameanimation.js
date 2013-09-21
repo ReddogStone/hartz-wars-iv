@@ -1,9 +1,10 @@
 'use strict';
 
-function FrameAnimation(frameTime) {
+function FrameAnimation(frameTime, selector) {
 	this.frameTime = frameTime || 1;
 	this.frames = [];
 	this.time = 0;
+	this.selector = selector;
 }
 FrameAnimation.prototype = {
 	addFrame: function(rect) {
@@ -15,6 +16,9 @@ FrameAnimation.prototype = {
 		while (this.time > totalTime) {
 			this.time -= totalTime;
 		}
+		
+		var rect = this.selector();
+		this.apply(rect);
 	},
 	apply: function(rect) {
 		var frameIndex = Math.floor(this.time / this.frameTime);

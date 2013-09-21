@@ -41,5 +41,22 @@ Node.extends(Object, {
 			element.render(context);
 		});
 		context.restore();
-	}	
+	},
+	update: function(deltaTime) {
+		if (this.updateSelf) {
+			this.updateSelf(deltaTime);
+		}
+		
+		var action = this.action;
+		if (action) {
+			action.update(deltaTime);
+			if (action.finished) {
+				this.action = null;
+			}
+		}
+	
+		this.children.forEach(function(element, index, array) {
+			element.update(deltaTime);
+		});
+	}
 })
