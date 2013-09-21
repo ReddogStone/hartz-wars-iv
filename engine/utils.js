@@ -6,3 +6,6 @@ Array.prototype.remove = function(element) {
 		this.splice(index, 1);
 	}
 }
+Array.prototype.clear = function() {
+	this.splice(0, this.length);
+}

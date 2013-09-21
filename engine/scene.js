@@ -10,18 +10,18 @@ MouseDispatcher.prototype.removeHandler = function(handler) {
 	this.handlers.remove(handler);
 };
 MouseDispatcher.prototype.mouseDown = function(node, event) {
-	this.handlers.every(function(element, index, array) {
+	this.handlers.some(function(element, index, array) {
 		return !element.mouseHandler.mouseDown(element, event);
 	});
 };
 MouseDispatcher.prototype.mouseUp = function(node, event) {
-	this.handlers.every(function(element, index, array) {
-		return !element.mouseHandler.mouseUp(element, event);
+	this.handlers.some(function(element, index, array) {
+		return element.mouseHandler.mouseUp(element, event);
 	});
 };
 MouseDispatcher.prototype.mouseMove = function(node, event) {
-	this.handlers.every(function(element, index, array) {
-		return !element.mouseHandler.mouseMove(element, event);
+	this.handlers.some(function(element, index, array) {
+		return element.mouseHandler.mouseMove(element, event);
 	});
 };
 

@@ -7,30 +7,79 @@ var ButtonState = {
 	INACTIVE: {name: 'INACTIVE', index: 3},
 };
 
-function Button(sprite) {
+function JumpingLabel(offsetX, offsetY) {
+	this.offsetX = offsetX;
+	this.offsetY = offsetY;
+	this._applied = false;
+}
+JumpingLabel.prototype.apply = function(button) {
+	var state = button.state();
+	var pos = button._labelPos;
+	if (state == ButtonState.PRESSED) {
+		pos.x += this.offsetX;
+		pos.y += this.offsetY;
+		this.applied = true;
+	} else if (this.applied) {
+		pos.x -= this.offsetX;
+		pos.y -= this.offsetY;
+	}
+};
+
+function ChangingColor(active, pressed, hovered, inactive) {
+	this._colors = [active, pressed, hovered, inactive];
+}
+ChangingColor.prototype.apply = function(button) {
+	var state = button.state();
+	var color = this._colors[state.index];
+	if (!color) {
+		color = this._colors[ButtonState.ACTIVE.index];
+	}
+	if (color) {
+		button._label.color = color;
+	}
+};
+ChangingColor.prototype.setColor = function(state, value) {
+	this._colors[state.index] = value;
+};
+
+function ChangingFrames(active, pressed, hovered, inactive) {
+	this._rects = [active, pressed, hovered, inactive];
+}
+ChangingFrames.prototype.apply = function(button) {
+	var state = button.state();
+	var rect = this._rects[state.index];
+	if (!rect) {
+		rect = this._rects[ButtonState.ACTIVE.index];
+	}
+	if (rect) {
+		button._sprite.sourceRect = rect;
+	}
+};
+ChangingFrames.prototype.setRect = function(state, value) {
+	this._rects[state.index] = value;
+};
+
+function Button(size, texture) {
+	this._sprite = new Sprite(size, texture);
+	var label = new Label();
+	label.align = 'center';
+	this._label = label;
+	this._labelPos = new Pos(0.5 * size.sx, 0.5 * size.sy);
+	
 	this._enabled = true;
 	this._state = ButtonState.ACTIVE;
-	
-	var activeRect = sprite.sourceRect;
-	this._rects = new Array(activeRect, null, null, null);
-	this._colors = new Array('#FFFFFF', null, null, null);
-	
-	this._adjust(sprite);
+	this.effects = [];
 }
 
 // PRIVATE
-Button.prototype._adjust = function(node) {
-	var state = this.state();
-	if (node.sprite) {
-		node.sprite.sourceRect = this._rect();
-	}
-	if (node.label) {
-		node.label.color = this._color();
-	}
+Button.prototype._adjust = function() {
+	this.effects.forEach(function(element, index, array) {
+		element.apply(this);
+	}, this);
 };
-Button.prototype._setState = function(value, node) {
+Button.prototype._setState = function(value) {
 	this._state = value;
-	this._adjust(node);
+	this._adjust();
 };
 Button.prototype._rect = function() {
 	var stateIndex = this.state().index;
@@ -63,73 +112,70 @@ Button.prototype.pressed = function() {
 	return this._pressed;
 };
 // SETTERS	
-Button.prototype.setRect = function(state, value) {
-	this._rects[state.index] = value;
-};
-Button.prototype.setLabelColor = function(state, value) {
-	this._colors[state.index] = value;
-};
 Button.prototype.setEnabled = function(value) {
 	this._enabled = value;
+	this._setState(ButtonState.INACTIVE);
+};
+Button.prototype.addEffect = function(effect) {
+	this.effects.push(effect);
+	this._adjust();
 };
 // METHODS	
 Button.prototype.mouseDown = function(node, event) {
 	if (this._enabled && node.getRect().containsPoint(event)) {
-		this._setState(ButtonState.PRESSED, node);
-		if (node.label) {
-			node.renderable.children[1].pos.x += 2;
-			node.renderable.children[1].pos.y += 2;
-		}
+		this._setState(ButtonState.PRESSED);
 	}
 };
 Button.prototype.mouseUp = function(node, event) {
 	if (this._enabled) {
 		if (node.getRect().containsPoint(event)) {
-			this._setState(ButtonState.HOVERED, node);
+			this._setState(ButtonState.HOVERED);
 		} else {
-			this._setState(ButtonState.ACTIVE, node);
+			this._setState(ButtonState.ACTIVE);
 		}
-		if (node.label) {
-			node.renderable.children[1].pos.x -= 2;
-			node.renderable.children[1].pos.y -= 2;
-		}			
 	}
 };
 Button.prototype.mouseMove = function(node, event) {
 	if (this._enabled) {
 		if (node.getRect().containsPoint(event)) {
 			if (this._state == ButtonState.ACTIVE) {
-				this._setState(ButtonState.HOVERED, node);
+				this._setState(ButtonState.HOVERED);
 			}
 		} else if (this._state == ButtonState.HOVERED) {
-			this._setState(ButtonState.ACTIVE, node);
+			this._setState(ButtonState.ACTIVE);
 		}
 	}
 };
+Button.prototype.render = function(node, context) {
+	var sprite = this._sprite;
+	var label = this._label;
+	var labelPos = this._labelPos;
+	sprite.render(node, context);
+	
+	context.save();
+	RenderUtils.transform(context, labelPos);
+	label.render(node, context);
+	context.restore();
+}
 
-function createButtonNode(size, texture) {
+function createButtonNode(size, texture, effects) {
 	var node = new Node();
 	
-	var renderList = new RenderList;
+	var button = new Button(size, texture);
+	if (effects) {
+		effects.forEach(function(element, index, array) {
+			button.addEffect(element);
+		});
+	} else {
+		button.addEffect(new ChangingColor('#000000', '#0000FF', '#FF0000', '#909090'));
+	}
 	
-	var spriteNode = createSpriteNode(size, texture);
-	var sprite = spriteNode.renderable;
-	renderList.addChild(spriteNode);
-	node.sprite = sprite;
-
-	var labelNode = createLabelNode();
-	var label = labelNode.renderable;
-	labelNode.pos = new Pos(0.5 * size.sx, 0.5 * size.sy + 10);
-	label.align = 'center';
-	renderList.addChild(labelNode);
-	node.label = label;
-	
-	var button = new Button(sprite);
+	node.renderable = button;
 	node.mouseHandler = button;
 	node.size = cloneSize(size);
-	node.renderable = renderList;
+	node.label = button._label;
 	
-	node.debug = 'Button';	
+	node.debug = 'Button';
 	
 	return node;
 }
