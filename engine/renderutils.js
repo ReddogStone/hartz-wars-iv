@@ -7,13 +7,20 @@ var RenderUtils = (function() {
 	}
 	
 	function renderNode(node, context) {
-		if (node.renderable) {
+		var renderable = node.renderable;
+		if (renderable) {
 			var pos = node.pos;
+			var anchor = node.anchor;
+			var size = renderable.size;
+			if (size) {
+				pos = new Pos(pos.x - anchor.x * size.x, pos.y - anchor.y * size.y);
+			}
+			
 			context.save();
 			context.translate(pos.x, pos.y);
 			context.rotate(pos.rot);
 			
-			node.renderable.render(node, context);
+			renderable.render(node, context);
 			
 			context.restore();
 		}

@@ -18,11 +18,11 @@ function clonePoint(value) {
 }
 
 function Size(sx, sy) {
-	this.sx = sx || 0;
-	this.sy = sy || 0;
+	this.x = sx || 0;
+	this.y = sy || 0;
 }
 function cloneSize(value) {
-	return value ? new Size(value.sx, value.sy) : new Size();
+	return value ? new Size(value.x, value.y) : new Size();
 }
 
 function Rect(x, y, sx, sy) {

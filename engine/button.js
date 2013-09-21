@@ -10,18 +10,15 @@ var ButtonState = {
 function JumpingLabel(offsetX, offsetY) {
 	this.offsetX = offsetX;
 	this.offsetY = offsetY;
-	this._applied = false;
 }
 JumpingLabel.prototype.apply = function(button) {
 	var state = button.state();
-	var pos = button._labelPos;
+	var offset = button._labelOffset;
 	if (state == ButtonState.PRESSED) {
-		pos.x += this.offsetX;
-		pos.y += this.offsetY;
-		this.applied = true;
-	} else if (this.applied) {
-		pos.x -= this.offsetX;
-		pos.y -= this.offsetY;
+		offset.x = this.offsetX;
+		offset.y = this.offsetY;
+	} else {
+		Vec.setZero(offset);
 	}
 };
 
@@ -59,16 +56,20 @@ ChangingFrames.prototype.setRect = function(state, value) {
 	this._rects[state.index] = value;
 };
 
-function Button(size, texture) {
+function Button(context, size, texture) {
 	this._sprite = new Sprite(size, texture);
-	var label = new Label();
+	var label = new Label(context);
 	label.align = 'center';
 	this._label = label;
-	this._labelPos = new Pos(0.5 * size.sx, 0.5 * size.sy);
+	var labelSize = label.size;
+	this._labelOffset = new Point();
 	
 	this._enabled = true;
 	this._state = ButtonState.ACTIVE;
 	this.effects = [];
+	
+	this._size = size;
+	Object.defineProperty(this, 'size', {get: this._getSize, set: this._setSize});
 }
 
 // PRIVATE
@@ -97,6 +98,18 @@ Button.prototype._color = function() {
 		return this._colors[ButtonState.ACTIVE.index];
 	}
 };
+Button.prototype._getSize = function() {
+	return this._size;
+};
+Button.prototype._setSize = function(value) {
+	this._size = value;
+	this._sprite.size = value;
+};
+Button.prototype._getRect = function(node) {
+	var pos = node.pos;
+	var size = this._size;
+	return new Rect(pos.x, pos.y, size.x, size.y);
+}
 // GETTERS
 Button.prototype.state = function() {
 	if (this._enabled) {
@@ -122,13 +135,13 @@ Button.prototype.addEffect = function(effect) {
 };
 // METHODS	
 Button.prototype.mouseDown = function(node, event) {
-	if (this._enabled && node.getRect().containsPoint(event)) {
+	if (this._enabled && this._getRect(node).containsPoint(event)) {
 		this._setState(ButtonState.PRESSED);
 	}
 };
 Button.prototype.mouseUp = function(node, event) {
 	if (this._enabled) {
-		if (node.getRect().containsPoint(event)) {
+		if (this._getRect(node).containsPoint(event)) {
 			this._setState(ButtonState.HOVERED);
 		} else {
 			this._setState(ButtonState.ACTIVE);
@@ -137,7 +150,7 @@ Button.prototype.mouseUp = function(node, event) {
 };
 Button.prototype.mouseMove = function(node, event) {
 	if (this._enabled) {
-		if (node.getRect().containsPoint(event)) {
+		if (this._getRect(node).containsPoint(event)) {
 			if (this._state == ButtonState.ACTIVE) {
 				this._setState(ButtonState.HOVERED);
 			}
@@ -149,19 +162,26 @@ Button.prototype.mouseMove = function(node, event) {
 Button.prototype.render = function(node, context) {
 	var sprite = this._sprite;
 	var label = this._label;
-	var labelPos = this._labelPos;
+	var size = this._size;
+	var labelSize = label.size;
+	var labelOff = this._labelOffset;
+	var labelPos = Vec.add(Vec.mul(Vec.sub(size, labelSize), 0.5), labelOff);
 	sprite.render(node, context);
 	
 	context.save();
 	RenderUtils.transform(context, labelPos);
+
+//	context.fillRect(0, 0, labelSize.x, labelSize.y);
+	
 	label.render(node, context);
+	
 	context.restore();
 }
 
-function createButtonNode(size, texture, effects) {
+function createButtonNode(context, size, texture, effects) {
 	var node = new Node();
 	
-	var button = new Button(size, texture);
+	var button = new Button(context, size, texture);
 	if (effects) {
 		effects.forEach(function(element, index, array) {
 			button.addEffect(element);
@@ -172,7 +192,6 @@ function createButtonNode(size, texture, effects) {
 	
 	node.renderable = button;
 	node.mouseHandler = button;
-	node.size = cloneSize(size);
 	node.label = button._label;
 	
 	node.debug = 'Button';

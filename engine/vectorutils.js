@@ -7,6 +7,10 @@ Vec.make = function(v) {
 Vec.create = function(x, y) {
     return {x: x, y: y};
 };
+Vec.setZero = function(v) {
+	v.x = 0.0;
+	v.y = 0.0;
+};
 Vec.set = function(v, value) {
 	v.x = value.x;
 	v.y = value.y;
