@@ -6,8 +6,14 @@ function Node() {
 	this.size = new Size();
 	
 	this.children = [];
+	this.actions = [];
 }
 Node.extends(Object, {
+	init: function() {
+		this.children.forEach(function(element, index, array) {
+			element.init();
+		});
+	},
 	getRect: function() {
 		var pos = this.pos;
 		var size = this.size;
@@ -21,6 +27,15 @@ Node.extends(Object, {
 	},
 	removeChild: function(child) {
 		this.children.remove(child);
+	},
+	addAction: function(action) {
+		if (action.init) {	
+			action.init();
+		}
+		this.actions.push(action);
+	},
+	removeAction: function(action) {
+		this.actions.remove(action);
 	},
 	render: function(context) {
 		var pos = this.pos;
@@ -47,13 +62,12 @@ Node.extends(Object, {
 			this.updateSelf(deltaTime);
 		}
 		
-		var action = this.action;
-		if (action) {
-			action.update(deltaTime);
-			if (action.finished) {
-				this.action = null;
+		this.actions.forEach(function(element, index, array) {
+			element.update(deltaTime);
+			if (element.finished) {
+				this.actions.splice(index, 1);
 			}
-		}
+		}, this);
 	
 		this.children.forEach(function(element, index, array) {
 			element.update(deltaTime);

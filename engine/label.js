@@ -10,10 +10,11 @@ Font.prototype.toString = function() {
 	return this.style + ' ' + this.weight + ' ' + this.size + 'pt ' + this.family;
 };
 
-function Label(context, text, font, color) {
+function Label(text, font, color) {
 	Node.apply(this);
 	
-	this._context = context;
+	var canvas = document.createElement('canvas');
+	this._context = canvas.getContext('2d');
 	this.text = text || '';
 	
 	this.font = font || new Font();

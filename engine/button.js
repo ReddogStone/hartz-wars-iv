@@ -7,18 +7,26 @@ var ButtonState = {
 	INACTIVE: {name: 'INACTIVE', index: 3},
 };
 
+function GenericButtonEffect(callback) {
+	this.apply = callback;
+}
+
 function JumpingLabel(offsetX, offsetY) {
 	this.offsetX = offsetX;
 	this.offsetY = offsetY;
+	this._applied = false;
 }
 JumpingLabel.prototype.apply = function(button) {
 	var state = button.getState();
 	var offset = button.getLabelOffset();
 	if (state == ButtonState.PRESSED) {
-		offset.x = this.offsetX;
-		offset.y = this.offsetY;
-	} else {
-		Vec.setZero(offset);
+		offset.x += this.offsetX;
+		offset.y += this.offsetY;
+		this._applied = true;
+	} else if (this._applied) {
+		offset.x -= this.offsetX;
+		offset.y -= this.offsetY;
+		this._applied = false;
 	}
 };
 
@@ -33,6 +41,7 @@ ChangingColor.prototype.apply = function(button) {
 	}
 	if (color) {
 		button.label.color = color;
+		button.sprite.color = color;
 	}
 };
 ChangingColor.prototype.setColor = function(state, value) {
@@ -49,19 +58,19 @@ ChangingFrames.prototype.apply = function(button) {
 		rect = this._rects[ButtonState.ACTIVE.index];
 	}
 	if (rect) {
-		button._sprite.sourceRect = rect;
+		button.sprite.sourceRect = rect;
 	}
 };
 ChangingFrames.prototype.setRect = function(state, value) {
 	this._rects[state.index] = value;
 };
 
-function Button(context, size, texture, effects) {
+function Button(size, texture, effects) {
 	Node.apply(this);
 	
 	var sprite = new Sprite(size, texture);
 	
-	var label = new Label(context);
+	var label = new Label();
 	label.anchor = new Point(0.5, 0.5);
 	label.pos = new Pos(0.5 * size.x, 0.5 * size.y);
 	
@@ -71,7 +80,7 @@ function Button(context, size, texture, effects) {
 	this._enabled = true;
 	this._state = ButtonState.ACTIVE;
 	
-	this.parent.size = size;
+	this._size = cloneSize(size);
 	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize, set: this.setSize});
 	
 	this.mouseHandler = this;
@@ -79,7 +88,7 @@ function Button(context, size, texture, effects) {
 	this.addChild(labelOffsetter);
 	
 	this.label = label;
-	this._sprite = sprite;
+	this.sprite = sprite;
 	this._labelOffsetter = labelOffsetter;
 	
 	this._effects = [];
@@ -104,6 +113,9 @@ Button.extends(Node, {
 		this._state = value;
 		this._adjust();
 	},
+	init: function() {
+		this._setState(ButtonState.ACTIVE);
+	},
 	getState: function() {
 		if (this._enabled) {
 			return this._state;
@@ -115,13 +127,13 @@ Button.extends(Node, {
 		return this._enabled;
 	},
 	getSize: function() {
-		return this.parent.size;
+		return this._size;
 	},
 	getLabelOffset: function() {
 		return this._labelOffsetter.pos;
 	},
 	setSize: function(value) {
-		this.parent.size = value;
+		this._size = value;
 		this._sprite.setSize(value);
 	},
 	setEnabled: function(value) {
@@ -140,28 +152,36 @@ Button.extends(Node, {
 			if (this.onPressed) {
 				this.onPressed();
 			}
+			return true;
 		}
 	},
 	mouseUp: function(event) {
 		if (this._enabled) {
 			if (this.getRect().containsPoint(event)) {
 				this._setState(ButtonState.HOVERED);
+				if (this.onClicked) {
+					this.onClicked();
+				}
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}
-			if (this.onReleased) {
-				this.onReleased();
-			}
+			return true;
 		}
 	},
 	mouseMove: function(event) {
 		if (this._enabled) {
 			if (this.getRect().containsPoint(event)) {
 				if (this._state == ButtonState.ACTIVE) {
-					this._setState(ButtonState.HOVERED);
+					if (event.down) {
+						this._setState(ButtonState.PRESSED);
+					} else {
+						this._setState(ButtonState.HOVERED);
+					}
 				}
-			} else if (this._state == ButtonState.HOVERED) {
+				return true;
+			} else {
 				this._setState(ButtonState.ACTIVE);
+				return true;
 			}
 		}
 	},
