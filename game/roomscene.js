@@ -6,9 +6,6 @@ function RoomScene() {
 	var image = new Image();
 	image.src = 'data/walk_anim.png';
 	
-	var buttonImg = new Image();
-	buttonImg.src = 'data/cartoon_button.png';
-	
 	var roomDoorHighlightImg = new Image();
 	roomDoorHighlightImg.src = 'data/room_door_highlight.png';
 	
@@ -38,7 +35,7 @@ function RoomScene() {
 	
 	var buttonEffects = [
 		new JumpingLabel(2, 2), 
-		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(255,255,255,1)'),
+		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,200,0,1)'),
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state != ButtonState.ACTIVE) {
@@ -49,7 +46,7 @@ function RoomScene() {
 		})];
 	var button = new Button(new Size(148, 286), roomDoorHighlightImg, buttonEffects);
 	button.pos = new Pos(630, 152);
-	
+	button.setLabelOffset(0, -50);
 	var self = this;
 	button.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
 	var label = button.label;

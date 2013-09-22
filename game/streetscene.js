@@ -4,10 +4,10 @@ function StreetScene() {
 	Scene.apply(this);
 
 	var bgImg = new Image();
-	bgImg.src = 'http://www.toonpool.com/user/3135/files/a_busy_street_in_india_586455.jpg';
+	bgImg.src = 'data/street_bg.png';
 	
-	var buttonImg = new Image();
-	buttonImg.src = 'data/cartoon_button.png';
+	var homeDoorHighlightImg = new Image();
+	homeDoorHighlightImg.src = 'data/street_home_door_highlight.png';	
 
 	var root = new Scene();
 	
@@ -20,10 +20,22 @@ function StreetScene() {
 	root.addChild(foreground);
 	root.mouseHandler.addHandler(foreground);
 	
-	var buttonEffects = [new JumpingLabel(2, 2), new ChangingColor('#382A1D', '#810C05', '#38503A')];
-	var button = new Button(new Size(215, 72), buttonImg, buttonEffects);
-	button.pos = new Pos(590, 100);
+	var buttonEffects = [
+		new JumpingLabel(2, 2), 
+		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,120,0,1)'),
+		new GenericButtonEffect( function(button) {
+			var state = button.getState();
+			if (state != ButtonState.ACTIVE) {
+				button.sprite.blend = 'screen';
+			} else {
+				button.sprite.blend = 'source-over';
+			}
+		})];
+	var scale = 2.1;
+	var button = new Button(new Size(74 * scale, 153 * scale), homeDoorHighlightImg, buttonEffects);
+	button.pos = new Pos(730, 0);
 	button.onClicked = function() { if (root.onEnterHome) root.onEnterHome(); };
+	button.setLabelOffset(-150, -100);
 	var label = button.label;
 	label.text = 'Reingehen';
 	label.font = new Font('Comic Sans MS', 24, '900', 'italic');

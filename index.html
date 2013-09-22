@@ -160,7 +160,7 @@
 		g_roomScene.onExitToStreet = function() {g_root = g_streetScene; g_root.init();};
 		g_streetScene = new StreetScene(context);
 		g_streetScene.onEnterHome = function() {g_root = g_roomScene; g_root.init();};
-		g_root = g_roomScene;
+		g_root = g_streetScene;
 		
 		
 		animate(window.performance.now(), canvas, context);

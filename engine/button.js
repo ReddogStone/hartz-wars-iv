@@ -139,8 +139,10 @@ Button.extends(Node, {
 	setEnabled: function(value) {
 		this._enabled = value;
 	},
-	setLabelOffset: function(value) {
-		this._labelOffsetter.pos = clonePos(value);
+	setLabelOffset: function(x, y) {
+		var pos = this._labelOffsetter.pos;
+		pos.x = x;
+		pos.y = y;
 	},
 	addEffect: function(effect) {
 		this._effects.push(effect);
