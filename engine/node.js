@@ -4,6 +4,10 @@ function Node() {
 	this.pos = new Pos();
 	this.anchor = new Point();
 	this.size = new Size();
+	this.visible = true;
+	this.selfVisible = true;
+	this.scale = new Size(1, 1);
+	this.alpha = 1.0;
 	
 	this.children = [];
 	this.actions = [];
@@ -17,6 +21,10 @@ Node.extends(Object, {
 	getRect: function() {
 		var pos = this.pos;
 		var size = this.size;
+		var anchor = this.anchor;
+		
+		pos = new Pos(pos.x - anchor.x * size.x, pos.y - anchor.y * size.y);
+		
 		return new Rect(pos.x, pos.y, size.x, size.y);
 	},
 	addChild: function(child) {
@@ -38,17 +46,20 @@ Node.extends(Object, {
 		this.actions.remove(action);
 	},
 	render: function(context) {
-		var pos = this.pos;
-		var anchor = this.anchor;
-		var size = this.size;
-		if (size) {
-			pos = new Pos(pos.x - anchor.x * size.x, pos.y - anchor.y * size.y);
+		if (!this.visible) {
+			return;
 		}
+	
+		var pos = this.pos;
+		var scale = this.scale;
+		var size = this.size;
+		var anchor = this.anchor;
 		
 		context.save();
-		RenderUtils.transform(context, pos);
+		context.globalAlpha = this.alpha;
+		RenderUtils.transform(context, pos, scale, size, anchor);
 		
-		if (this.renderSelf) {
+		if (this.renderSelf && this.selfVisible) {
 			this.renderSelf(context);
 		}		
 		

@@ -36,7 +36,9 @@ function Sprite(size, texture, sourceRect) {
 	
 	this.size = cloneSize(size);
 	this.texture = texture;
-	this.sourceRect = sourceRect || new Rect(0, 0, texture.width, texture.height);
+	var width = texture ? texture.width : 0;
+	var height = texture ? texture.height : 0;
+	this.sourceRect = sourceRect || new Rect(0, 0, width, height);
 	this._bufferCanvas = document.createElement('canvas');
 	this._buffered = false;
 	this._color = null;
@@ -59,38 +61,47 @@ Sprite.extends(Node, {
 			var size = this.size;
 			var operation = context.globalCompositeOperation;
 			var texture = this.texture;
-			
-			if (this.color) {
-				let bufferCanvas = this._bufferCanvas;
-				let width = texture.width;
-				let height = texture.height;
-				if (!this._buffered) {
-					bufferCanvas.width = width;
-					bufferCanvas.height = height;
-					let buffer = bufferCanvas.getContext('2d');
-					
-					buffer.drawImage(texture, 0, 0);
-					let data = buffer.getImageData(0, 0, width, height);
-					let pixelData = data.data;
-					let color = parseColor(this.color);
-					for (let i = 0; i < pixelData.length; i += 4) {
-						let sr = pixelData[i];
-						let sg = pixelData[i + 1];
-						let sb = pixelData[i + 2];
-						let sa = pixelData[i + 3];
-						pixelData[i] = 255 * (sr / 255 * color.red / 255);
-						pixelData[i + 1] = 255 * (sg / 255 * color.green / 255);
-						pixelData[i + 2] = 255 * (sb / 255 * color.blue / 255);
-						pixelData[i + 3] = sa * color.alpha;
-					}
-					buffer.putImageData(data, 0, 0);
-					this._buffered = true;
-				}
-				texture = bufferCanvas;
-			}
 
+			var saveOp = context.globalCompositeOperation;
 			context.globalCompositeOperation = this.blend;
-			context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+			
+			if (texture) {
+				if (this.color) {
+					let bufferCanvas = this._bufferCanvas;
+					let width = texture.width;
+					let height = texture.height;
+					if (!this._buffered) {
+						bufferCanvas.width = width;
+						bufferCanvas.height = height;
+						let buffer = bufferCanvas.getContext('2d');
+						
+						buffer.drawImage(texture, 0, 0);
+						let data = buffer.getImageData(0, 0, width, height);
+						let pixelData = data.data;
+						let color = parseColor(this.color);
+						for (let i = 0; i < pixelData.length; i += 4) {
+							let sr = pixelData[i];
+							let sg = pixelData[i + 1];
+							let sb = pixelData[i + 2];
+							let sa = pixelData[i + 3];
+							pixelData[i] = 255 * (sr / 255 * color.red / 255);
+							pixelData[i + 1] = 255 * (sg / 255 * color.green / 255);
+							pixelData[i + 2] = 255 * (sb / 255 * color.blue / 255);
+							pixelData[i + 3] = sa * color.alpha;
+						}
+						buffer.putImageData(data, 0, 0);
+						this._buffered = true;
+					}
+					texture = bufferCanvas;
+				}
+
+				context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+			} else if (this.color) {
+				context.fillStyle = this.color;
+				context.fillRect(0, 0, size.x, size.y);
+			}
+			
+			context.globalCompositeOperation = saveOp;
 		} catch (e) {
 			throw e;
 		}

@@ -101,7 +101,7 @@ function Button(size, texture, effects) {
 	}
 	
 	this.onPressed = null;
-	this.onReleased = null;
+	this.onClicked = null;
 }
 Button.extends(Node, {
 	_adjust: function() {
@@ -134,7 +134,8 @@ Button.extends(Node, {
 	},
 	setSize: function(value) {
 		this._size = value;
-		this._sprite.setSize(value);
+		this.sprite.size = value;
+		this.label.pos = new Pos(0.5 * value.x, 0.5 * value.y);
 	},
 	setEnabled: function(value) {
 		this._enabled = value;
@@ -164,10 +165,10 @@ Button.extends(Node, {
 				if (this.onClicked) {
 					this.onClicked();
 				}
+				return true;
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}
-			return true;
 		}
 	},
 	mouseMove: function(event) {
@@ -183,7 +184,6 @@ Button.extends(Node, {
 				return true;
 			} else {
 				this._setState(ButtonState.ACTIVE);
-				return true;
 			}
 		}
 	},

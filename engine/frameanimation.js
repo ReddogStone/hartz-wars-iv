@@ -6,7 +6,7 @@ function FrameAnimation(frameTime, selector) {
 	this.time = 0;
 	this.selector = selector;
 }
-FrameAnimation.prototype = {
+FrameAnimation.extends(Object, {
 	addFrame: function(rect) {
 		this.frames.push(rect);
 	},
@@ -28,4 +28,4 @@ FrameAnimation.prototype = {
 		rect.sx = frameRect.sx;
 		rect.sy = frameRect.sy;
 	}
-};
+});

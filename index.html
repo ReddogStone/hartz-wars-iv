@@ -12,6 +12,7 @@
 <script src="engine/clock.js" type="text/javascript;version=1.8"></script>
 <script src="engine/sprite.js" type="text/javascript;version=1.8"></script>
 <script src="engine/frameanimation.js" type="text/javascript;version=1.8"></script>
+<script src="engine/linearaction.js" type="text/javascript;version=1.8"></script>
 <script src="engine/button.js" type="text/javascript;version=1.8"></script>
 <script src="engine/label.js" type="text/javascript;version=1.8"></script>
 
@@ -147,28 +148,27 @@
 
 	window.onload = function() {
 		g_canvas = document.getElementById("myCanvas");
-        var canvas = g_canvas;
-		var context = canvas.getContext("2d");
+		var context = g_canvas.getContext("2d");
 
-		g_camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
+		g_camera = new Camera(-g_canvas.width * 0.5, -g_canvas.height * 0.5, 0, 1, 1);
 		
-		canvas.addEventListener('mousedown', handleMouseDown, false);
-		canvas.addEventListener('mousemove', handleMouseMove, false);
-		canvas.addEventListener('mouseup', handleMouseUp, false);
+		g_canvas.addEventListener('mousedown', handleMouseDown, false);
+		g_canvas.addEventListener('mousemove', handleMouseMove, false);
+		g_canvas.addEventListener('mouseup', handleMouseUp, false);
 		
 		g_roomScene = new RoomScene(context);
 		g_roomScene.onExitToStreet = function() {g_root = g_streetScene; g_root.init();};
 		g_streetScene = new StreetScene(context);
 		g_streetScene.onEnterHome = function() {g_root = g_roomScene; g_root.init();};
-		g_root = g_streetScene;
+		g_root = g_roomScene;
 		
 		
-		animate(window.performance.now(), canvas, context);
+		animate(window.performance.now(), g_canvas, context);
 	};
 
 </script>
 </head>
 <body>
-	<canvas id="myCanvas" width="1024" height="640"></canvas>
+	<canvas id="myCanvas" width="1024" height="768"></canvas>
 </body>
 </html>

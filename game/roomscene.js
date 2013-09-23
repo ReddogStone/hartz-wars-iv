@@ -23,7 +23,7 @@ function RoomScene() {
 	this.mouseHandler.addHandler(foreground);
 	
 	var sprite = new Sprite(new Size(150, 300), image, new Rect(30, 30, 100, 200));
-	sprite.pos = new Pos(350, 600);
+	sprite.pos = new Pos(400, 600);
 	sprite.anchor = new Point(0, 1.0);
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
 	animation.addFrame(new Rect(30, 30, 100, 200));
@@ -31,6 +31,8 @@ function RoomScene() {
 	animation.addFrame(new Rect(292, 30, 100, 200));
 	animation.addFrame(new Rect(442, 30, 100, 200));
 	sprite.addAction(animation);
+	var guy = sprite;
+	sprite.addAction(new LinearAction(100, function(value) {guy.pos.rot = Math.sin(100 * value);} ));
 	foreground.addChild(sprite);
 	
 	var buttonEffects = [
