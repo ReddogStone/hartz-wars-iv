@@ -1,25 +1,26 @@
 ﻿<!DOCTYPE HTML>
 <html>
 <head>
-<script src="engine/utils.js" type="text/javascript;version=1.8"></script>
-<script src="engine/vectorutils.js" type="text/javascript;version=1.8"></script>
-<script src="engine/loc.js" type="text/javascript;version=1.8"></script>
-<script src="engine/renderutils.js" type="text/javascript;version=1.8"></script>
-<script src="engine/node.js" type="text/javascript;version=1.8"></script>
-<script src="engine/renderlist.js" type="text/javascript;version=1.8"></script>
-<script src="engine/scene.js" type="text/javascript;version=1.8"></script>
-<script src="engine/camera.js" type="text/javascript;version=1.8"></script>
-<script src="engine/clock.js" type="text/javascript;version=1.8"></script>
-<script src="engine/sprite.js" type="text/javascript;version=1.8"></script>
-<script src="engine/frameanimation.js" type="text/javascript;version=1.8"></script>
-<script src="engine/linearaction.js" type="text/javascript;version=1.8"></script>
-<script src="engine/button.js" type="text/javascript;version=1.8"></script>
-<script src="engine/label.js" type="text/javascript;version=1.8"></script>
+<script src="engine/utils.js" type="text/javascript;version=1.7"></script>
+<script src="engine/vectorutils.js" type="text/javascript;version=1.7"></script>
+<script src="engine/loc.js" type="text/javascript;version=1.7"></script>
+<script src="engine/renderutils.js" type="text/javascript;version=1.7"></script>
+<script src="engine/node.js" type="text/javascript;version=1.7"></script>
+<script src="engine/renderlist.js" type="text/javascript;version=1.7"></script>
+<script src="engine/scene.js" type="text/javascript;version=1.7"></script>
+<script src="engine/camera.js" type="text/javascript;version=1.7"></script>
+<script src="engine/clock.js" type="text/javascript;version=1.7"></script>
+<script src="engine/sprite.js" type="text/javascript;version=1.7"></script>
+<script src="engine/frameanimation.js" type="text/javascript;version=1.7"></script>
+<script src="engine/linearaction.js" type="text/javascript;version=1.7"></script>
+<script src="engine/button.js" type="text/javascript;version=1.7"></script>
+<script src="engine/label.js" type="text/javascript;version=1.7"></script>
 
-<script src="game/roomscene.js" type="text/javascript;version=1.8"></script>
-<script src="game/streetscene.js" type="text/javascript;version=1.8"></script>
+<script src="game/player.js" type="text/javascript;version=1.7"></script>
+<script src="game/roomscene.js" type="text/javascript;version=1.7"></script>
+<script src="game/streetscene.js" type="text/javascript;version=1.7"></script>
 
-<script type="text/javascript;version=1.8">
+<script type="text/javascript;version=1.7">
 	'use strict';
 	
 	window.requestAnimFrame = (function () {
@@ -47,6 +48,7 @@
 	var g_roomScene;
 	var g_streetScene;
 	var g_root;
+	var g_player;
 	
 	function animate(lastTime, canvas, context){
 		// update
@@ -156,10 +158,20 @@
 		g_canvas.addEventListener('mousemove', handleMouseMove, false);
 		g_canvas.addEventListener('mouseup', handleMouseUp, false);
 		
-		g_roomScene = new RoomScene(context);
-		g_roomScene.onExitToStreet = function() {g_root = g_streetScene; g_root.init();};
-		g_streetScene = new StreetScene(context);
-		g_streetScene.onEnterHome = function() {g_root = g_roomScene; g_root.init();};
+		g_player = new Player();
+		g_roomScene = new RoomScene();
+		g_roomScene.onExitToStreet = function() {
+			g_root = g_streetScene; 
+			g_root.init();
+			var playerBody = g_player.body = g_root.playerBody;
+			playerBody.pos = new Pos(700, 300);
+			playerBody.scale = new Size(0.5, 0.5);
+		};
+		g_streetScene = new StreetScene();
+		g_streetScene.onEnterHome = function() {
+			g_root = g_roomScene; 
+			g_root.init();
+		};
 		g_root = g_roomScene;
 		
 		

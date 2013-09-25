@@ -3,8 +3,8 @@
 function RoomScene() {
 	Scene.apply(this);
 
-	var image = new Image();
-	image.src = 'data/walk_anim.png';
+	var playerImage = new Image();
+	playerImage.src = 'data/walk_anim.png';
 	
 	var roomDoorHighlightImg = new Image();
 	roomDoorHighlightImg.src = 'data/room_door_highlight.png';
@@ -22,7 +22,7 @@ function RoomScene() {
 	this.addChild(foreground);
 	this.mouseHandler.addHandler(foreground);
 	
-	var sprite = new Sprite(new Size(150, 300), image, new Rect(30, 30, 100, 200));
+	var sprite = new Sprite(new Size(150, 300), playerImage, new Rect(30, 30, 100, 200));
 	sprite.pos = new Pos(400, 600);
 	sprite.anchor = new Point(0, 1.0);
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
@@ -31,8 +31,7 @@ function RoomScene() {
 	animation.addFrame(new Rect(292, 30, 100, 200));
 	animation.addFrame(new Rect(442, 30, 100, 200));
 	sprite.addAction(animation);
-	var guy = sprite;
-	sprite.addAction(new LinearAction(100, function(value) {guy.pos.rot = Math.sin(100 * value);} ));
+	this.playerBody = sprite;
 	foreground.addChild(sprite);
 	
 	var buttonEffects = [
