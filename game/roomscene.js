@@ -12,6 +12,9 @@ function RoomScene() {
 	var bgImg = new Image();
 	bgImg.src = 'data/room_bg.png';
 	
+	var progressImg = new Image();
+	progressImg.src = 'data/progress.png';
+	
 	var background = new Scene();
 	this.addChild(background);
 	this.mouseHandler.addHandler(background);
@@ -55,6 +58,60 @@ function RoomScene() {
 	label.font = new Font('Comic Sans MS', 24, '900', 'italic');
 	foreground.addChild(button);
 	foreground.mouseHandler.addHandler(button);
+	
+	var hungerProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
+	hungerProgress.pos = new Pos(200, 650);
+	hungerProgress.setFrameColor('#009000');
+	hungerProgress.setFillColor('#7F0000');
+	hungerProgress.setProgress(0.5);
+	foreground.addChild(hungerProgress);
+	this.hungerProgress = hungerProgress;
+	
+	label = new Label('Hunger', new Font('Comic Sans MS', 14, '900'), '#FFFFFF');
+	label.pos = new Pos(-10, hungerProgress.size.y * 0.5);
+	label.anchor = new Point(1, 0.5);
+	hungerProgress.addChild(label);
+	
+	var energyProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
+	energyProgress.pos = new Pos(400, 650);
+	energyProgress.setFrameColor('#009000');
+	energyProgress.setFillColor('#FFFF00');
+	energyProgress.setProgress(0.5);
+	foreground.addChild(energyProgress);
+	this.energyProgress = energyProgress;
+	
+	label = new Label('Energy', new Font('Comic Sans MS', 14, '900'), '#FFFFFF');
+	label.pos = new Pos(-10, energyProgress.size.y * 0.5);
+	label.anchor = new Point(1, 0.5);
+	energyProgress.addChild(label);
+
+	var funProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
+	funProgress.pos = new Pos(600, 650);
+	funProgress.setFrameColor('#009000');
+	funProgress.setFillColor('#70707F');
+	funProgress.setProgress(0.5);
+	foreground.addChild(funProgress);
+	this.funProgress = funProgress;
+	
+	label = new Label('Fun', new Font('Comic Sans MS', 14, '900'), '#FFFFFF');
+	label.pos = new Pos(-10, funProgress.size.y * 0.5);
+	label.anchor = new Point(1, 0.5);
+	funProgress.addChild(label);	
 }
-RoomScene.extends(Scene);
+RoomScene.extends(Scene, {
+	init: function() {
+		var hunger = this.hungerProgress;
+		hunger.addAction(new LinearAction(10.0, function(value) {
+			hunger.setProgress(value);
+		}));
+		var energy = this.energyProgress;
+		energy.addAction(new LinearAction(10.0, function(value) {
+			energy.setProgress(1.0 - value);
+		}));
+		var fun = this.funProgress;
+		fun.addAction(new LinearAction(10.0, function(value) {
+			fun.setProgress(value);
+		}));
+	}
+});
 	

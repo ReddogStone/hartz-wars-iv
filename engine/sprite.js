@@ -59,7 +59,6 @@ Sprite.extends(Node, {
 		try {
 			var sRect = this.sourceRect;
 			var size = this.size;
-			var operation = context.globalCompositeOperation;
 			var texture = this.texture;
 
 			var saveOp = context.globalCompositeOperation;

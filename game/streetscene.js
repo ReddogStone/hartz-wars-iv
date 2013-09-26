@@ -2,7 +2,7 @@
 
 function StreetScene() {
 	Scene.apply(this);
-
+	
 	var playerImage = new Image();
 	playerImage.src = 'data/walk_anim.png';
 	
@@ -13,7 +13,7 @@ function StreetScene() {
 	homeDoorHighlightImg.src = 'data/street_home_door_highlight.png';
 	
 	var mapImg = new Image();
-	mapImg.src = 'http://thumb1.shutterstock.com/display_pic_with_logo/623560/623560,1315411594,2/stock-vector-editable-vector-street-map-of-a-generic-city-with-push-pins-all-d-buildings-arrows-and-push-pins-84206464.jpg';
+	mapImg.src = 'data/map.png';
 
 	var background = new Scene();	
 	background.addChild(new Sprite(new Size(1024, 640), bgImg));
@@ -30,7 +30,7 @@ function StreetScene() {
 	this.addChild(mapOverlay);
 	this.mouseHandler.addHandler(mapOverlay);
 	
-	var sprite = new Sprite(new Size(450, 470), mapImg);
+	var sprite = new Sprite(new Size(800, 598), mapImg);
 	sprite.anchor = new Point(0.5, 0.5);
 	sprite.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
 	mapOverlay.addChild(sprite);
@@ -50,7 +50,7 @@ function StreetScene() {
 		})];
 
 	var button = new Button(new Size(0, 0), undefined, buttonEffects);
-	button.pos = new Pos(sprite.pos.x - 100, sprite.pos.y - 100);
+	button.pos = new Pos(sprite.pos.x - 50, sprite.pos.y - 130);
 	var label = button.label;
 	label.text = 'Zuhause';
 	label.font = new Font('Comic Sans MS', 16, '900', 'italic');
@@ -118,12 +118,7 @@ function StreetScene() {
 	button.anchor = new Point(0, 1);
 	button.pos = new Pos(20, 748);
 	button.onClicked = function() { 
-		mapOverlay.visible = true;
-		mapOverlay.addAction(new LinearAction(0.2, function(value) {
-			mapOverlay.scale.x = value;
-			mapOverlay.scale.y = value;
-			mapOverlay.color = 'rgba(255,255,255,' + value + ')';
-		}));
+		self.activateMap();
 	};
 	label = button.label;
 	label.text = 'Karte';
@@ -134,6 +129,30 @@ function StreetScene() {
 };
 StreetScene.extends(Scene, {
 	init: function() {
+		this.deactivateMap();
+	},
+	activateMap: function() {
+		var map = this.mapOverlay;
+		map.visible = true;
+		map.addAction(new LinearAction(0.2, function(value) {
+			map.scale.x = value;
+			map.scale.y = value;
+			map.color = 'rgba(255,255,255,' + value + ')';
+		}));
+		
+		var self = this;
+		var handler = new MouseNonHandler();
+		handler.mouseDown = function(event) {
+			self.deactivateMap();
+			return true;
+		}
+		this.closeMapHandler = {mouseHandler: handler};
+		this.mouseHandler.addHandler(this.closeMapHandler);
+		this.mouseHandler.addHandler(this.mapOverlay);
+	},
+	deactivateMap: function() {
 		this.mapOverlay.visible = false;
+		this.mouseHandler.removeHandler(this.closeMapHandler);
+		this.mouseHandler.removeHandler(this.mapOverlay);
 	}
 });

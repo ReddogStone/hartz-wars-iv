@@ -7,6 +7,7 @@
 <script src="engine/renderutils.js" type="text/javascript;version=1.7"></script>
 <script src="engine/node.js" type="text/javascript;version=1.7"></script>
 <script src="engine/renderlist.js" type="text/javascript;version=1.7"></script>
+<script src="engine/mousehandler.js" type="text/javascript;version=1.7"></script>
 <script src="engine/scene.js" type="text/javascript;version=1.7"></script>
 <script src="engine/camera.js" type="text/javascript;version=1.7"></script>
 <script src="engine/clock.js" type="text/javascript;version=1.7"></script>
@@ -14,6 +15,7 @@
 <script src="engine/frameanimation.js" type="text/javascript;version=1.7"></script>
 <script src="engine/linearaction.js" type="text/javascript;version=1.7"></script>
 <script src="engine/button.js" type="text/javascript;version=1.7"></script>
+<script src="engine/progress.js" type="text/javascript;version=1.7"></script>
 <script src="engine/label.js" type="text/javascript;version=1.7"></script>
 
 <script src="game/player.js" type="text/javascript;version=1.7"></script>
@@ -79,7 +81,7 @@
 		g_root.render(context);
 		
 		// draw fps
-		context.font = "20pt Calibri";
+		context.font = "20pt Comic Sans MS";
 		context.fillStyle = "#FF0000";
 		context.strokeStyle = "#FF0000";
 		context.lineWidth = 1;
@@ -87,14 +89,14 @@
 		context.fillText(fpsText, 5, 25);
 		
 		// draw mouse coordinates
-		var mouseText = g_mouse.x + "," + g_mouse.y;
+		var mouseText = g_mouse.x + ", " + g_mouse.y;
 		context.fillText(mouseText, 900, 25);
 		
 		// draw clock
 		context.fillStyle = "#000000";
-		context.fillText(g_clock.toString(), 712, 752);
+		context.fillText(g_clock.toString(), 682, 752);
 		context.fillStyle = "#FFFFFF";
-		context.fillText(g_clock.toString(), 710, 750);
+		context.fillText(g_clock.toString(), 680, 750);
 		
 		// request new frame
 		requestAnimFrame(function(){
@@ -164,16 +166,17 @@
 			g_root = g_streetScene; 
 			g_root.init();
 			var playerBody = g_player.body = g_root.playerBody;
-			playerBody.pos = new Pos(700, 300);
-			playerBody.scale = new Size(0.5, 0.5);
+			playerBody.pos = new Pos(700, 280);
+			playerBody.scale = new Size(-0.5, 0.5);
+			g_root.pos = new Pos(512, 300);
 		};
 		g_streetScene = new StreetScene();
 		g_streetScene.onEnterHome = function() {
-			g_root = g_roomScene; 
+			g_root = g_roomScene;
 			g_root.init();
 		};
 		g_root = g_roomScene;
-		
+		g_root.init();		
 		
 		animate(window.performance.now(), g_canvas, context);
 	};
