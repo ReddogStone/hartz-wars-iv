@@ -18,17 +18,14 @@ function StreetScene() {
 	var background = new Scene();	
 	background.addChild(new Sprite(new Size(1024, 640), bgImg));
 	this.addChild(background);
-	this.mouseHandler.addHandler(background);
 	
 	var foreground = new Scene();
 	this.addChild(foreground);
-	this.mouseHandler.addHandler(foreground);
 	
 	var mapOverlay = new Scene();
 	mapOverlay.anchor = new Point(0.5, 0.5);
 	mapOverlay.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
 	this.addChild(mapOverlay);
-	this.mouseHandler.addHandler(mapOverlay);
 	
 	var sprite = new Sprite(new Size(800, 598), mapImg);
 	sprite.anchor = new Point(0.5, 0.5);
@@ -62,7 +59,6 @@ function StreetScene() {
 		mapOverlay.visible = false;
 	};
 	mapOverlay.addChild(button);
-	mapOverlay.mouseHandler.addHandler(button);
 	this.mapOverlay = mapOverlay;
 	
 	sprite = new Sprite(new Size(150, 300), playerImage, new Rect(30, 30, 100, 200));
@@ -99,7 +95,6 @@ function StreetScene() {
 	label.text = 'Reingehen';
 	label.font = new Font('Comic Sans MS', 24, '900', 'italic');
 	foreground.addChild(button);
-	foreground.mouseHandler.addHandler(button);
 
 	buttonEffects = [new GenericButtonEffect( function(button) {
 			var state = button.getState();
@@ -125,7 +120,6 @@ function StreetScene() {
 	label.font = new Font('Comic Sans MS', 24, '900', 'italic');
 	button.size = cloneSize(label.size);
 	foreground.addChild(button);
-	foreground.mouseHandler.addHandler(button);
 };
 StreetScene.extends(Scene, {
 	init: function() {
@@ -139,20 +133,13 @@ StreetScene.extends(Scene, {
 			map.scale.y = value;
 			map.color = 'rgba(255,255,255,' + value + ')';
 		}));
-		
-		var self = this;
-		var handler = new MouseNonHandler();
-		handler.mouseDown = function(event) {
-			self.deactivateMap();
-			return true;
-		}
-		this.closeMapHandler = {mouseHandler: handler};
-		this.mouseHandler.addHandler(this.closeMapHandler);
-		this.mouseHandler.addHandler(this.mapOverlay);
 	},
 	deactivateMap: function() {
 		this.mapOverlay.visible = false;
-		this.mouseHandler.removeHandler(this.closeMapHandler);
-		this.mouseHandler.removeHandler(this.mapOverlay);
+	},
+	mouseDown: function(event) {
+		if (!this._super_mouseDown(event)) {
+			this.deactivateMap();
+		}
 	}
 });

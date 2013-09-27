@@ -17,13 +17,11 @@ function RoomScene() {
 	
 	var background = new Scene();
 	this.addChild(background);
-	this.mouseHandler.addHandler(background);
 
 	background.addChild(new Sprite(new Size(1024, 640), bgImg));
 	
 	var foreground = new Scene();
 	this.addChild(foreground);
-	this.mouseHandler.addHandler(foreground);
 	
 	var sprite = new Sprite(new Size(150, 300), playerImage, new Rect(30, 30, 100, 200));
 	sprite.pos = new Pos(400, 600);
@@ -57,7 +55,6 @@ function RoomScene() {
 	label.text = 'Rausgehen';
 	label.font = new Font('Comic Sans MS', 24, '900', 'italic');
 	foreground.addChild(button);
-	foreground.mouseHandler.addHandler(button);
 	
 	var hungerProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
 	hungerProgress.pos = new Pos(200, 650);

@@ -12,10 +12,13 @@ Array.prototype.clear = function() {
 
 Function.prototype.extends = function(parent, methods) {
     this.prototype = Object.create(parent.prototype);
-    Object.defineProperty(this.prototype, 'parent', {value: this.prototype.constructor});
+    Object.defineProperty(this.prototype, 'parent', {value: parent.prototype});
     Object.defineProperty(this.prototype, 'constructor', {value: this});
 	
 	for (let method in methods) {
 		this.prototype[method] = methods[method];
+		this.prototype['_super_' + method] = function() {
+			this.parent[method].apply(this, arguments);
+		}
 	}
 }

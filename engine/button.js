@@ -83,7 +83,6 @@ function Button(size, texture, effects) {
 	this._size = cloneSize(size);
 	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize, set: this.setSize});
 	
-	this.mouseHandler = this;
 	this.addChild(sprite);
 	this.addChild(labelOffsetter);
 	

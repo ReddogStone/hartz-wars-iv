@@ -130,7 +130,7 @@
 		g_mouse.y = coords.y;
 		g_mouse.down = true;
 
-		g_root.mouseHandler.mouseDown(g_mouse);
+		g_root.mouseDown(g_mouse);
 	}
 
 	function handleMouseUp(event) {
@@ -139,7 +139,7 @@
 		g_mouse.y = coords.y;
 		g_mouse.down = false;
 		
-		g_root.mouseHandler.mouseUp(g_mouse);
+		g_root.mouseUp(g_mouse);
 	}
 
 	function handleMouseMove(event) {
@@ -147,7 +147,7 @@
 		g_mouse.x = coords.x;
 		g_mouse.y = coords.y;
 		
-		g_root.mouseHandler.mouseMove(g_mouse);
+		g_root.mouseMove(g_mouse);
 	}
 
 	window.onload = function() {
