@@ -18,7 +18,7 @@ Function.prototype.extends = function(parent, methods) {
 	for (let method in methods) {
 		this.prototype[method] = methods[method];
 		this.prototype['_super_' + method] = function() {
-			this.parent[method].apply(this, arguments);
+			return this.parent[method].apply(this, arguments);
 		}
 	}
 }

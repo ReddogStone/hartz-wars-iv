@@ -30,6 +30,11 @@ function StreetScene() {
 	var sprite = new Sprite(new Size(800, 598), mapImg);
 	sprite.anchor = new Point(0.5, 0.5);
 	sprite.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
+	sprite.mouseDown = sprite.mouseUp = sprite.mouseMove = function(event) { 
+		if (this.getLocalRect().containsPoint(event)) { 
+			return true; 
+		}
+	};
 	mapOverlay.addChild(sprite);
 	
 	var buttonEffects = [new GenericButtonEffect( function(button) {
@@ -128,17 +133,21 @@ StreetScene.extends(Scene, {
 	activateMap: function() {
 		var map = this.mapOverlay;
 		map.visible = true;
-		map.addAction(new LinearAction(0.2, function(value) {
+		map.addAction(new LinearAction(0.2, function(value) {	
 			map.scale.x = value;
 			map.scale.y = value;
+			map.pos.rot = value * 2 * Math.PI;
 			map.color = 'rgba(255,255,255,' + value + ')';
 		}));
+		
+//		map.pos.rot = 0.5;
 	},
 	deactivateMap: function() {
 		this.mapOverlay.visible = false;
 	},
 	mouseDown: function(event) {
-		if (!this._super_mouseDown(event)) {
+		var handled = this._super_mouseDown(event);
+		if (!handled) {
 			this.deactivateMap();
 		}
 	}

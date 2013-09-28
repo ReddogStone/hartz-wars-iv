@@ -149,7 +149,7 @@ Button.extends(Node, {
 		this._adjust();
 	},
 	mouseDown: function(event) {
-		if (this._enabled && this.getRect().containsPoint(event)) {
+		if (this._enabled && this.getLocalRect().containsPoint(event)) {
 			this._setState(ButtonState.PRESSED);
 			if (this.onPressed) {
 				this.onPressed();
@@ -159,7 +159,7 @@ Button.extends(Node, {
 	},
 	mouseUp: function(event) {
 		if (this._enabled) {
-			if (this.getRect().containsPoint(event)) {
+			if (this.getLocalRect().containsPoint(event)) {
 				this._setState(ButtonState.HOVERED);
 				if (this.onClicked) {
 					this.onClicked();
@@ -172,7 +172,7 @@ Button.extends(Node, {
 	},
 	mouseMove: function(event) {
 		if (this._enabled) {
-			if (this.getRect().containsPoint(event)) {
+			if (this.getLocalRect().containsPoint(event)) {
 				if (this._state == ButtonState.ACTIVE) {
 					if (event.down) {
 						this._setState(ButtonState.PRESSED);

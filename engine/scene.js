@@ -13,11 +13,25 @@ function Scene() {
 Scene.extends(Node, {
 	_handleMouseEvent: function(event, type) {
 		var children = this.children;
-		var child;
+		
 		for (var i = children.length - 1; i >= 0; --i) {
-			child = children[i];
+			var child = children[i];
+			var pos = child.pos;
+			var scale = child.scale;
+			var size = child.size;
+			var anchor = child.anchor;
+			
+			var inverseTransform = Transform.identity().
+				translate(pos.x, pos.y).
+				rotate(pos.rot).
+				scale(scale.x, scale.y).
+				translate(-size.x * anchor.x, - size.y * anchor.y).
+				inverse();
+			var childEvent = inverseTransform.apply(event);
+			childEvent.down = event.down;
+			
 			if (child.visible && child[type]) {
-				if (child[type](event)) {
+				if (child[type](childEvent)) {
 					return true;
 				}
 			}

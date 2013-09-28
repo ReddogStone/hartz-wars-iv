@@ -18,14 +18,21 @@ Node.extends(Object, {
 			element.init();
 		});
 	},
-	getRect: function() {
+	getTransform: function() {
 		var pos = this.pos;
+		var scale = this.scale;
 		var size = this.size;
 		var anchor = this.anchor;
 		
-		pos = new Pos(pos.x - anchor.x * size.x, pos.y - anchor.y * size.y);
-		
-		return new Rect(pos.x, pos.y, size.x, size.y);
+		return Transform.identity().
+			translate(pos.x, pos.y).
+			rotate(pos.rot).
+			scale(scale.x, scale.y).
+			translate(-size.x * anchor.x, - size.y * anchor.y);
+	},
+	getLocalRect: function() {
+		var size = this.size;
+		return new Rect(0, 0, size.x, size.y);
 	},
 	addChild: function(child) {
 		if (child.init) {

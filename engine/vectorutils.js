@@ -24,6 +24,9 @@ Vec.sub = function(v1, v2) {
 Vec.mul = function(v, s) {
 	return {x: v.x * s, y: v.y * s};
 };
+Vec.scale = function(v1, v2) {
+	return {x: v1.x * v2.x, y: v1.y * v2.y};
+};
 Vec.dot = function(v1, v2) {
 	return v1.x * v2.x + v1.y * v2.y;
 };

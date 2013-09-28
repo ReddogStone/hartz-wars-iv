@@ -3,6 +3,7 @@
 <head>
 <script src="engine/utils.js" type="text/javascript;version=1.7"></script>
 <script src="engine/vectorutils.js" type="text/javascript;version=1.7"></script>
+<script src="engine/transform.js" type="text/javascript;version=1.7"></script>
 <script src="engine/loc.js" type="text/javascript;version=1.7"></script>
 <script src="engine/renderutils.js" type="text/javascript;version=1.7"></script>
 <script src="engine/node.js" type="text/javascript;version=1.7"></script>
@@ -124,30 +125,27 @@
         };
     }
 
-	function handleMouseDown(event) {
+	function handleMouseEvent(event, isDown, type) {
 		var coords = extractMouseCoords(g_canvas, event);
 		g_mouse.x = coords.x;
 		g_mouse.y = coords.y;
-		g_mouse.down = true;
+		g_mouse.down = isDown;
 
-		g_root.mouseDown(g_mouse);
+		var transformedEvent = {x: g_mouse.x, y: g_mouse.y, down: g_mouse.down};
+		Vec.set(transformedEvent, g_root.getTransform().inverse().apply(transformedEvent));
+		g_root[type](transformedEvent);
+	}
+
+	function handleMouseDown(event) {
+		handleMouseEvent(event, true, 'mouseDown');
 	}
 
 	function handleMouseUp(event) {
-		var coords = extractMouseCoords(g_canvas, event);
-		g_mouse.x = coords.x;
-		g_mouse.y = coords.y;
-		g_mouse.down = false;
-		
-		g_root.mouseUp(g_mouse);
+		handleMouseEvent(event, false, 'mouseUp');
 	}
 
 	function handleMouseMove(event) {
-		var coords = extractMouseCoords(g_canvas, event);
-		g_mouse.x = coords.x;
-		g_mouse.y = coords.y;
-		
-		g_root.mouseMove(g_mouse);
+		handleMouseEvent(event, g_mouse.down, 'mouseMove');
 	}
 
 	window.onload = function() {
@@ -168,7 +166,6 @@
 			var playerBody = g_player.body = g_root.playerBody;
 			playerBody.pos = new Pos(700, 280);
 			playerBody.scale = new Size(-0.5, 0.5);
-			g_root.pos = new Pos(512, 300);
 		};
 		g_streetScene = new StreetScene();
 		g_streetScene.onEnterHome = function() {
