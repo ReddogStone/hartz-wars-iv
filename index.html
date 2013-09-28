@@ -165,8 +165,9 @@
 			g_root = g_streetScene; 
 			g_root.init();
 			var playerBody = g_player.body = g_root.playerBody;
-			playerBody.pos = new Pos(700, 280);
+			playerBody.pos = new Pos(850, 280);
 			playerBody.scale = new Size(-0.5, 0.5);
+			playerBody.z = 0;
 		};
 		g_streetScene = new StreetScene();
 		g_streetScene.onEnterHome = function() {
@@ -178,7 +179,28 @@
 		
 		animate(window.performance.now(), g_canvas, context);
 	};
-
+	
+/*	var list = new SortedList(function(a, b) {return a < b;} );
+	list.add(1);
+	list.add(2);
+	list.add(3);
+	list.add(5);
+	list.add(4);
+	console.log(list.toString());
+	console.log(list[0] + ',' + list[1] + ',' + list[2] + ',' + list[3] + ',' + list[4] + ',' + list[5]);
+	
+	list.remove(3);
+	list.remove(7);
+	console.log(list.toString());
+	console.log(list[0] + ',' + list[1] + ',' + list[2] + ',' + list[3] + ',' + list[4] + ',' + list[5]);
+	
+	list._list[0] = 5;
+	list._list[2] = 53;
+	list._list[3] = 1;
+	console.log(list.toString());
+	list.resort();
+	console.log(list.toString()); */
+	
 </script>
 </head>
 <body>

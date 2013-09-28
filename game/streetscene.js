@@ -127,7 +127,7 @@ function StreetScene() {
 	foreground.addChild(button);
 };
 StreetScene.extends(Scene, {
-	init: function() {
+	initSelf: function() {
 		this.deactivateMap();
 	},
 	activateMap: function() {

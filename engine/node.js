@@ -8,12 +8,16 @@ function Node() {
 	this.selfVisible = true;
 	this.scale = new Size(1, 1);
 	this.alpha = 1.0;
+	this.z = Number.NEGATIVE_INFINITY;
 	
-	this.children = [];
+	this.children = new SortedList( function(a, b) {return a.z < b.z;} );
 	this.actions = [];
 }
 Node.extends(Object, {
 	init: function() {
+		if (initSelf in this) {
+			this.initSelf();
+		}
 		this.children.forEach(function(element, index, array) {
 			element.init();
 		});
@@ -35,13 +39,13 @@ Node.extends(Object, {
 		return new Rect(0, 0, size.x, size.y);
 	},
 	addChild: function(child) {
-		if (child.init) {
-			child.init();
-		}
-		this.children.push(child);
+		this.children.add(child);
 	},
 	removeChild: function(child) {
 		this.children.remove(child);
+	},
+	repositionChild: function(child) {
+		
 	},
 	addAction: function(action) {
 		if (action.init) {	
@@ -70,6 +74,7 @@ Node.extends(Object, {
 			this.renderSelf(context);
 		}		
 		
+		this.children.resort();
 		this.children.forEach(function(element, index, array) {
 			element.render(context);
 		});
