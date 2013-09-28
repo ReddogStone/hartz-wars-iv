@@ -20,10 +20,5 @@ Function.prototype.extends = function(parent, methods) {
 		var method = names[i];
 		var descriptor = Object.getOwnPropertyDescriptor(methods, method);
 		Object.defineProperty(this.prototype, method, descriptor);
-		if (typeof descriptor.value === 'function') {
-			this.prototype['_super_' + method] = function() {
-				return this.parent[method].apply(this, arguments);
-			}
-		}
 	}
 }

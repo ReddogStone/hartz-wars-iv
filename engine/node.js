@@ -15,7 +15,7 @@ function Node() {
 }
 Node.extends(Object, {
 	init: function() {
-		if (initSelf in this) {
+		if ('initSelf' in this) {
 			this.initSelf();
 		}
 		this.children.forEach(function(element, index, array) {
@@ -70,7 +70,7 @@ Node.extends(Object, {
 		context.globalAlpha = this.alpha;
 		RenderUtils.transform(context, pos, scale, size, anchor);
 		
-		if (this.renderSelf && this.selfVisible) {
+		if (('renderSelf' in this) && this.selfVisible) {
 			this.renderSelf(context);
 		}		
 		
@@ -81,7 +81,7 @@ Node.extends(Object, {
 		context.restore();
 	},
 	update: function(deltaTime) {
-		if (this.updateSelf) {
+		if ('updateSelf' in this) {
 			this.updateSelf(deltaTime);
 		}
 		

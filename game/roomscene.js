@@ -96,7 +96,7 @@ function RoomScene() {
 	funProgress.addChild(label);	
 }
 RoomScene.extends(Scene, {
-	init: function() {
+	initSelf: function() {
 		var hunger = this.hungerProgress;
 		hunger.addAction(new LinearAction(10.0, function(value) {
 			hunger.setProgress(value);

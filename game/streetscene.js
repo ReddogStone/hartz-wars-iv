@@ -1,6 +1,7 @@
 'use strict';
 
 function StreetScene() {
+	var self = this;
 	Scene.apply(this);
 	
 	var playerImage = new Image();
@@ -25,12 +26,20 @@ function StreetScene() {
 	var mapOverlay = new Scene();
 	mapOverlay.anchor = new Point(0.5, 0.5);
 	mapOverlay.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
+	mapOverlay.handleMouseDown = function(event) {
+		if (!this.parent.mouseDown.call(this, event)) {
+			self.deactivateMap();
+		}
+	}
+	mapOverlay.handleMouseUp = mapOverlay.handleMouseMove =function(event) {
+		return true; 
+	};
 	this.addChild(mapOverlay);
 	
 	var sprite = new Sprite(new Size(800, 598), mapImg);
 	sprite.anchor = new Point(0.5, 0.5);
 	sprite.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
-	sprite.mouseDown = sprite.mouseUp = sprite.mouseMove = function(event) { 
+	sprite.handleMouseDown = sprite.handleMouseUp = sprite.handleMouseMove = function(event) {
 		if (this.getLocalRect().containsPoint(event)) { 
 			return true; 
 		}
@@ -58,7 +67,6 @@ function StreetScene() {
 	label.font = new Font('Comic Sans MS', 16, '900', 'italic');
 	button.size = cloneSize(label.size);
 
-	var self = this;
 	button.onClicked = function() { 
 		if (self.onEnterHome) self.onEnterHome();
 		mapOverlay.visible = false;
@@ -144,11 +152,5 @@ StreetScene.extends(Scene, {
 	},
 	deactivateMap: function() {
 		this.mapOverlay.visible = false;
-	},
-	mouseDown: function(event) {
-		var handled = this._super_mouseDown(event);
-		if (!handled) {
-			this.deactivateMap();
-		}
 	}
 });

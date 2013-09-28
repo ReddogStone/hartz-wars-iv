@@ -114,6 +114,7 @@ Button.extends(Node, {
 	},
 	init: function() {
 		this._setState(ButtonState.ACTIVE);
+		this.parent.init.call(this);
 	},
 	getState: function() {
 		if (this._enabled) {
@@ -148,7 +149,7 @@ Button.extends(Node, {
 		this._effects.push(effect);
 		this._adjust();
 	},
-	mouseDown: function(event) {
+	handleMouseDown: function(event) {
 		if (this._enabled && this.getLocalRect().containsPoint(event)) {
 			this._setState(ButtonState.PRESSED);
 			if (this.onPressed) {
@@ -157,7 +158,7 @@ Button.extends(Node, {
 			return true;
 		}
 	},
-	mouseUp: function(event) {
+	handleMouseUp: function(event) {
 		if (this._enabled) {
 			if (this.getLocalRect().containsPoint(event)) {
 				this._setState(ButtonState.HOVERED);
@@ -170,7 +171,7 @@ Button.extends(Node, {
 			}
 		}
 	},
-	mouseMove: function(event) {
+	handleMouseMove: function(event) {
 		if (this._enabled) {
 			if (this.getLocalRect().containsPoint(event)) {
 				if (this._state == ButtonState.ACTIVE) {
