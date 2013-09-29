@@ -97,7 +97,7 @@ var streetSceneTemplate = ( function() {
 					},
 					mapButton: {
 						type: 'Button',
-						pos: {x: 20, y: 748},
+						pos: {x: 20, y: 620},
 						anchor: {x: 0, y: 1},
 						effects: mapButtonEffects,
 						label: {
@@ -115,12 +115,12 @@ var streetSceneTemplate = ( function() {
 						texture: mapImg,
 						size: {x: 800, y: 598},
 						anchor: {x: 0.5, y: 0.5},
-						pos: {x: 512, y: 384},
+						pos: {x: 512, y: 320},
 					},
 					homeButton: {
 						type: 'Button',
 						effects: mapHomeButtonEffects,
-						pos: {x: 462, y: 254},
+						pos: {x: 462, y: 190},
 						label: {
 							text: 'Zuhause',
 							font: {family: 'Comic Sans MS', size: 16, weight: 900}
