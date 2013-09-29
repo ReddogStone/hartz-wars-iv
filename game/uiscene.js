@@ -12,7 +12,22 @@ var uiSceneTemplate = ( function() {
 				pos: {x: 0, y: 640},
 				color: 'argb(0, 128, 0, 1)'
 			},
-			hungerProgress: {
+			moneyLabel: {
+				type: 'Label',
+				anchor: {x: 1, y: 0},
+				text: 'Geld: ',
+				font: {family: 'Comic Sans MS', size: 14, weight: 900},
+				color: '#FFFFFF',
+				pos: {x: 450, y: 650}
+			},
+			moneyAmountLabel: {
+				type: 'Label',
+				text: '100€',
+				font: {family: 'Comic Sans MS', size: 14, weight: 900},
+				color: '#FFFFFF',
+				pos: {x: 450, y: 650}
+			},
+			saturationProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
 				texture: progressImg,

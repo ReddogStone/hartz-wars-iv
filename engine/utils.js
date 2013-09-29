@@ -15,10 +15,12 @@ Function.prototype.extends = function(parent, methods) {
     Object.defineProperty(this.prototype, 'parent', {value: parent.prototype});
     Object.defineProperty(this.prototype, 'constructor', {value: this});
 	
-	var names = Object.keys(methods);
-	for (var i = 0; i < names.length; ++i) {
-		var method = names[i];
-		var descriptor = Object.getOwnPropertyDescriptor(methods, method);
-		Object.defineProperty(this.prototype, method, descriptor);
+	if (methods) {
+		var names = Object.keys(methods);
+		for (var i = 0; i < names.length; ++i) {
+			var method = names[i];
+			var descriptor = Object.getOwnPropertyDescriptor(methods, method);
+			Object.defineProperty(this.prototype, method, descriptor);
+		}
 	}
 }

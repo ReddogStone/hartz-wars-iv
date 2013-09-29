@@ -71,69 +71,6 @@ var barSceneTemplate = ( function() {
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					},					
-					hungerProgress: {
-						type: 'Progress',
-						size: {x: 100, y: 30},
-						texture: progressImg,
-						fillRect: {x: 0, y: 72, sx: 30, sy: 72},
-						frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-						pos: {x: 200, y: 650},
-						frameColor: '#009000',
-						fillColor: '#7F0000',
-						progress: 0.5,
-						children: {
-							label: {
-								type: 'Label',
-								text: 'Sättigung',
-								font: {family: 'Comic Sans MS', size: 14, weight: 900},
-								color: '#FFFFFF',
-								pos: {x: -10, y: 12},
-								anchor: {x: 1, y: 0.5}
-							}
-						}
-					},
-					energyProgress: {
-						type: 'Progress',
-						size: {x: 100, y: 30},
-						texture: progressImg,
-						fillRect: {x: 0, y: 72, sx: 30, sy: 72},
-						frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-						pos: {x: 200, y: 690},
-						frameColor: '#009000',
-						fillColor: '#FFFF00',
-						progress: 0.5,
-						children: {
-							label: {
-								type: 'Label',
-								text: 'Energie',
-								font: {family: 'Comic Sans MS', size: 14, weight: 900},
-								color: '#FFFFFF',
-								pos: {x: -10, y: 12},
-								anchor: {x: 1, y: 0.5}
-							}
-						}
-					},
-					funProgress: {
-						type: 'Progress',
-						size: {x: 100, y: 30},
-						texture: progressImg,
-						fillRect: {x: 0, y: 72, sx: 30, sy: 72},
-						frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-						pos: {x: 200, y: 730},
-						frameColor: '#009000',
-						fillColor: '#70707F',
-						progress: 0.5,
-						children: {
-							label: {
-								type: 'Label',
-								text: 'Lebenslust',
-								font: {family: 'Comic Sans MS', size: 14, weight: 900},
-								color: '#FFFFFF',
-								pos: {x: -10, y: 12},
-								anchor: {x: 1, y: 0.5}
-							}
-						}
-					}					
 				}
 			}
 		}
@@ -156,23 +93,8 @@ function BarScene() {
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	
-	var button = foreground.doorButton;
-	button.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
+	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
+	foreground.doenerButton.onClicked = function() { if (self.onEatDoener) self.onEatDoener(); };
 }
-BarScene.extends(Scene, {
-	initSelf: function() {
-		var hunger = this.foreground.hungerProgress;
-		hunger.addAction(new LinearAction(10.0, function(value) {
-			hunger.progress = value;
-		}));
-		var energy = this.foreground.energyProgress;
-		energy.addAction(new LinearAction(10.0, function(value) {
-			energy.progress = 1.0 - value;
-		}));
-		var fun = this.foreground.funProgress;
-		fun.addAction(new LinearAction(10.0, function(value) {
-			fun.progress = value;
-		}));
-	}
-});
+BarScene.extends(Scene);
 	
