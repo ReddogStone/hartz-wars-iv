@@ -4,6 +4,7 @@ var streetSceneTemplate = ( function() {
 	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
 	var bgImg = new Image(); bgImg.src = 'data/street_bg.png';
 	var homeDoorHighlightImg = new Image();	homeDoorHighlightImg.src = 'data/street_home_door_highlight.png';
+	var barDoorHighlightImg = new Image();	barDoorHighlightImg.src = 'data/street_bar_door_highlight.png';
 	var mapImg = new Image(); mapImg.src = 'data/map.png';
 
 	var mapHomeButtonEffects = [new GenericButtonEffect( function(button) {
@@ -20,7 +21,7 @@ var streetSceneTemplate = ( function() {
 			}
 		})];
 		
-	var homeDoorButtonEffects = [
+	var doorButtonEffects = [
 		new JumpingLabel(2, 2), 
 		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,120,0,1)'),
 		new GenericButtonEffect( function(button) {
@@ -74,10 +75,22 @@ var streetSceneTemplate = ( function() {
 						type: 'Button',
 						size: {x: 150, y: 265},
 						texture: homeDoorHighlightImg,
-						effects: homeDoorButtonEffects,
+						effects: doorButtonEffects,
 						pos: {x: 730, y: 0},
 						label: {
 							offset: {x: -150, y: -50},
+							text: 'Reingehen',
+							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+						}
+					},
+					barDoorButton: {
+						type: 'Button',
+						size: {x: 82, y: 150},
+						texture: barDoorHighlightImg,
+						effects: doorButtonEffects,
+						pos: {x: 82, y: 0},
+						label: {
+							offset: {x: 0, y: 90},
 							text: 'Reingehen',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
@@ -157,15 +170,17 @@ function StreetScene() {
 	animation.addFrame(new Rect(442, 30, 100, 200));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
-	button = foreground.homeDoorButton;
-	button.onClicked = function() { 
+	foreground.homeDoorButton.onClicked = function() { 
 		if (self.onEnterHome) self.onEnterHome(); 
 	};
+	foreground.barDoorButton.onClicked = function() { 
+		if (self.onEnterBar) self.onEnterBar();
+	};
 	button = foreground.mapButton;
+	button.size = Size.clone(button.label.size);
 	button.onClicked = function() { 
 		self.activateMap();
 	};
-	button.size = Size.clone(button.label.size);
 };
 StreetScene.extends(Scene, {
 	initSelf: function() {
