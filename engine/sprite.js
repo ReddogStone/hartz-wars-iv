@@ -36,18 +36,7 @@ function Sprite(texture, size, sourceRect) {
 	Node.apply(this);
 	
 	this.size = cloneSize(size);
-	this.texture = texture;
-	if (texture) {
-		if (texture.complete) {
-			this.sourceRect = new Rect(0, 0, texture.width, texture.height);
-		} else {
-			texture.onload = function() {
-				if (!self.sourceRect) {
-					self.sourceRect = new Rect(0, 0, texture.width, texture.height);
-				}
-			};
-		}
-	}
+	this.texture = texture; // setter is used
 	this.sourceRect = sourceRect || this.sourceRect;
 	this._bufferCanvas = document.createElement('canvas');
 	this._buffered = false;
@@ -62,6 +51,22 @@ Sprite.extends(Node, {
 		if (this._color != value) {
 			this._color = value;
 			this._buffered = false;
+		}
+	},
+	get texture() {
+		return this._texture;
+	},
+	set texture(value) {
+		var self = this;
+		this._texture = value;
+		if (value) {
+			if (value.complete) {
+				this.sourceRect = this.sourceRect || new Rect(0, 0, value.width, value.height);
+			} else {
+				value.onload = function() {
+					self.sourceRect = self.sourceRect || new Rect(0, 0, value.width, value.height);
+				};
+			}
 		}
 	},
 	renderSelf: function(context) {
