@@ -36,8 +36,8 @@ function Sprite(texture, size, sourceRect) {
 	Node.apply(this);
 	
 	this.size = cloneSize(size);
-	this.texture = texture; // setter is used
-	this.sourceRect = sourceRect || this.sourceRect;
+	this.texture = texture;
+	this.sourceRect = sourceRect;
 	this._bufferCanvas = document.createElement('canvas');
 	this._buffered = false;
 	this._color = null;
@@ -53,22 +53,6 @@ Sprite.extends(Node, {
 			this._buffered = false;
 		}
 	},
-	get texture() {
-		return this._texture;
-	},
-	set texture(value) {
-		var self = this;
-		this._texture = value;
-		if (value) {
-			if (value.complete) {
-				this.sourceRect = this.sourceRect || new Rect(0, 0, value.width, value.height);
-			} else {
-				value.onload = function() {
-					self.sourceRect = self.sourceRect || new Rect(0, 0, value.width, value.height);
-				};
-			}
-		}
-	},
 	renderSelf: function(context) {
 		var sRect = this.sourceRect;
 		var size = this.size;
@@ -78,10 +62,10 @@ Sprite.extends(Node, {
 		context.globalCompositeOperation = this.blend;
 		
 		if (texture && texture.complete) {
+			var width = texture.width;
+			var height = texture.height;
 			if (this.color) {
 				var bufferCanvas = this._bufferCanvas;
-				var width = texture.width;
-				var height = texture.height;
 				if (!this._buffered) {
 					bufferCanvas.width = width;
 					bufferCanvas.height = height;
@@ -106,7 +90,8 @@ Sprite.extends(Node, {
 				}
 				texture = bufferCanvas;
 			}
-
+			
+			sRect = sRect || new Rect(0, 0, width, height);
 			context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
 		} else if (this.color) {
 			context.fillStyle = this.color;
