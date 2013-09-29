@@ -79,7 +79,7 @@ var streetSceneTemplate = ( function() {
 						label: {
 							offset: {x: -150, y: -50},
 							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900, style: 'italic'}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					},
 					mapButton: {
@@ -89,7 +89,7 @@ var streetSceneTemplate = ( function() {
 						effects: mapButtonEffects,
 						label: {
 							text: 'Karte',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900, style: 'italic'}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					}
 				}
@@ -110,7 +110,7 @@ var streetSceneTemplate = ( function() {
 						pos: {x: 462, y: 254},
 						label: {
 							text: 'Zuhause',
-							font: {family: 'Comic Sans MS', size: 16, weight: 900, style: 'italic'}
+							font: {family: 'Comic Sans MS', size: 16, weight: 900}
 						}
 					}
 				}

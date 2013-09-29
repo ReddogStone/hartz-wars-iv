@@ -49,9 +49,9 @@ var roomSceneTemplate = ( function() {
 						effects: roomDoorEffects,
 						pos: {x: 630, y: 152},
 						label: {
-							offset: {x: 0, y: -50},
+							offset: {x: 0, y: -170},
 							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900, style: 'italic'}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					},
 					hungerProgress: {
