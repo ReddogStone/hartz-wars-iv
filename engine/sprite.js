@@ -11,7 +11,7 @@ function parseColor(color) {
 		b = parseInt(b, 16);
 		a = 1.0;
 	} else if (color.indexOf('rgba(') == 0) {
-		let parts = color.slice(5).split(',');
+		var parts = color.slice(5).split(',');
 		r = parts[0];
 		g = parts[1];
 		b = parts[2];
@@ -32,13 +32,23 @@ function parseColor(color) {
 }
 
 function Sprite(texture, size, sourceRect) {
+	var self = this;
 	Node.apply(this);
 	
 	this.size = cloneSize(size);
 	this.texture = texture;
-	var width = texture ? texture.width : 0;
-	var height = texture ? texture.height : 0;
-	this.sourceRect = sourceRect || new Rect(0, 0, width, height);
+	if (texture) {
+		if (texture.complete) {
+			this.sourceRect = new Rect(0, 0, texture.width, texture.height);
+		} else {
+			texture.onload = function() {
+				if (!self.sourceRect) {
+					self.sourceRect = new Rect(0, 0, texture.width, texture.height);
+				}
+			};
+		}
+	}
+	this.sourceRect = sourceRect || this.sourceRect;
 	this._bufferCanvas = document.createElement('canvas');
 	this._buffered = false;
 	this._color = null;
@@ -55,53 +65,49 @@ Sprite.extends(Node, {
 		}
 	},
 	renderSelf: function(context) {
-		try {
-			var sRect = this.sourceRect;
-			var size = this.size;
-			var texture = this.texture;
+		var sRect = this.sourceRect;
+		var size = this.size;
+		var texture = this.texture;
 
-			var saveOp = context.globalCompositeOperation;
-			context.globalCompositeOperation = this.blend;
-			
-			if (texture) {
-				if (this.color) {
-					let bufferCanvas = this._bufferCanvas;
-					let width = texture.width;
-					let height = texture.height;
-					if (!this._buffered) {
-						bufferCanvas.width = width;
-						bufferCanvas.height = height;
-						let buffer = bufferCanvas.getContext('2d');
-						
-						buffer.drawImage(texture, 0, 0);
-						let data = buffer.getImageData(0, 0, width, height);
-						let pixelData = data.data;
-						let color = parseColor(this.color);
-						for (let i = 0; i < pixelData.length; i += 4) {
-							let sr = pixelData[i];
-							let sg = pixelData[i + 1];
-							let sb = pixelData[i + 2];
-							let sa = pixelData[i + 3];
-							pixelData[i] = 255 * (sr / 255 * color.red / 255);
-							pixelData[i + 1] = 255 * (sg / 255 * color.green / 255);
-							pixelData[i + 2] = 255 * (sb / 255 * color.blue / 255);
-							pixelData[i + 3] = sa * color.alpha;
-						}
-						buffer.putImageData(data, 0, 0);
-						this._buffered = true;
+		var saveOp = context.globalCompositeOperation;
+		context.globalCompositeOperation = this.blend;
+		
+		if (texture && texture.complete) {
+			if (this.color) {
+				var bufferCanvas = this._bufferCanvas;
+				var width = texture.width;
+				var height = texture.height;
+				if (!this._buffered) {
+					bufferCanvas.width = width;
+					bufferCanvas.height = height;
+					var buffer = bufferCanvas.getContext('2d');
+					
+					buffer.drawImage(texture, 0, 0);
+					var data = buffer.getImageData(0, 0, width, height);
+					var pixelData = data.data;
+					var color = parseColor(this.color);
+					for (var i = 0; i < pixelData.length; i += 4) {
+						var sr = pixelData[i];
+						var sg = pixelData[i + 1];
+						var sb = pixelData[i + 2];
+						var sa = pixelData[i + 3];
+						pixelData[i] = 255 * (sr / 255 * color.red / 255);
+						pixelData[i + 1] = 255 * (sg / 255 * color.green / 255);
+						pixelData[i + 2] = 255 * (sb / 255 * color.blue / 255);
+						pixelData[i + 3] = sa * color.alpha;
 					}
-					texture = bufferCanvas;
+					buffer.putImageData(data, 0, 0);
+					this._buffered = true;
 				}
-
-				context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
-			} else if (this.color) {
-				context.fillStyle = this.color;
-				context.fillRect(0, 0, size.x, size.y);
+				texture = bufferCanvas;
 			}
-			
-			context.globalCompositeOperation = saveOp;
-		} catch (e) {
-			throw e;
+
+			context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+		} else if (this.color) {
+			context.fillStyle = this.color;
+			context.fillRect(0, 0, size.x, size.y);
 		}
+		
+		context.globalCompositeOperation = saveOp;
 	}
 });

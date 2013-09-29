@@ -1,14 +1,14 @@
 'use strict';
 
-const _M00 = 0;
-const _M01 = 1;
-const _M02 = 2;
-const _M10 = 3;
-const _M11 = 4;
-const _M12 = 5;
-const _M20 = 6;
-const _M21 = 7;
-const _M22 = 8;
+var _M00 = 0;
+var _M01 = 1;
+var _M02 = 2;
+var _M10 = 3;
+var _M11 = 4;
+var _M12 = 5;
+var _M20 = 6;
+var _M21 = 7;
+var _M22 = 8;
 
 function Transform() {
     this._matrix = new Array(9);

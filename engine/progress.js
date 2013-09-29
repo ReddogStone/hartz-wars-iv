@@ -33,18 +33,18 @@ Progress.extends(Node, {
 	set frameColor(value) {
 		this._frameSprite.color = value;
 	},
-	getFillColor: function() {
+	get fillColor() {
 		return this._frameSpriteLeft.getColor();
 	},
-	setFillColor: function(value) {
+	set fillColor(value) {
 		this._fillSpriteLeft.color = value;
 		this._fillSpriteMiddle.color = value;
 		this._fillSpriteRight.color = value;
 	},
-	getProgress: function() {
+	get progress() {
 		return this._progress;
 	},
-	setProgress: function(value) {
+	set progress(value) {
 		this._progress = value;
 		this._fillSpriteMiddle.scale.x = value;
 		this._fillSpriteMiddle.pos.x = Math.floor(this._fillSpriteLeft.size.x);

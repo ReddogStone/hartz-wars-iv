@@ -91,7 +91,7 @@ function StreetScene() {
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'screen';
+				button.sprite.blend = 'lighter';
 			} else {
 				button.sprite.blend = 'source-over';
 			}
