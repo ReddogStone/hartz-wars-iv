@@ -18,12 +18,12 @@ function RoomScene() {
 	var background = new Scene();
 	this.addChild(background);
 
-	background.addChild(new Sprite(new Size(1024, 640), bgImg));
+	background.addChild(new Sprite(bgImg, new Size(1024, 640)));
 	
 	var foreground = new Scene();
 	this.addChild(foreground);
 	
-	var sprite = new Sprite(new Size(150, 300), playerImage, new Rect(30, 30, 100, 200));
+	var sprite = new Sprite(playerImage, new Size(150, 300), new Rect(30, 30, 100, 200));
 	sprite.pos = new Pos(400, 600);
 	sprite.anchor = new Point(0, 1.0);
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
@@ -58,7 +58,7 @@ function RoomScene() {
 	
 	var hungerProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
 	hungerProgress.pos = new Pos(200, 650);
-	hungerProgress.setFrameColor('#009000');
+	hungerProgress.frameColor = '#009000';
 	hungerProgress.setFillColor('#7F0000');
 	hungerProgress.setProgress(0.5);
 	foreground.addChild(hungerProgress);
@@ -71,7 +71,7 @@ function RoomScene() {
 	
 	var energyProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
 	energyProgress.pos = new Pos(400, 650);
-	energyProgress.setFrameColor('#009000');
+	energyProgress.frameColor = '#009000';
 	energyProgress.setFillColor('#FFFF00');
 	energyProgress.setProgress(0.5);
 	foreground.addChild(energyProgress);
@@ -84,7 +84,7 @@ function RoomScene() {
 
 	var funProgress = new Progress(new Size(100, 30), progressImg, new Rect(0, 72, 30, 72), new Rect(0, 0, 215, 72));
 	funProgress.pos = new Pos(600, 650);
-	funProgress.setFrameColor('#009000');
+	funProgress.frameColor = '#009000';
 	funProgress.setFillColor('#70707F');
 	funProgress.setProgress(0.5);
 	foreground.addChild(funProgress);

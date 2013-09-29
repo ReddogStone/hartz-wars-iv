@@ -17,7 +17,7 @@ function StreetScene() {
 	mapImg.src = 'data/map.png';
 
 	var background = new Scene();	
-	background.addChild(new Sprite(new Size(1024, 640), bgImg));
+	background.addChild(new Sprite(bgImg, new Size(1024, 640)));
 	this.addChild(background);
 	
 	var foreground = new Scene();
@@ -27,16 +27,15 @@ function StreetScene() {
 	mapOverlay.anchor = new Point(0.5, 0.5);
 	mapOverlay.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
 	mapOverlay.handleMouseDown = function(event) {
-		if (!this.parent.mouseDown.call(this, event)) {
-			self.deactivateMap();
-		}
+		self.deactivateMap();
+		return true;
 	}
 	mapOverlay.handleMouseUp = mapOverlay.handleMouseMove =function(event) {
 		return true; 
 	};
 	this.addChild(mapOverlay);
 	
-	var sprite = new Sprite(new Size(800, 598), mapImg);
+	var sprite = new Sprite(mapImg, new Size(800, 598));
 	sprite.anchor = new Point(0.5, 0.5);
 	sprite.pos = new Pos(0.5 * mapOverlay.size.x, 0.5 * mapOverlay.size.y);
 	sprite.handleMouseDown = sprite.handleMouseUp = sprite.handleMouseMove = function(event) {
@@ -74,7 +73,7 @@ function StreetScene() {
 	mapOverlay.addChild(button);
 	this.mapOverlay = mapOverlay;
 	
-	sprite = new Sprite(new Size(150, 300), playerImage, new Rect(30, 30, 100, 200));
+	sprite = new Sprite(playerImage, new Size(150, 300), new Rect(30, 30, 100, 200));
 	sprite.pos = new Pos(400, 600);
 	sprite.anchor = new Point(0, 1.0);
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );

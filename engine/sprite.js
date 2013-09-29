@@ -31,7 +31,7 @@ function parseColor(color) {
 	};
 }
 
-function Sprite(size, texture, sourceRect) {
+function Sprite(texture, size, sourceRect) {
 	Node.apply(this);
 	
 	this.size = cloneSize(size);
@@ -43,13 +43,12 @@ function Sprite(size, texture, sourceRect) {
 	this._buffered = false;
 	this._color = null;
 	this.blend = 'source-over';
-	Object.defineProperty(this, 'color', {enumerable: true, get: this.getColor, set: this.setColor});
 }
 Sprite.extends(Node, {
-	getColor: function() {
+	get color() {
 		return this._color;
 	},
-	setColor: function(value) {
+	set color(value) {
 		if (this._color != value) {
 			this._color = value;
 			this._buffered = false;

@@ -68,7 +68,7 @@ ChangingFrames.prototype.setRect = function(state, value) {
 function Button(size, texture, effects) {
 	Node.apply(this);
 	
-	var sprite = new Sprite(size, texture);
+	var sprite = new Sprite(texture, size);
 	
 	var label = new Label();
 	label.anchor = new Point(0.5, 0.5);
