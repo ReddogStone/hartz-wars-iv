@@ -9,6 +9,9 @@ function Font(family, size, weight, style) {
 Font.prototype.toString = function() {
 	return this.style + ' ' + this.weight + ' ' + this.size + 'pt ' + this.family;
 };
+Font.clone = function(value) {
+	return value ? new Font(value.family, value.size, value.weight, value.style) : new Font();
+}
 
 function Label(text, font, color) {
 	Node.apply(this);
@@ -19,11 +22,9 @@ function Label(text, font, color) {
 	
 	this.font = font || new Font();
 	this.color = color || '#000000';
-	
-	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize});
 }
 Label.extends(Node, {
-	getSize: function() {
+	get size() {
 		this._context.font = this.font.toString();
 		var sx = this._context.measureText(this.text).width;
 		var sy = this.font.size;

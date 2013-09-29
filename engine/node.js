@@ -3,7 +3,6 @@
 function Node() {
 	this.pos = new Pos();
 	this.anchor = new Point();
-	this.size = new Size();
 	this.visible = true;
 	this.selfVisible = true;
 	this.scale = new Size(1, 1);
@@ -96,4 +95,4 @@ Node.extends(Object, {
 			element.update(deltaTime);
 		});
 	}
-})
+});

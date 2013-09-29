@@ -18,7 +18,7 @@ function JumpingLabel(offsetX, offsetY) {
 }
 JumpingLabel.prototype.apply = function(button) {
 	var state = button.getState();
-	var offset = button.getLabelOffset();
+	var offset = button.labelOffset;
 	if (state == ButtonState.PRESSED) {
 		offset.x += this.offsetX;
 		offset.y += this.offsetY;
@@ -72,7 +72,9 @@ function Button(size, texture, effects) {
 	
 	var label = new Label();
 	label.anchor = new Point(0.5, 0.5);
-	label.pos = new Pos(0.5 * size.x, 0.5 * size.y);
+	if (size) {
+		label.pos = new Pos(0.5 * size.x, 0.5 * size.y);
+	}
 	
 	var labelOffsetter = new Node();
 	labelOffsetter.addChild(label);
@@ -80,8 +82,7 @@ function Button(size, texture, effects) {
 	this._enabled = true;
 	this._state = ButtonState.ACTIVE;
 	
-	this._size = cloneSize(size);
-	Object.defineProperty(this, 'size', {enumerable: true, get: this.getSize, set: this.setSize});
+	this._size = Size.clone(size);
 	
 	this.addChild(sprite);
 	this.addChild(labelOffsetter);
@@ -95,9 +96,9 @@ function Button(size, texture, effects) {
 		effects.forEach(function(element, index, array) {
 			this.addEffect(element);
 		}, this);
-	} else {
+	}/* else {
 		this.addEffect(new ChangingColor('#000000', '#0000FF', '#FF0000', '#909090'));
-	}
+	}*/
 	
 	this.onPressed = null;
 	this.onClicked = null;
@@ -123,30 +124,42 @@ Button.extends(Node, {
 			return ButtonState.INACTIVE;
 		}
 	},
-	isEnabled: function() {
-		return this._enabled;
-	},
-	getSize: function() {
+	get size() {
 		return this._size;
 	},
-	getLabelOffset: function() {
+	set size(value) {
+		this._size = value;
+		if (this.sprite) { this.sprite.size = value; }
+		if (this.label) { this.label.pos = new Pos(0.5 * value.x, 0.5 * value.y); }
+	},
+	get labelOffset() {
 		return this._labelOffsetter.pos;
 	},
-	setSize: function(value) {
-		this._size = value;
-		this.sprite.size = value;
-		this.label.pos = new Pos(0.5 * value.x, 0.5 * value.y);
+	set labelOffset(value) {
+		var pos = this._labelOffsetter.pos;
+		pos.x = value.x;
+		pos.y = value.y;
 	},
-	setEnabled: function(value) {
+	get enabled() {
+		return this._enabled;
+	},
+	set enabled(value) {
 		this._enabled = value;
 	},
-	setLabelOffset: function(x, y) {
-		var pos = this._labelOffsetter.pos;
-		pos.x = x;
-		pos.y = y;
+	get texture() {
+		return this.sprite.texture;
+	},
+	set texture(value) {
+		this.sprite.texture = value;
 	},
 	addEffect: function(effect) {
 		this._effects.push(effect);
+		this._adjust();
+	},
+	addEffects: function(effects) {
+		effects.forEach(function(element, index, array) {
+			this._effects.push(element);
+		}, this);
 		this._adjust();
 	},
 	handleMouseDown: function(event) {

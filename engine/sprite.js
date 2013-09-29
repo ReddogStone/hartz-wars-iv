@@ -35,7 +35,7 @@ function Sprite(texture, size, sourceRect) {
 	var self = this;
 	Node.apply(this);
 	
-	this.size = cloneSize(size);
+	this.size = Size.clone(size);
 	this.texture = texture;
 	this.sourceRect = sourceRect;
 	this._bufferCanvas = document.createElement('canvas');

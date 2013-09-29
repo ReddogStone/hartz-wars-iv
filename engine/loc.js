@@ -5,7 +5,7 @@ function Pos(x, y, rot) {
 	this.y = y || 0;
 	this.rot = rot || 0;
 }
-function clonePos(value) {
+Pos.clone = function(value) {
 	return value ? new Pos(value.x, value.y, value.rot) : new Pos();
 }
 
@@ -13,7 +13,7 @@ function Point(x, y) {
 	this.x = x || 0;
 	this.y = y || 0;
 }
-function clonePoint(value) {
+Point.clone = function(value) {
 	return value ? new Point(value.x, value.y) : new Point();
 }
 
@@ -21,7 +21,7 @@ function Size(sx, sy) {
 	this.x = sx || 0;
 	this.y = sy || 0;
 }
-function cloneSize(value) {
+Size.clone = function(value) {
 	return value ? new Size(value.x, value.y) : new Size();
 }
 
@@ -54,6 +54,6 @@ Rect.prototype.containsPoint = function(point) {
 	
 	return (dx > 0) && (dx < this.sx) && (dy > 0 && dy < this.sy);
 };
-function cloneRect(value) {
+Rect.clone = function(value) {
 	return value ? new Rect(value.x, value.y, value.sx, value.sy) : new Rect();
 }
