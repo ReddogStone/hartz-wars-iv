@@ -9,7 +9,7 @@ var barSceneTemplate = ( function() {
 	
 	var roomDoorEffects = [
 		new JumpingLabel(2, 2), 
-		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,200,0,1)'),
+		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state != ButtonState.ACTIVE) {
@@ -21,7 +21,7 @@ var barSceneTemplate = ( function() {
 
 	var foodButtonEffects = [
 		new JumpingLabel(2, 2), 
-		new ChangingColor('rgba(255,255,255,0)', 'rgba(100,255,100,1)', 'rgba(255,255,255,1)')];
+		new ChangingColor(Color.transparentBlack, new Color(0.39, 1, 0.39), Color.white)];
 		
 	return {
 		type: 'Scene',
@@ -70,7 +70,7 @@ var barSceneTemplate = ( function() {
 							text: 'Döner - 3,20€',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
-					},					
+					},
 				}
 			}
 		}

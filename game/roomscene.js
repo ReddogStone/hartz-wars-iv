@@ -8,7 +8,7 @@ var roomSceneTemplate = ( function() {
 	
 	var highlightEffects = [
 		new JumpingLabel(2, 2), 
-		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,200,0,1)'),
+		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state != ButtonState.ACTIVE) {
@@ -65,7 +65,7 @@ var roomSceneTemplate = ( function() {
 							text: 'Schlafen',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
-					},
+					}
 				}
 			}
 		}

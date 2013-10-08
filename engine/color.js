@@ -1,0 +1,27 @@
+'use strict';
+
+function Color(red, green, blue, alpha) {
+	this.red = red || 0.0;
+	this.green = green || 0.0;
+	this.blue = blue || 0.0;
+	this.alpha = (alpha !== undefined) ? alpha : 1.0;
+}
+
+Color.extends(Object, {
+	toString: function() {
+		var red = Math.floor(this.red * 255.0);
+		var green = Math.floor(this.green * 255.0);
+		var blue = Math.floor(this.blue * 255.0);
+		return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + this.alpha + ')';
+	}
+});
+
+Color.clone = function(value) {
+	return new Color(value.red, value.green, value.blue, value.alpha);
+}
+Object.defineProperty(Color, 'white', {get: function() { return new Color(1, 1, 1, 1); } })
+Object.defineProperty(Color, 'black', {get: function() { return new Color(0, 0, 0, 1); } })
+Object.defineProperty(Color, 'red', {get: function() { return new Color(1, 0, 0, 1); } })
+Object.defineProperty(Color, 'green', {get: function() { return new Color(0, 1, 0, 1); } })
+Object.defineProperty(Color, 'blue', {get: function() { return new Color(0, 0, 1, 1); } })
+Object.defineProperty(Color, 'transparentBlack', {get: function() { return new Color(0, 0, 0, 0); } })

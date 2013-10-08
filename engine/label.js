@@ -21,7 +21,7 @@ function Label(text, font, color) {
 	this.text = text || '';
 	
 	this.font = font || new Font();
-	this.color = color || '#000000';
+	this.color = color || new Color();
 }
 Label.extends(Node, {
 	get size() {
@@ -32,7 +32,7 @@ Label.extends(Node, {
 	},
 	renderSelf: function(context) {
 		context.font = this.font.toString();
-		context.fillStyle = this.color;
+		context.fillStyle = this.color.toString();
 		context.textAlign = 'start';
 		var sy = this.font.size;
 		context.fillText(this.text, 0, sy);

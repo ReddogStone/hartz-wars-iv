@@ -10,20 +10,20 @@ var streetSceneTemplate = ( function() {
 	var mapHomeButtonEffects = [new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state == ButtonState.ACTIVE) {
-				button.label.color = 'rgba(0,0,0,1)';
+				button.label.color = Color.black;
 				button.labelOffset = new Point(0, 0);
 			} else if (state == ButtonState.PRESSED) {
-				button.label.color = 'rgba(255,0,0,1)';
+				button.label.color = Color.red;
 				button.labelOffset = new Point(2, 2);
 			} else if (state == ButtonState.HOVERED) {
-				button.label.color = 'rgba(0,120,0,1)';
+				button.label.color = new Color(0, 0.47, 0);
 				button.labelOffset = new Point(0, 0);
 			}
 		})];
 		
 	var doorButtonEffects = [
 		new JumpingLabel(2, 2), 
-		new ChangingColor('rgba(255,255,255,0)', 'rgba(255,0,0,1)', 'rgba(0,120,0,1)'),
+		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.47, 0)),
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state != ButtonState.ACTIVE) {
@@ -36,13 +36,13 @@ var streetSceneTemplate = ( function() {
 	var mapButtonEffects = [new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state == ButtonState.ACTIVE) {
-				button.label.color = 'rgba(255,255,255,1)';
+				button.label.color = Color.white;
 				button.labelOffset = new Point(0, 0);
 			} else if (state == ButtonState.PRESSED) {
-				button.label.color = 'rgba(255,0,0,1)';
+				button.label.color = Color.red;
 				button.labelOffset = new Point(2, 2);
 			} else if (state == ButtonState.HOVERED) {
-				button.label.color = 'rgba(0,120,0,1)';
+				button.label.color = new Color(0, 0.47, 0);
 				button.labelOffset = new Point(0, 0);
 			}
 		})];

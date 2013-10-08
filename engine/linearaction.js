@@ -6,6 +6,12 @@ function LinearAction(duration, applyCallback) {
 	this.time = 0;
 }
 LinearAction.extends(Object, {
+	start: function() {
+		this.callback(0.0);
+	},
+	stop: function() {
+		this.callback(1.0);
+	},
 	update: function(deltaTime) {
 		this.time += deltaTime;
 		if (this.time > this.duration) {

@@ -47,12 +47,15 @@ Node.extends(Object, {
 		
 	},
 	addAction: function(action) {
-		if (action.init) {	
-			action.init();
+		if (action.start) {
+			action.start();
 		}
 		this.actions.push(action);
 	},
 	removeAction: function(action) {
+		if (action.stop) {
+			action.stop();
+		}
 		this.actions.remove(action);
 	},
 	render: function(context) {
