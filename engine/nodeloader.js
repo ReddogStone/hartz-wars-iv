@@ -3,6 +3,12 @@
 var globalScope = this;
 Node.loadFromTemplate = ( function() {
 	var module = {};
+	function loadImage(srcPath) {
+		var image = new Image();
+		image.src = srcPath;
+		return image;
+	}
+	
 	module.loadNode = function(template, node) {
 		if (template.pos) { node.pos = Pos.clone(template.pos); }
 		if (template.anchor) { node.anchor = Point.clone(template.anchor); }
@@ -21,7 +27,7 @@ Node.loadFromTemplate = ( function() {
 	module.loadSprite = function(template, sprite) {
 		module.loadNode(template, sprite);
 		
-		if (template.texture) { sprite.texture = template.texture; }
+		if (template.texture) { sprite.texture = loadImage(template.texture); }
 		if (template.sourceRect) { sprite.sourceRect = Rect.clone(template.sourceRect); }
 		if (template.color) { sprite.color = Color.clone(template.color); }
 		if (template.blend)	{ sprite.blend = template.blend; }
@@ -38,7 +44,7 @@ Node.loadFromTemplate = ( function() {
 	module.loadButton = function(template, button) {
 		module.loadNode(template, button);
 		
-		if (template.texture) { button.texture = template.texture; }
+		if (template.texture) { button.texture = loadImage(template.texture); }
 		if (template.effects) { button.addEffects(template.effects); }
 		if (template.label) {
 			var label = template.label;

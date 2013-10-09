@@ -1,13 +1,6 @@
 'use strict';
 
 var streetSceneTemplate = ( function() {
-	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
-	var bgImg = new Image(); bgImg.src = 'data/street_bg.png';
-	var homeDoorHighlightImg = new Image();	homeDoorHighlightImg.src = 'data/street_home_door_highlight.png';
-	var barDoorHighlightImg = new Image();	barDoorHighlightImg.src = 'data/street_bar_door_highlight.png';
-	var toSuprmarketHighlightImg = new Image();	toSuprmarketHighlightImg.src = 'data/street_to_supermarket_highlight.png';
-	var mapImg = new Image(); mapImg.src = 'data/map.png';
-
 	var mapHomeButtonEffects = [new GenericButtonEffect( function(button) {
 			var state = button.getState();
 			if (state == ButtonState.ACTIVE) {
@@ -56,7 +49,7 @@ var streetSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: bgImg,
+						texture: 'data/street_bg.png',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -66,7 +59,7 @@ var streetSceneTemplate = ( function() {
 				children: {
 					playerBody: {
 						type: 'Sprite',
-						texture: playerImg,
+						texture: 'data/walk_anim.png',
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 400, y: 600},
@@ -75,7 +68,7 @@ var streetSceneTemplate = ( function() {
 					homeDoorButton: {
 						type: 'Button',
 						size: {x: 150, y: 265},
-						texture: homeDoorHighlightImg,
+						texture: 'data/street_home_door_highlight.png',
 						effects: doorButtonEffects,
 						pos: {x: 730, y: 0},
 						label: {
@@ -87,11 +80,11 @@ var streetSceneTemplate = ( function() {
 					barDoorButton: {
 						type: 'Button',
 						size: {x: 82, y: 150},
-						texture: barDoorHighlightImg,
+						texture: 'data/street_bar_door_highlight.png',
 						effects: doorButtonEffects,
 						pos: {x: 82, y: 0},
 						label: {
-							offset: {x: 0, y: 90},
+							offset: {x: 130, y: 65},
 							text: 'Reingehen',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900},
 							z: 10
@@ -100,7 +93,7 @@ var streetSceneTemplate = ( function() {
 					toSupermarketButton: {
 						type: 'Button',
 						size: {x: 52, y: 640},
-						texture: toSuprmarketHighlightImg,
+						texture: 'data/street_to_supermarket_highlight.png',
 						effects: doorButtonEffects,
 						pos: {x: 0, y: 0},
 						label: {
@@ -127,7 +120,7 @@ var streetSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: mapImg,
+						texture: 'data/map.png',
 						size: {x: 800, y: 598},
 						anchor: {x: 0.5, y: 0.5},
 						pos: {x: 512, y: 320},

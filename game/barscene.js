@@ -1,12 +1,6 @@
 'use strict';
 
 var barSceneTemplate = ( function() {
-	var bgImg = new Image(); bgImg.src = 'data/bar_bg.png';
-	var doenerImg = new Image(); doenerImg.src = 'data/doener.png';
-	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
-	var doorHighlightImg = new Image();	doorHighlightImg.src = 'data/bar_door_highlight.png';
-	var progressImg = new Image(); progressImg.src = 'data/progress.png';
-	
 	var roomDoorEffects = [
 		new JumpingLabel(2, 2), 
 		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
@@ -31,7 +25,7 @@ var barSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: bgImg,
+						texture: 'data/bar_bg.png',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -41,7 +35,7 @@ var barSceneTemplate = ( function() {
 				children: {
 					playerBody: {
 						type: 'Sprite',
-						texture: playerImg,
+						texture: 'data/walk_anim.png',
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
@@ -50,7 +44,7 @@ var barSceneTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 80, y: 570},
-						texture: doorHighlightImg,
+						texture: 'data/bar_door_highlight.png',
 						effects: roomDoorEffects,
 						pos: {x: 0, y: 23},
 						label: {
@@ -62,7 +56,7 @@ var barSceneTemplate = ( function() {
 					doenerButton: {
 						type: 'Button',
 						size: {x: 160, y: 90},
-						texture: doenerImg,
+						texture: 'data/doener.png',
 						effects: foodButtonEffects,
 						pos: {x: 205, y: 50},
 						label: {

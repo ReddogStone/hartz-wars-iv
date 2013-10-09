@@ -1,11 +1,6 @@
 'use strict';
 
 var supermarketOutsideTemplate = ( function() {
-	var bgImg = new Image(); bgImg.src = 'data/supermarket_outside_bg.png';
-	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
-	var toStreetHighlightImg = new Image();	toStreetHighlightImg.src = 'data/supermarket_to_street_highlight.png';
-	var doorHighlightImg = new Image();	doorHighlightImg.src = 'data/supermarket_door_highlight.png';
-	
 	var highlightEffects = [
 		new JumpingLabel(2, 2), 
 		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
@@ -26,7 +21,7 @@ var supermarketOutsideTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: bgImg,
+						texture: 'data/supermarket_outside_bg.png',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -36,7 +31,7 @@ var supermarketOutsideTemplate = ( function() {
 				children: {
 					playerBody: {
 						type: 'Sprite',
-						texture: playerImg,
+						texture: 'data/walk_anim.png',
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
@@ -45,7 +40,7 @@ var supermarketOutsideTemplate = ( function() {
 					toStreetButton: {
 						type: 'Button',
 						size: {x: 119, y: 516},
-						texture: toStreetHighlightImg,
+						texture: 'data/supermarket_to_street_highlight.png',
 						effects: highlightEffects,
 						pos: {x: 1024, y: 640},
 						anchor: {x: 1, y: 1},
@@ -58,7 +53,7 @@ var supermarketOutsideTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 173, y: 275},
-						texture: doorHighlightImg,
+						texture: 'data/supermarket_door_highlight.png',
 						effects: highlightEffects,
 						pos: {x: 630, y: 285},
 						label: {
