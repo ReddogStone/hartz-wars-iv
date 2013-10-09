@@ -1,7 +1,7 @@
 'use strict';
 
-var supermarketOutsideTemplate = ( function() {
-	var bgImg = new Image(); bgImg.src = 'data/supermarket_outside_bg.png';
+var supermarketInsideTemplate = ( function() {
+	var bgImg = new Image(); bgImg.src = 'data/supermarket_inside_bg.png';
 	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
 	var toStreetHighlightImg = new Image();	toStreetHighlightImg.src = 'data/supermarket_to_street_highlight.png';
 	var doorHighlightImg = new Image();	doorHighlightImg.src = 'data/supermarket_door_highlight.png';
@@ -41,43 +41,18 @@ var supermarketOutsideTemplate = ( function() {
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
 						anchor: {x: 0, y: 1}
-					},
-					toStreetButton: {
-						type: 'Button',
-						size: {x: 119, y: 516},
-						texture: toStreetHighlightImg,
-						effects: highlightEffects,
-						pos: {x: 1024, y: 640},
-						anchor: {x: 1, y: 1},
-						label: {
-							offset: {x: -40, y: -320},
-							text: 'Zur Straße',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
-						}
-					},
-					doorButton: {
-						type: 'Button',
-						size: {x: 173, y: 275},
-						texture: doorHighlightImg,
-						effects: highlightEffects,
-						pos: {x: 630, y: 285},
-						label: {
-							offset: {x: 0, y: 150},
-							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
-						}
-					},
+					}
 				}
 			}
 		}
 	};
 })();
 
-function SupermarketOutsideScene() {
+function SupermarketInsideScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(supermarketOutsideTemplate, this);
+	Node.loadFromTemplate(supermarketInsideTemplate, this);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;
@@ -89,8 +64,8 @@ function SupermarketOutsideScene() {
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	
-	foreground.toStreetButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
-	foreground.doorButton.onClicked = function() { if (self.onEnterSupermarket) self.onEnterSupermarket(); };
+//	foreground.toStreetButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
+//	foreground.chestButton.onClicked = function() { if (self.onSleep) self.onSleep(); };
 }
-SupermarketOutsideScene.extends(Scene);
+SupermarketInsideScene.extends(Scene);
 	
