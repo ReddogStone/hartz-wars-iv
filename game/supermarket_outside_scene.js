@@ -1,13 +1,11 @@
 'use strict';
 
-var barSceneTemplate = ( function() {
-	var bgImg = new Image(); bgImg.src = 'data/bar_bg.png';
-	var doenerImg = new Image(); doenerImg.src = 'data/doener.png';
+var supermarketOutsideTemplate = ( function() {
+	var bgImg = new Image(); bgImg.src = 'data/supermarket_outside_bg.png';
 	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
-	var doorHighlightImg = new Image();	doorHighlightImg.src = 'data/bar_door_highlight.png';
-	var progressImg = new Image(); progressImg.src = 'data/progress.png';
+	var toStreetHighlightImg = new Image();	toStreetHighlightImg.src = 'data/supermarket_to_street_highlight.png';
 	
-	var roomDoorEffects = [
+	var highlightEffects = [
 		new JumpingLabel(2, 2), 
 		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
 		new GenericButtonEffect( function(button) {
@@ -19,10 +17,6 @@ var barSceneTemplate = ( function() {
 			}
 		})];
 
-	var foodButtonEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, new Color(0.39, 1, 0.39), Color.white)];
-		
 	return {
 		type: 'Scene',
 		children: {
@@ -47,27 +41,16 @@ var barSceneTemplate = ( function() {
 						pos: {x: 250, y: 700},
 						anchor: {x: 0, y: 1}
 					},
-					doorButton: {
+					toStreetButton: {
 						type: 'Button',
-						size: {x: 80, y: 570},
-						texture: doorHighlightImg,
-						effects: roomDoorEffects,
-						pos: {x: 0, y: 23},
+						size: {x: 119, y: 516},
+						texture: toStreetHighlightImg,
+						effects: highlightEffects,
+						pos: {x: 1024, y: 640},
+						anchor: {x: 1, y: 1},
 						label: {
-							offset: {x: 50, y: 310},
-							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
-						}
-					},
-					doenerButton: {
-						type: 'Button',
-						size: {x: 160, y: 90},
-						texture: doenerImg,
-						effects: foodButtonEffects,
-						pos: {x: 205, y: 50},
-						label: {
-							offset: {x: 0, y: 100},
-							text: 'Döner - 3,20€',
+							offset: {x: -40, y: -320},
+							text: 'Zur Straße',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					},
@@ -77,11 +60,11 @@ var barSceneTemplate = ( function() {
 	};
 })();
 
-function BarScene() {
+function SupermarketOutsideScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(barSceneTemplate, this);
+	Node.loadFromTemplate(supermarketOutsideTemplate, this);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;
@@ -93,8 +76,8 @@ function BarScene() {
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	
-	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) { self.onExitToStreet(); } };
-	foreground.doenerButton.onClicked = function() { if (self.onEatDoener) { self.onEatDoener(); } };
+	foreground.toStreetButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
+//	foreground.chestButton.onClicked = function() { if (self.onSleep) self.onSleep(); };
 }
-BarScene.extends(Scene);
+SupermarketOutsideScene.extends(Scene);
 	

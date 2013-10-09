@@ -88,8 +88,8 @@ function RoomScene() {
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	
-	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
-	foreground.chestButton.onClicked = function() { if (self.onSleep) self.onSleep(); };
+	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) { self.onExitToStreet(); } };
+	foreground.chestButton.onClicked = function() { if (self.onSleep) { self.onSleep(); } };
 }
 RoomScene.extends(Scene);
 	

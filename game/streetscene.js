@@ -5,6 +5,7 @@ var streetSceneTemplate = ( function() {
 	var bgImg = new Image(); bgImg.src = 'data/street_bg.png';
 	var homeDoorHighlightImg = new Image();	homeDoorHighlightImg.src = 'data/street_home_door_highlight.png';
 	var barDoorHighlightImg = new Image();	barDoorHighlightImg.src = 'data/street_bar_door_highlight.png';
+	var toSuprmarketHighlightImg = new Image();	toSuprmarketHighlightImg.src = 'data/street_to_supermarket_highlight.png';
 	var mapImg = new Image(); mapImg.src = 'data/map.png';
 
 	var mapHomeButtonEffects = [new GenericButtonEffect( function(button) {
@@ -92,6 +93,20 @@ var streetSceneTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: 90},
 							text: 'Reingehen',
+							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							z: 10
+						}
+					},
+					toSupermarketButton: {
+						type: 'Button',
+						size: {x: 52, y: 640},
+						texture: toSuprmarketHighlightImg,
+						effects: doorButtonEffects,
+						pos: {x: 0, y: 0},
+						label: {
+							offset: {x: 40, y: 100},
+							anchor: {x: 0, y: 0.5},
+							text: 'Zum Supermarkt',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
 						}
 					},
@@ -171,10 +186,13 @@ function StreetScene() {
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	foreground.homeDoorButton.onClicked = function() { 
-		if (self.onEnterHome) self.onEnterHome(); 
+		if (self.onEnterHome) { self.onEnterHome(); }
 	};
 	foreground.barDoorButton.onClicked = function() { 
-		if (self.onEnterBar) self.onEnterBar();
+		if (self.onEnterBar) { self.onEnterBar(); }
+	};
+	foreground.toSupermarketButton.onClicked = function() { 
+		if (self.onExitToSupermarket) { self.onExitToSupermarket(); }
 	};
 	button = foreground.mapButton;
 	button.size = Size.clone(button.label.size);

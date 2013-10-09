@@ -23,7 +23,7 @@ Node.loadFromTemplate = ( function() {
 		
 		if (template.texture) { sprite.texture = template.texture; }
 		if (template.sourceRect) { sprite.sourceRect = Rect.clone(template.sourceRect); }
-		if (template.color) { sprite.color = template.color; }
+		if (template.color) { sprite.color = Color.clone(template.color); }
 		if (template.blend)	{ sprite.blend = template.blend; }
 	}
 	
@@ -32,7 +32,7 @@ Node.loadFromTemplate = ( function() {
 		
 		if (template.text) { label.text = template.text; }
 		if (template.font) { label.font = Font.clone(template.font); }
-		if (template.color) { label.color = template.color; }
+		if (template.color) { label.color = Color.clone(template.color); }
 	}
 
 	module.loadButton = function(template, button) {
@@ -53,8 +53,8 @@ Node.loadFromTemplate = ( function() {
 		if (template.texture) { progress.texture = template.texture; }
 		if (template.frameRect) { progress.frameRect = Rect.clone(template.frameRect); }
 		if (template.fillRect) { progress.fillRect = Rect.clone(template.fillRect); }
-		if (template.frameColor) { progress.frameColor = template.frameColor; }
-		if (template.fillColor) { progress.fillColor = template.fillColor; }
+		if (template.frameColor) { progress.frameColor = Color.clone(template.frameColor); }
+		if (template.fillColor) { progress.fillColor = Color.clone(template.fillColor); }
 		if (template.progress) { progress.progress = template.progress; }
 	}
 

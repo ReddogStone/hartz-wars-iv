@@ -31,7 +31,7 @@ JumpingLabel.prototype.apply = function(button) {
 };
 
 function ChangingColor(active, pressed, hovered, inactive) {
-	this._colors = [active, pressed, hovered, inactive];
+	this._colors = [Color.clone(active), Color.clone(pressed), Color.clone(hovered), Color.clone(inactive)];
 }
 ChangingColor.prototype.apply = function(button) {
 	var state = button.getState();
