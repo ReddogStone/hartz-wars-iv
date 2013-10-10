@@ -190,7 +190,7 @@
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(100, 170);
-			playerBody.scale = new Size(0.6, 0.6);
+			playerBody.scale = new Size(0.4, 0.4);
 			playerBody.z = 0;
 		}
 		g_barScene.onEatDoener = function() {
@@ -212,6 +212,10 @@
 		g_streetScene.onExitToSupermarket = function() {
 			g_root.children[0] = g_supermarketOutsideScene;
 			g_root.init();
+			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
+			playerBody.pos = new Pos(1000, 700);
+			playerBody.scale = new Size(-1, 1);
+			playerBody.z = 0;
 		};
 		g_supermarketOutsideScene = new SupermarketOutsideScene();
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
@@ -221,7 +225,7 @@
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(60, 170);
-			playerBody.scale = new Size(0.5, 0.5);
+			playerBody.scale = new Size(0.4, 0.4);
 			playerBody.z = 0;
 		};
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
@@ -234,7 +238,7 @@
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(60, 170);
-			playerBody.scale = new Size(0.5, 0.5);
+			playerBody.scale = new Size(0.4, 0.4);
 			playerBody.z = 0;
 		};
 		

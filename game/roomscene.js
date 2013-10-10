@@ -1,11 +1,6 @@
 'use strict';
 
 var roomSceneTemplate = ( function() {
-	var bgImg = new Image(); bgImg.src = 'data/room_bg.png';
-	var playerImg = new Image(); playerImg.src = 'data/walk_anim.png';
-	var roomDoorHighlightImg = new Image();	roomDoorHighlightImg.src = 'data/room_door_highlight.png';
-	var chestHighlightImg = new Image(); chestHighlightImg.src = 'data/room_chest_highlight.png';
-	
 	var highlightEffects = [
 		new JumpingLabel(2, 2), 
 		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
@@ -26,7 +21,7 @@ var roomSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: bgImg,
+						texture: 'data/room_bg.png',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -36,7 +31,7 @@ var roomSceneTemplate = ( function() {
 				children: {
 					playerBody: {
 						type: 'Sprite',
-						texture: playerImg,
+						texture: 'data/walk_anim.png',
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 400, y: 600},
@@ -45,7 +40,7 @@ var roomSceneTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 148, y: 286},
-						texture: roomDoorHighlightImg,
+						texture: 'data/room_door_highlight.png',
 						effects: highlightEffects,
 						pos: {x: 630, y: 152},
 						label: {
@@ -57,7 +52,7 @@ var roomSceneTemplate = ( function() {
 					chestButton: {
 						type: 'Button',
 						size: {x: 205, y: 164},
-						texture: chestHighlightImg,
+						texture: 'data/room_chest_highlight.png',
 						effects: highlightEffects,
 						pos: {x: 139, y: 342},
 						label: {

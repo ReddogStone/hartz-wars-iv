@@ -1,8 +1,6 @@
 'use strict';
 
 var uiSceneTemplate = ( function() {
-	var progressImg = new Image(); progressImg.src = 'data/progress.png';
-	
 	return {
 		type: 'Scene',
 		children: {
@@ -30,7 +28,7 @@ var uiSceneTemplate = ( function() {
 			saturationProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
-				texture: progressImg,
+				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: 200, y: 650},
@@ -51,7 +49,7 @@ var uiSceneTemplate = ( function() {
 			energyProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
-				texture: progressImg,
+				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: 200, y: 690},
@@ -72,7 +70,7 @@ var uiSceneTemplate = ( function() {
 			funProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
-				texture: progressImg,
+				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: 200, y: 730},

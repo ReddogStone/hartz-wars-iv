@@ -56,7 +56,7 @@ Node.loadFromTemplate = ( function() {
 	module.loadProgress = function(template, progress) {
 		module.loadNode(template, progress);
 		
-		if (template.texture) { progress.texture = template.texture; }
+		if (template.texture) { progress.texture = loadImage(template.texture); }
 		if (template.frameRect) { progress.frameRect = Rect.clone(template.frameRect); }
 		if (template.fillRect) { progress.fillRect = Rect.clone(template.fillRect); }
 		if (template.frameColor) { progress.frameColor = Color.clone(template.frameColor); }
