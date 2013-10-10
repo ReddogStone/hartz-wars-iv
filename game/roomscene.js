@@ -22,7 +22,8 @@ var roomSceneTemplate = ( function() {
 					sprite: {
 						type: 'Sprite',
 						texture: 'data/room_bg.png',
-						size: {x: 1024, y: 640}
+						size: {x: 1024, y: 640},
+						z: 0
 					}
 				}
 			},
@@ -35,7 +36,8 @@ var roomSceneTemplate = ( function() {
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 400, y: 600},
-						anchor: {x: 0, y: 1}
+						anchor: {x: 0, y: 1},
+						z: 10
 					},
 					doorButton: {
 						type: 'Button',
@@ -46,8 +48,9 @@ var roomSceneTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: -170},
 							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
-						}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+						},
+						z: 5
 					},
 					chestButton: {
 						type: 'Button',
@@ -59,7 +62,8 @@ var roomSceneTemplate = ( function() {
 							offset: {x: 0, y: -100},
 							text: 'Schlafen',
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}
-						}
+						},
+						z: 5
 					}
 				}
 			}

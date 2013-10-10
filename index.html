@@ -8,6 +8,7 @@
 <script src="engine/loc.js" type="text/javascript"></script>
 <script src="engine/renderutils.js" type="text/javascript"></script>
 <script src="engine/color.js" type="text/javascript"></script>
+<script src="engine/viewport.js" type="text/javascript"></script>
 <script src="engine/node.js" type="text/javascript"></script>
 <script src="engine/nodeloader.js" type="text/javascript"></script>
 <script src="engine/renderlist.js" type="text/javascript"></script>
@@ -64,6 +65,8 @@
 	var g_root;
 	var g_player;
 	
+	var g_mainViewport = new Viewport(new Rect(0, 0, 1024, 640));
+	
 	function animate(lastTime, canvas, context){
 		// update
 		var time = window.performance.now();
@@ -90,7 +93,9 @@
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
 		// draw scene
-		g_root.render(context);
+//		g_root.render(context);
+
+		g_mainViewport.render(context, g_roomScene);
 		
 		// draw fps
 		context.font = "20pt Comic Sans MS";
@@ -265,7 +270,7 @@
 		g_player.money = 391;
 		
 		g_root = new Scene();
-		g_root.addChild(g_supermarketInsideScene);
+		g_root.addChild(g_roomScene);
 		g_root.addChild(g_uiScene);
 /*		var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
 		playerBody.pos = new Pos(1000, 680);

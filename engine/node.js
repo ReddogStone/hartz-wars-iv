@@ -8,6 +8,9 @@ function Node() {
 	this.scale = new Size(1, 1);
 	this.alpha = 1.0;
 	this.z = Number.NEGATIVE_INFINITY;
+	if (!('size' in this)) {
+		this.size = new Size(0, 0);
+	}
 	
 	this.children = new SortedList( function(a, b) {return a.z < b.z;} );
 	this.actions = [];
@@ -26,6 +29,10 @@ Node.extends(Object, {
 		var scale = this.scale;
 		var size = this.size;
 		var anchor = this.anchor;
+		
+		if (!size) {
+			debugger;
+		}
 		
 		return Transform.identity().
 			translate(pos.x, pos.y).

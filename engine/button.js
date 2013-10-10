@@ -99,6 +99,7 @@ function Button(size, texture, effects) {
 	}/* else {
 		this.addEffect(new ChangingColor('#000000', '#0000FF', '#FF0000', '#909090'));
 	}*/
+	this._z;
 	
 	this.onPressed = null;
 	this.onClicked = null;
@@ -123,6 +124,14 @@ Button.extends(Node, {
 		} else {
 			return ButtonState.INACTIVE;
 		}
+	},
+	get z() {
+		return this._z;
+	},
+	set z(value) {
+		this._z = value;
+		if (this.sprite) { this.sprite.z = value; }
+		if (this.label) { this.label.z = value; }
 	},
 	get size() {
 		return this._size;

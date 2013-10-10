@@ -75,13 +75,13 @@ Transform.extends(Object, {
 		var n10 = n[_M10]; var n11 = n[_M11]; var n12 = n[_M12];
 		var n20 = n[_M20]; var n21 = n[_M21]; var n22 = n[_M22];
 		r[_M00] = m00 * n00 + m10 * n01 + m20 * n02;
-		r[_M01] = m00 * n00 + m10 * n01 + m20 * n02;
-		r[_M02] = m00 * n00 + m10 * n01 + m20 * n02;
-		r[_M10] = m01 * n10 + m11 * n11 + m21 * n12;
+		r[_M01] = m01 * n00 + m11 * n01 + m21 * n02;
+		r[_M02] = m02 * n00 + m12 * n01 + m22 * n02;
+		r[_M10] = m00 * n10 + m10 * n11 + m20 * n12;
 		r[_M11] = m01 * n10 + m11 * n11 + m21 * n12;
-		r[_M12] = m01 * n10 + m11 * n11 + m21 * n12;
-		r[_M20] = m02 * n20 + m12 * n21 + m22 * n22;
-		r[_M21] = m02 * n20 + m12 * n21 + m22 * n22;
+		r[_M12] = m02 * n10 + m12 * n11 + m22 * n12;
+		r[_M20] = m00 * n20 + m10 * n21 + m20 * n22;
+		r[_M21] = m01 * n20 + m11 * n21 + m21 * n22;
 		r[_M22] = m02 * n20 + m12 * n21 + m22 * n22;
 		return res;
 	},
@@ -125,6 +125,10 @@ Transform.extends(Object, {
 		r[_M21] = (m01 * m20 - m00 * m21) / det;
 		r[_M22] = (m00 * m11 - m01 * m10) / det;
 		return res;
+	},
+	setToContext: function(context) {
+		var m = this._matrix;
+		context.setTransform(m[_M00], m[_M01], m[_M10], m[_M11], m[_M20], m[_M21]);
 	}
 });
 Transform.identity = function() {
