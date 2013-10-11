@@ -90,6 +90,7 @@ var supermarketInsideTemplate = ( function() {
 		children: {
 			background: {
 				type: 'Scene',
+				z: 0,
 				children: {
 					sprite: {
 						type: 'Sprite',
@@ -107,7 +108,8 @@ var supermarketInsideTemplate = ( function() {
 						size: {x: 150, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
-						anchor: {x: 0, y: 1}
+						anchor: {x: 0, y: 1},
+						z: 1
 					}
 				}
 			},
@@ -196,6 +198,9 @@ SupermarketInsideScene.extends(Scene, {
 		
 		var buyOverlay = this.buyOverlay;
 		buyOverlay.exitButton.onClicked = function() { if (self.onExit) self.onExit(); };		
+		buyOverlay.buyCheapButton.onClicked = function() { if (self.onBuyCheapFood) { self.onBuyCheapFood(); } };
+		buyOverlay.buyExpensiveButton.onClicked = function() { if (self.onBuyExpensiveFood) { self.onBuyExpensiveFood(); } };
+		buyOverlay.buyHealthyButton.onClicked = function() { if (self.onBuyHealthyFood) { self.onBuyHealthyFood(); } };
 	}
 });
 	

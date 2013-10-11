@@ -44,6 +44,7 @@ Viewport.extends(Object, {
 			var node = current[0];
 			var transform = current[1];
 			transform.setToContext(bufferContext);
+			bufferContext.globalAlpha = node.alpha;
 			node.renderSelf(bufferContext);
 		}
 		var destRect = this.destRect;

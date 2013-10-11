@@ -13,11 +13,11 @@ Node.loadFromTemplate = ( function() {
 		if (template.pos) { node.pos = Pos.clone(template.pos); }
 		if (template.anchor) { node.anchor = Point.clone(template.anchor); }
 		if (template.size) { node.size = Size.clone(template.size); }
-		if (template.visible) { node.visible = template.visible; }
-		if (template.selfVisible) { node.selfVisible = template.selfVisible; }
+		if (template.visible !== undefined) { node.visible = template.visible; }
+		if (template.selfVisible !== undefined) { node.selfVisible = template.selfVisible; }
 		if (template.scale) { node.scale = Size.clone(template.scale); }
-		if (template.alpha) { node.alpha = template.alpha; }
-		if (template.z) { node.z = template.z; }
+		if (template.alpha !== undefined) { node.alpha = template.alpha; }
+		if (template.z !== undefined) { node.z = template.z; }
 	}
 
 	module.loadScene = function(template, scene) {

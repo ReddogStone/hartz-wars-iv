@@ -203,7 +203,6 @@ Button.extends(Node, {
 						this._setState(ButtonState.HOVERED);
 					}
 				}
-				return true;
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}

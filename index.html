@@ -182,7 +182,6 @@
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(850, 280);
 			playerBody.scale = new Size(-0.5, 0.5);
-			playerBody.z = 0;
 		};
 		g_roomScene.onSleep = function() {
 			g_player.saturation -= 10;
@@ -196,7 +195,6 @@
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(100, 170);
 			playerBody.scale = new Size(0.4, 0.4);
-			playerBody.z = 0;
 		}
 		g_barScene.onEatDoener = function() {
 			if (g_player.money >= 3.2) {
@@ -220,7 +218,6 @@
 			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
 			playerBody.pos = new Pos(1000, 700);
 			playerBody.scale = new Size(-1, 1);
-			playerBody.z = 0;
 		};
 		g_supermarketOutsideScene = new SupermarketOutsideScene();
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
@@ -231,7 +228,6 @@
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(60, 170);
 			playerBody.scale = new Size(0.4, 0.4);
-			playerBody.z = 0;
 		};
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
 			g_root = g_supermarketInsideScene;
@@ -241,11 +237,19 @@
 		g_supermarketInsideScene.onExit = function() {
 			g_root = g_supermarketOutsideScene;
 			g_root.init();
-			var playerBody = g_player.body = g_streetScene.playerBody;
-			playerBody.pos = new Pos(60, 170);
-			playerBody.scale = new Size(0.4, 0.4);
-			playerBody.z = 0;
+			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
+			playerBody.pos = new Pos(700, 570);
+			playerBody.scale = new Size(-0.7, 0.7);
 		};
+		g_supermarketInsideScene.onBuyCheapFood = function() {
+			g_player.money -= 10;
+		}
+		g_supermarketInsideScene.onBuyExpensiveFood = function() {
+			g_player.money -= 30;
+		}
+		g_supermarketInsideScene.onBuyHealthyFood = function() {
+			g_player.money -= 15;
+		}
 		
 		g_uiScene = new UIScene();
 		g_player.onValueChanged = function(valueName, newValue) {
