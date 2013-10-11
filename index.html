@@ -65,7 +65,8 @@
 	var g_root;
 	var g_player;
 	
-	var g_mainViewport = new Viewport(new Rect(0, 0, 1024, 640));
+	var g_mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
+	var g_uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
 	
 	function animate(lastTime, canvas, context){
 		// update
@@ -93,9 +94,8 @@
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
 		// draw scene
-//		g_root.render(context);
-
-		g_mainViewport.render(context, g_roomScene);
+		g_mainViewport.render(context, g_root);
+		g_uiViewport.render(context, g_uiScene);
 		
 		// draw fps
 		context.font = "20pt Comic Sans MS";
@@ -177,7 +177,7 @@
 		g_player = new Player();
 		g_roomScene = new RoomScene();
 		g_roomScene.onExitToStreet = function() {
-			g_root.children[0] = g_streetScene; 
+			g_root = g_streetScene; 
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(850, 280);
@@ -191,7 +191,7 @@
 		
 		g_barScene = new BarScene();
 		g_barScene.onExitToStreet = function() {
-			g_root.children[0] = g_streetScene; 
+			g_root = g_streetScene; 
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(100, 170);
@@ -207,15 +207,15 @@
 		
 		g_streetScene = new StreetScene();
 		g_streetScene.onEnterHome = function() {
-			g_root.children[0] = g_roomScene;
+			g_root = g_roomScene;
 			g_root.init();
 		};
 		g_streetScene.onEnterBar = function() {
-			g_root.children[0] = g_barScene;
+			g_root = g_barScene;
 			g_root.init();
 		};
 		g_streetScene.onExitToSupermarket = function() {
-			g_root.children[0] = g_supermarketOutsideScene;
+			g_root = g_supermarketOutsideScene;
 			g_root.init();
 			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
 			playerBody.pos = new Pos(1000, 700);
@@ -226,7 +226,7 @@
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
 		};
 		g_supermarketOutsideScene.onExitToStreet = function() {
-			g_root.children[0] = g_streetScene;
+			g_root = g_streetScene;
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(60, 170);
@@ -234,12 +234,12 @@
 			playerBody.z = 0;
 		};
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
-			g_root.children[0] = g_supermarketInsideScene;
+			g_root = g_supermarketInsideScene;
 			g_root.init();
 		};
 		g_supermarketInsideScene = new SupermarketInsideScene();
 		g_supermarketInsideScene.onExit = function() {
-			g_root.children[0] = g_supermarketOutsideScene;
+			g_root = g_supermarketOutsideScene;
 			g_root.init();
 			var playerBody = g_player.body = g_streetScene.playerBody;
 			playerBody.pos = new Pos(60, 170);
@@ -269,9 +269,7 @@
 		g_player.fun = 5;
 		g_player.money = 391;
 		
-		g_root = new Scene();
-		g_root.addChild(g_roomScene);
-		g_root.addChild(g_uiScene);
+		g_root = g_roomScene;
 /*		var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
 		playerBody.pos = new Pos(1000, 680);
 		playerBody.scale = new Size(-0.8, 0.8);

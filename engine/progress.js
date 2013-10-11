@@ -21,6 +21,16 @@ function Progress(size, texture, fillRect, frameRect) {
 	this.addChild(this._frameSprite);
 }
 Progress.extends(Node, {
+	get z() {
+		return this._z;
+	},
+	set z(value) {
+		this._z = value;
+		if (this._fillSpriteLeft) { this._fillSpriteLeft.z = value; }
+		if (this._fillSpriteMiddle) { this._fillSpriteMiddle.z = value; }
+		if (this._fillSpriteRight) { this._fillSpriteRight.z = value; }
+		if (this._frameSprite) { this._frameSprite.z = value + 1; }
+	},
 	get frameColor() {
 		return this._frameSprite.color;
 	},

@@ -7,8 +7,10 @@ var uiSceneTemplate = ( function() {
 			background: {
 				type: 'Sprite',
 				size: {x: 1024, y: 128},
-				pos: {x: 0, y: 640},
+				pos: {x: 0, y: 0},
+				scale: {x: 1, y: 1},
 				color: {green: 0.25},
+				z: 0
 			},
 			moneyLabel: {
 				type: 'Label',
@@ -16,14 +18,16 @@ var uiSceneTemplate = ( function() {
 				text: 'Geld: ',
 				font: {family: 'Comic Sans MS', size: 14, weight: 900},
 				color: Color.white,
-				pos: {x: 450, y: 650}
+				pos: {x: 450, y: 10},
+				z: 1
 			},
 			moneyAmountLabel: {
 				type: 'Label',
 				text: '100€',
 				font: {family: 'Comic Sans MS', size: 14, weight: 900},
 				color: Color.white,
-				pos: {x: 450, y: 650}
+				pos: {x: 450, y: 10},
+				z: 1
 			},
 			saturationProgress: {
 				type: 'Progress',
@@ -31,9 +35,10 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 650},
+				pos: {x: 200, y: 10},
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.5},
+				z: 1,
 				progress: 0.5,
 				children: {
 					label: {
@@ -52,9 +57,10 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 690},
+				pos: {x: 200, y: 50},
 				frameColor: {green: 0.56},
 				fillColor: {red: 1, green: 1},
+				z: 1,
 				progress: 0.5,
 				children: {
 					label: {
@@ -73,9 +79,10 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 730},
+				pos: {x: 200, y: 90},
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
+				z: 1,
 				progress: 0.5,
 				children: {
 					label: {
