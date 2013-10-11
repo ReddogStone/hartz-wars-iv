@@ -12,7 +12,7 @@ function Node() {
 		this.size = new Size(0, 0);
 	}
 	
-	this.children = new SortedList( function(a, b) {return a.z < b.z;} );
+	this.children = [];
 	this.actions = [];
 }
 Node.extends(Object, {
@@ -45,7 +45,7 @@ Node.extends(Object, {
 		return new Rect(0, 0, size.x, size.y);
 	},
 	addChild: function(child) {
-		this.children.add(child);
+		this.children.push(child);
 	},
 	removeChild: function(child) {
 		this.children.remove(child);
@@ -83,7 +83,7 @@ Node.extends(Object, {
 			this.renderSelf(context);
 		}		
 		
-		this.children.resort();
+//		this.children.resort();
 		this.children.forEach(function(element, index, array) {
 			element.render(context);
 		});

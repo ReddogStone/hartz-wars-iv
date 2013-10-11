@@ -19,7 +19,7 @@ var supermarketInsideTemplate = ( function() {
 			}
 			button.label.color = color;
 		})];
-	var darkButtonEffects = [
+	var cheapButtonEffects = [
 		new JumpingLabel(2, 2),		
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
@@ -37,7 +37,25 @@ var supermarketInsideTemplate = ( function() {
 			}
 			button.label.color = color;
 		})];
-	var lightButtonEffects = [
+	var healthyButtonEffects = [
+		new JumpingLabel(2, 2),		
+		new GenericButtonEffect( function(button) {
+			var state = button.getState();
+			var color = Color.black;
+			switch (state) {
+				case ButtonState.ACTIVE:
+					color = Color.white;
+					break;
+				case ButtonState.HOVERED:
+					color = Color.red;
+					break;
+				case ButtonState.PRESSED:
+					color = new Color(0, 0.8, 0);
+					break;
+			}
+			button.label.color = color;
+		})];
+	var expensiveButtonEffects = [
 		new JumpingLabel(2, 2),		
 		new GenericButtonEffect( function(button) {
 			var state = button.getState();
@@ -120,33 +138,33 @@ var supermarketInsideTemplate = ( function() {
 						size: {x: 200, y: 125},
 						texture: 'data/supermarket_cheap_food.png',
 						pos: {x: 9, y: 70},
-						effects: darkButtonEffects,
+						effects: cheapButtonEffects,
 						label: {
-							text: 'Billigessen',
+							text: 'Billig',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
 						}
 					},
 					buyExpensiveButton: {
 						type: 'Button',
-						size: {x: 200, y: 125},
+						size: {x: 193, y: 125},
 						texture: 'data/supermarket_expensive_food.png',
-						pos: {x: 209, y: 70},
-						effects: lightButtonEffects,
+						pos: {x: 214, y: 70},
+						effects: expensiveButtonEffects,
 						label: {
-							text: 'Gutes Essen',
+							text: 'Vornehm',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
 						}
 					},
 					buyHealthyButton: {
 						type: 'Button',
-						size: {x: 200, y: 125},
+						size: {x: 200, y: 131},
 						texture: 'data/supermarket_healthy_food.png',
-						pos: {x: 9, y: 202},
-						effects: darkButtonEffects,
+						pos: {x: 9, y: 200},
+						effects: healthyButtonEffects,
 						label: {
-							text: 'Bio-Essen',
+							text: 'Gesund',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
 						}
@@ -163,6 +181,7 @@ function SupermarketInsideScene() {
 SupermarketInsideScene.extends(Scene, {
 	init: function() {
 		var self = this;
+		this.children.clear();
 		Node.loadFromTemplate(supermarketInsideTemplate, this);
 		var foreground = this.foreground;
 
