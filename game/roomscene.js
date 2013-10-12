@@ -33,7 +33,7 @@ var roomSceneTemplate = ( function() {
 					playerBody: {
 						type: 'Sprite',
 						texture: 'data/walk_anim.png',
-						size: {x: 150, y: 300},
+						size: {x: 180, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 400, y: 600},
 						anchor: {x: 0, y: 1},
@@ -80,10 +80,10 @@ function RoomScene() {
 
 	var sprite = foreground.playerBody;
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
-	animation.addFrame(new Rect(30, 30, 100, 200));
-	animation.addFrame(new Rect(155, 30, 100, 200));
-	animation.addFrame(new Rect(292, 30, 100, 200));
-	animation.addFrame(new Rect(442, 30, 100, 200));
+	animation.addFrame(new Rect(0, 0, 150, 250));
+	animation.addFrame(new Rect(150, 0, 150, 250));
+	animation.addFrame(new Rect(300, 0, 150, 250));
+	animation.addFrame(new Rect(450, 0, 150, 250));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
 	
