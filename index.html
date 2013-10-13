@@ -177,11 +177,9 @@
 		g_player = new Player();
 		g_roomScene = new RoomScene();
 		g_roomScene.onExitToStreet = function() {
+			g_streetScene.enterFromRoom();
 			g_root = g_streetScene; 
 			g_root.init();
-			var playerBody = g_player.body = g_streetScene.playerBody;
-			playerBody.pos = new Pos(850, 280);
-			playerBody.scale = new Size(-0.5, 0.5);
 		};
 		g_roomScene.onSleep = function() {
 			g_player.saturation -= 10;
@@ -190,11 +188,9 @@
 		
 		g_barScene = new BarScene();
 		g_barScene.onExitToStreet = function() {
-			g_root = g_streetScene; 
+			g_streetScene.enterFromBar();
+			g_root = g_streetScene;
 			g_root.init();
-			var playerBody = g_player.body = g_streetScene.playerBody;
-			playerBody.pos = new Pos(100, 170);
-			playerBody.scale = new Size(0.4, 0.4);
 		}
 		g_barScene.onEatDoener = function() {
 			if (g_player.money >= 3.2) {
@@ -213,21 +209,17 @@
 			g_root.init();
 		};
 		g_streetScene.onExitToSupermarket = function() {
+			g_supermarketOutsideScene.enterFromStreet();
 			g_root = g_supermarketOutsideScene;
 			g_root.init();
-			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
-			playerBody.pos = new Pos(1000, 700);
-			playerBody.scale = new Size(-1, 1);
 		};
 		g_supermarketOutsideScene = new SupermarketOutsideScene();
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
 		};
 		g_supermarketOutsideScene.onExitToStreet = function() {
+			g_streetScene.enterFromSupermarket();
 			g_root = g_streetScene;
 			g_root.init();
-			var playerBody = g_player.body = g_streetScene.playerBody;
-			playerBody.pos = new Pos(60, 170);
-			playerBody.scale = new Size(0.4, 0.4);
 		};
 		g_supermarketOutsideScene.onEnterSupermarket = function() {
 			g_root = g_supermarketInsideScene;
@@ -235,11 +227,9 @@
 		};
 		g_supermarketInsideScene = new SupermarketInsideScene();
 		g_supermarketInsideScene.onExit = function() {
+			g_supermarketOutsideScene.enterFromSupermarket();
 			g_root = g_supermarketOutsideScene;
 			g_root.init();
-			var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
-			playerBody.pos = new Pos(700, 570);
-			playerBody.scale = new Size(-0.7, 0.7);
 		};
 		g_supermarketInsideScene.onBuyCheapFood = function() {
 			g_player.money -= 10;

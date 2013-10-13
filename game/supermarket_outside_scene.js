@@ -22,7 +22,8 @@ var supermarketOutsideTemplate = ( function() {
 					sprite: {
 						type: 'Sprite',
 						texture: 'data/supermarket_outside_bg.png',
-						size: {x: 1024, y: 640}
+						size: {x: 1024, y: 640},
+						z: 0
 					}
 				}
 			},
@@ -35,7 +36,8 @@ var supermarketOutsideTemplate = ( function() {
 						size: {x: 180, y: 300},
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
-						anchor: {x: 0, y: 1}
+						anchor: {x: 0, y: 1},
+						z: 2
 					},
 					toStreetButton: {
 						type: 'Button',
@@ -44,10 +46,12 @@ var supermarketOutsideTemplate = ( function() {
 						effects: highlightEffects,
 						pos: {x: 1024, y: 640},
 						anchor: {x: 1, y: 1},
+						z: 1,
 						label: {
 							offset: {x: -40, y: -320},
 							text: 'Zur Straße',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							z: 3
 						}
 					},
 					doorButton: {
@@ -56,10 +60,12 @@ var supermarketOutsideTemplate = ( function() {
 						texture: 'data/supermarket_door_highlight.png',
 						effects: highlightEffects,
 						pos: {x: 630, y: 285},
+						z: 1,
 						label: {
 							offset: {x: 0, y: 150},
 							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							z: 3
 						}
 					},
 				}
@@ -87,5 +93,16 @@ function SupermarketOutsideScene() {
 	foreground.toStreetButton.onClicked = function() { if (self.onExitToStreet) self.onExitToStreet(); };
 	foreground.doorButton.onClicked = function() { if (self.onEnterSupermarket) self.onEnterSupermarket(); };
 }
-SupermarketOutsideScene.extends(Scene);
+SupermarketOutsideScene.extends(Scene, {
+	enterFromStreet: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(1000, 700);
+		playerBody.scale = new Size(-1, 1);
+	},
+	enterFromSupermarket: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(700, 570);
+		playerBody.scale = new Size(-0.7, 0.7);
+	}
+});
 	

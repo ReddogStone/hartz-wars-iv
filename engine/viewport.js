@@ -34,7 +34,7 @@ Viewport.extends(Object, {
 	},
 	render: function(context, scene) {
 		var flatList = this._gatherChildren(scene);
-		flatList.sort(function(a, b) {return (a.z - b.z);} );
+		flatList.sort(function(a, b) {return (a[0].z - b[0].z);} );
 		var buffer = this._buffer;
 		var bufferContext = buffer.getContext('2d');
 		bufferContext.clearRect(0, 0, buffer.width, buffer.height);

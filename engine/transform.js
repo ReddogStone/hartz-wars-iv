@@ -11,7 +11,7 @@ var _M21 = 7;
 var _M22 = 8;
 
 function Transform() {
-    this._matrix = new Array(9);
+	this._matrix = new Float32Array(9);
 };
 Transform.extends(Object, {
 	translate: function(x, y) {

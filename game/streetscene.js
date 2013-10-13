@@ -206,10 +206,23 @@ StreetScene.extends(Scene, {
 			map.pos.rot = value * 2 * Math.PI;
 			map.color = 'rgba(255,255,255,' + value + ')';
 		}));
-		
-//		map.pos.rot = 0.5;
 	},
 	deactivateMap: function() {
 		this.mapOverlay.visible = false;
+	},
+	enterFromRoom: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(850, 280);
+		playerBody.scale = new Size(-0.5, 0.5);
+	},
+	enterFromBar: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(100, 170);
+		playerBody.scale = new Size(0.4, 0.4);
+	},
+	enterFromSupermarket: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(60, 170);
+		playerBody.scale = new Size(0.4, 0.4);
 	}
 });
