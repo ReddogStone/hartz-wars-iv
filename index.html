@@ -164,6 +164,16 @@
 		handleMouseEvent(event, g_mouse.down, 'mouseMove');
 	}
 
+	function transitToScene(scene, func) {
+		return function() {
+			if (func) {
+				func.call(scene);
+			}
+			g_root = scene;
+			g_root.init();
+		};
+	}
+	
 	window.onload = function() {
 		g_canvas = document.getElementById("myCanvas");
 		var context = g_canvas.getContext("2d");
@@ -175,23 +185,10 @@
 		g_canvas.addEventListener('mouseup', handleMouseUp, false);
 		
 		g_player = new Player();
-		g_roomScene = new RoomScene();
-		g_roomScene.onExitToStreet = function() {
-			g_streetScene.enterFromRoom();
-			g_root = g_streetScene; 
-			g_root.init();
-		};
-		g_roomScene.onSleep = function() {
-			g_player.saturation -= 10;
-			g_player.energy += 5;
-		}
 		
+		// create scenes
+		g_roomScene = new RoomScene();
 		g_barScene = new BarScene();
-		g_barScene.onExitToStreet = function() {
-			g_streetScene.enterFromBar();
-			g_root = g_streetScene;
-			g_root.init();
-		}
 		g_barScene.onEatDoener = function() {
 			if (g_player.money >= 3.2) {
 				g_player.saturation += 10;
@@ -200,37 +197,9 @@
 		}
 		
 		g_streetScene = new StreetScene();
-		g_streetScene.onEnterHome = function() {
-			g_root = g_roomScene;
-			g_root.init();
-		};
-		g_streetScene.onEnterBar = function() {
-			g_root = g_barScene;
-			g_root.init();
-		};
-		g_streetScene.onExitToSupermarket = function() {
-			g_supermarketOutsideScene.enterFromStreet();
-			g_root = g_supermarketOutsideScene;
-			g_root.init();
-		};
+
 		g_supermarketOutsideScene = new SupermarketOutsideScene();
-		g_supermarketOutsideScene.onEnterSupermarket = function() {
-		};
-		g_supermarketOutsideScene.onExitToStreet = function() {
-			g_streetScene.enterFromSupermarket();
-			g_root = g_streetScene;
-			g_root.init();
-		};
-		g_supermarketOutsideScene.onEnterSupermarket = function() {
-			g_root = g_supermarketInsideScene;
-			g_root.init();
-		};
 		g_supermarketInsideScene = new SupermarketInsideScene();
-		g_supermarketInsideScene.onExit = function() {
-			g_supermarketOutsideScene.enterFromSupermarket();
-			g_root = g_supermarketOutsideScene;
-			g_root.init();
-		};
 		g_supermarketInsideScene.onBuyCheapFood = function() {
 			g_player.money -= 10;
 		}
@@ -241,6 +210,17 @@
 			g_player.money -= 15;
 		}
 		
+		// connect scenes
+		g_roomScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromRoom);		
+		g_barScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromBar);
+		g_streetScene.onEnterHome = transitToScene(g_roomScene);
+		g_streetScene.onEnterBar = transitToScene(g_barScene);
+		g_streetScene.onExitToSupermarket = transitToScene(g_supermarketOutsideScene, g_supermarketOutsideScene.enterFromStreet);
+		g_supermarketOutsideScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromSupermarket);
+		g_supermarketOutsideScene.onEnterSupermarket = transitToScene(g_supermarketInsideScene);
+		g_supermarketInsideScene.onExit = transitToScene(g_supermarketOutsideScene, g_supermarketOutsideScene.enterFromSupermarket);
+		
+		// create UI scene
 		g_uiScene = new UIScene();
 		g_player.onValueChanged = function(valueName, newValue) {
 			switch (valueName) {
@@ -263,12 +243,8 @@
 		g_player.fun = 5;
 		g_player.money = 391;
 		
-		g_root = g_roomScene;
-/*		var playerBody = g_player.body = g_supermarketOutsideScene.playerBody;
-		playerBody.pos = new Pos(1000, 680);
-		playerBody.scale = new Size(-0.8, 0.8);
-		playerBody.z = 0; */
-		g_root.init();
+		// initial transit
+		transitToScene(g_roomScene)();
 		
 		animate(window.performance.now(), g_canvas, context);
 	};
