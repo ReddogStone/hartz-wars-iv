@@ -23,13 +23,21 @@
 <script src="engine/label.js" type="text/javascript"></script>
 
 <script src="game/player.js" type="text/javascript"></script>
+<script src="game/product.js" type="text/javascript"></script>
+<script src="game/supermarket.js" type="text/javascript"></script>
+<script src="game/home.js" type="text/javascript"></script>
+<script src="game/world.js" type="text/javascript"></script>
+
 <script src="game/roomscene.js" type="text/javascript"></script>
 <script src="game/barscene.js" type="text/javascript"></script>
 <script src="game/streetscene.js" type="text/javascript"></script>
 <script src="game/supermarket_outside_scene.js" type="text/javascript"></script>
 <script src="game/supermarket_inside_scene.js" type="text/javascript"></script>
 <script src="game/uiscene.js" type="text/javascript"></script>
+
 <script src="game/clock.js" type="text/javascript"></script>
+
+<script src="game/gamecontroller.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 	'use strict';
@@ -53,20 +61,7 @@
 	
 	var g_mouse = {x: 0, y: 0, down: false};
 	
-	var g_camera;
-	var g_clock = new Clock(new Date());
-	
-	var g_roomScene;
-	var g_streetScene;
-	var g_barScene;
-	var g_uiScene;
-	var g_supermarketOutsideScene;
-	var g_supermarketInsideScene;
-	var g_root;
-	var g_player;
-	
-	var g_mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
-	var g_uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
+	var g_gameController;
 	
 	function animate(lastTime, canvas, context){
 		// update
@@ -84,18 +79,16 @@
 		}
 		
 		// update
-		g_clock.advance(10 * timeDiff / 60);
-		g_root.update(timeDiff);
+		g_gameController.update(timeDiff);
 		
-        var worldMousePos = g_camera.screenToWorld(g_mouse);
+        var worldMousePos = g_gameController.camera.screenToWorld(g_mouse);
 
 		// clear
 		context.fillStyle = "#003000";
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
 		// draw scene
-		g_mainViewport.render(context, g_root);
-		g_uiViewport.render(context, g_uiScene);
+		g_gameController.render(context);
 		
 		// draw fps
 		context.font = "20pt Comic Sans MS";
@@ -110,10 +103,11 @@
 		context.fillText(mouseText, 900, 25);
 		
 		// draw clock
+		var clock = g_gameController.world.clock;
 		context.fillStyle = "#000000";
-		context.fillText(g_clock.toString(), 682, 752);
+		context.fillText(clock.toString(), 682, 752);
 		context.fillStyle = "#FFFFFF";
-		context.fillText(g_clock.toString(), 680, 750);
+		context.fillText(clock.toString(), 680, 750);
 		
 		// request new frame
 		requestAnimFrame(function(){
@@ -147,9 +141,7 @@
 		g_mouse.y = coords.y;
 		g_mouse.down = isDown;
 
-		var transformedEvent = {x: g_mouse.x, y: g_mouse.y, down: g_mouse.down};
-		Vec.set(transformedEvent, g_root.getTransform().inverse().apply(transformedEvent));
-		g_root[type](transformedEvent);
+		g_gameController.handleMouseEvent(type, g_mouse);
 	}
 
 	function handleMouseDown(event) {
@@ -164,87 +156,16 @@
 		handleMouseEvent(event, g_mouse.down, 'mouseMove');
 	}
 
-	function transitToScene(scene, func) {
-		return function() {
-			if (func) {
-				func.call(scene);
-			}
-			g_root = scene;
-			g_root.init();
-		};
-	}
-	
 	window.onload = function() {
 		g_canvas = document.getElementById("myCanvas");
 		var context = g_canvas.getContext("2d");
 
-		g_camera = new Camera(-g_canvas.width * 0.5, -g_canvas.height * 0.5, 0, 1, 1);
+		g_gameController = new GameController();
+		g_gameController.initMainGame(g_canvas);
 		
 		g_canvas.addEventListener('mousedown', handleMouseDown, false);
 		g_canvas.addEventListener('mousemove', handleMouseMove, false);
 		g_canvas.addEventListener('mouseup', handleMouseUp, false);
-		
-		g_player = new Player();
-		
-		// create scenes
-		g_roomScene = new RoomScene();
-		g_barScene = new BarScene();
-		g_barScene.onEatDoener = function() {
-			if (g_player.money >= 3.2) {
-				g_player.saturation += 10;
-				g_player.money -= 3.2;
-			}
-		}
-		
-		g_streetScene = new StreetScene();
-
-		g_supermarketOutsideScene = new SupermarketOutsideScene();
-		g_supermarketInsideScene = new SupermarketInsideScene();
-		g_supermarketInsideScene.onBuyCheapFood = function() {
-			g_player.money -= 10;
-		}
-		g_supermarketInsideScene.onBuyExpensiveFood = function() {
-			g_player.money -= 30;
-		}
-		g_supermarketInsideScene.onBuyHealthyFood = function() {
-			g_player.money -= 15;
-		}
-		
-		// connect scenes
-		g_roomScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromRoom);		
-		g_barScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromBar);
-		g_streetScene.onEnterHome = transitToScene(g_roomScene);
-		g_streetScene.onEnterBar = transitToScene(g_barScene);
-		g_streetScene.onExitToSupermarket = transitToScene(g_supermarketOutsideScene, g_supermarketOutsideScene.enterFromStreet);
-		g_supermarketOutsideScene.onExitToStreet = transitToScene(g_streetScene, g_streetScene.enterFromSupermarket);
-		g_supermarketOutsideScene.onEnterSupermarket = transitToScene(g_supermarketInsideScene);
-		g_supermarketInsideScene.onExit = transitToScene(g_supermarketOutsideScene, g_supermarketOutsideScene.enterFromSupermarket);
-		
-		// create UI scene
-		g_uiScene = new UIScene();
-		g_player.onValueChanged = function(valueName, newValue) {
-			switch (valueName) {
-				case 'energy':
-					g_uiScene.energyProgress.progress = newValue * 0.01;
-					break;
-				case 'saturation':
-					g_uiScene.saturationProgress.progress = newValue * 0.01;
-					break;
-				case 'fun':
-					g_uiScene.funProgress.progress = newValue * 0.01;
-					break;
-				case 'money':
-					g_uiScene.moneyAmountLabel.text = newValue.toFixed(2) + '€';
-					break;
-			}
-		}
-		g_player.energy = 80;
-		g_player.saturation = 75;
-		g_player.fun = 5;
-		g_player.money = 391;
-		
-		// initial transit
-		transitToScene(g_roomScene)();
 		
 		animate(window.performance.now(), g_canvas, context);
 	};

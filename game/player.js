@@ -5,7 +5,7 @@ function Player() {
 	this._saturation = 100;
 	this._fun = 100;
 	this._money = 400;
-	this.body;
+	this.productInventory = [];
 };
 Player.extends(Object, {
 	setValue: function(valueName, value) {
@@ -28,5 +28,19 @@ Player.extends(Object, {
 		if (this.onValueChanged) {
 			this.onValueChanged('money', value);
 		}
+	},
+	canTakeProduct: function(product) {
+		return (this.productInventory.length <= 3);
+	},
+	takeProduct: function(product) {
+		this.productInventory.push(product);
+	},
+	dropAllProducts: function() {
+		var res = [];
+		var productInventory = this.productInventory;
+		while (productInventory.length > 0) {
+			res.unshift(productInventory.pop());
+		}
+		return res;
 	}
 });

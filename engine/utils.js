@@ -3,7 +3,12 @@
 Array.prototype.remove = function(element) {
 	var index = this.indexOf(element);
 	if (index > -1) {
-		this.splice(index, 1);
+		var result = this.splice(index, 1);
+		if (result.length === 1) {
+			return result[0];
+		} else {	
+			return null;
+		}
 	}
 }
 Array.prototype.clear = function() {
