@@ -35,23 +35,23 @@ GameController.extends(Object, {
 		var home = world.playerHome;
 		
 		// create scenes
-		var roomScene = this.roomScene = new RoomScene();
 		var barScene = this.barScene = new BarScene();
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
 		
 		// create controllers
+		var roomController = this.roomController = new RoomController(world);
 		var supermarketInsideController = this.supermarketInsideController = new SupermarketInsideController(world);
 		
 		// connect scenes
-		roomScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
+		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
 		barScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromBar);
 		supermarketOutsideScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromSupermarket);
 		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController);
 		supermarketInsideController.onExit = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromSupermarket);
 		streetScene.onEnterBar = this.transitToScene(barScene);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
-		var enterHome = this.transitToScene(roomScene);
+		var enterHome = this.transitToController(roomController);
 		streetScene.onEnterHome = function() {
 			var products = player.dropAllProducts();
 			home.storeProducts(products);
@@ -59,10 +59,6 @@ GameController.extends(Object, {
 		};
 		
 		// events
-		roomScene.onSleep = function() {
-			player.saturation -= 5;
-			player.energy += 5;
-		};
 		barScene.onEatDoener = function() {
 			if (player.money >= 3.2) {
 				player.saturation += 10;
@@ -94,7 +90,7 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(supermarketInsideController)();
+		this.transitToController(roomController)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
