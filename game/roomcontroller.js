@@ -21,7 +21,7 @@ RoomController.extends(Object, {
 		scene.onCookCheap = function() {
 			var product = world.playerHome.consumeProduct('cheap_food');
 			if (product) {
-				player.saturation += 10;
+				player.saturation += 20;
 				player.energy -= 5;
 				self._updateFoodAmount();
 			}
@@ -29,7 +29,7 @@ RoomController.extends(Object, {
 		scene.onCookExpensive = function() {
 			var product = world.playerHome.consumeProduct('expensive_food');
 			if (product) {
-				player.saturation += 5;
+				player.saturation += 15;
 				player.energy -= 10;
 				self._updateFoodAmount();
 			}
@@ -37,8 +37,8 @@ RoomController.extends(Object, {
 		scene.onCookHealthy = function() {
 			var product = world.playerHome.consumeProduct('healthy_food');
 			if (product) {
-				player.saturation += 5;
-				player.energy -= 10;
+				player.saturation += 15;
+				player.energy -= 5;
 				self._updateFoodAmount();
 			}
 		};
