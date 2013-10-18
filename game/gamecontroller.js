@@ -1,13 +1,5 @@
 'use strict';
 
-function buyProduct(buyer, product) {
-	var price = product.price;
-	if (buyer.money >= price) {
-		buyer.money -= price;
-		buyer.takeProduct(product);
-	}
-}
-
 function GameController(canvas) {
 }
 
@@ -19,8 +11,18 @@ GameController.extends(Object, {
 				func.call(scene);
 			}
 			self.rootScene = scene;
-			self.rootScene.init();
+			scene.init();
 		};
+	},
+	transitToController: function(controller, func) {
+		var self = this;
+		return function() {
+			if (func) {
+				func.call(controller);
+			}
+			self.rootScene = controller.scene;
+			controller.init();
+		};		
 	},
 	initMainGame: function(canvas) {
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
@@ -37,14 +39,16 @@ GameController.extends(Object, {
 		var barScene = this.barScene = new BarScene();
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
-		var supermarketInsideScene = this.supermarketInsideScene = new SupermarketInsideScene();
+		
+		// create controllers
+		var supermarketInsideController = this.supermarketInsideController = new SupermarketInsideController(world);
 		
 		// connect scenes
 		roomScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
 		barScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromBar);
 		supermarketOutsideScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromSupermarket);
-		supermarketOutsideScene.onEnterSupermarket = this.transitToScene(supermarketInsideScene);
-		supermarketInsideScene.onExit = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromSupermarket);
+		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController);
+		supermarketInsideController.onExit = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromSupermarket);
 		streetScene.onEnterBar = this.transitToScene(barScene);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
 		var enterHome = this.transitToScene(roomScene);
@@ -64,15 +68,6 @@ GameController.extends(Object, {
 				player.saturation += 10;
 				player.money -= 3.2;
 			}
-		}
-		supermarketInsideScene.onBuyCheapFood = function() {
-			buyProduct(player, supermarket.products['cheap_food']);
-		}
-		supermarketInsideScene.onBuyExpensiveFood = function() {
-			buyProduct(player, supermarket.products['expensive_food']);
-		}
-		supermarketInsideScene.onBuyHealthyFood = function() {
-			buyProduct(player, supermarket.products['healthy_food']);
 		}
 		
 		// create UI scene
@@ -99,7 +94,7 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToScene(roomScene)();
+		this.transitToController(supermarketInsideController)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);

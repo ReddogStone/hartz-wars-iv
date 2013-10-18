@@ -36,6 +36,9 @@ var supermarketInsideTemplate = ( function() {
 					break;
 			}
 			button.label.color = color;
+			if (button.priceLabel) {
+				button.priceLabel.color = color;
+			}
 		})];
 	var healthyButtonEffects = [
 		new JumpingLabel(2, 2),		
@@ -54,6 +57,9 @@ var supermarketInsideTemplate = ( function() {
 					break;
 			}
 			button.label.color = color;
+			if (button.priceLabel) {
+				button.priceLabel.color = color;
+			}
 		})];
 	var expensiveButtonEffects = [
 		new JumpingLabel(2, 2),		
@@ -72,6 +78,9 @@ var supermarketInsideTemplate = ( function() {
 					break;
 			}
 			button.label.color = color;
+			if (button.priceLabel) {
+				button.priceLabel.color = color;
+			}
 		})];
 	var highlightEffects = [
 		new JumpingLabel(2, 2), 
@@ -109,7 +118,7 @@ var supermarketInsideTemplate = ( function() {
 						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
 						pos: {x: 250, y: 700},
 						anchor: {x: 0, y: 1},
-						z: 1
+						z: 10
 					}
 				}
 			},
@@ -142,9 +151,16 @@ var supermarketInsideTemplate = ( function() {
 						pos: {x: 9, y: 70},
 						effects: cheapButtonEffects,
 						label: {
-							text: 'Billig',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+						},
+						children: {
+							priceLabel: {
+								type: 'Label',
+								anchor: {x: 0.5, y: 0.5},
+								pos: {x: 100, y: 70},
+								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							}
 						}
 					},
 					buyExpensiveButton: {
@@ -154,9 +170,16 @@ var supermarketInsideTemplate = ( function() {
 						pos: {x: 214, y: 70},
 						effects: expensiveButtonEffects,
 						label: {
-							text: 'Vornehm',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+						},
+						children: {
+							priceLabel: {
+								type: 'Label',
+								anchor: {x: 0.5, y: 0.5},
+								pos: {x: 100, y: 70},
+								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							}
 						}
 					},
 					buyHealthyButton: {
@@ -166,9 +189,16 @@ var supermarketInsideTemplate = ( function() {
 						pos: {x: 9, y: 200},
 						effects: healthyButtonEffects,
 						label: {
-							text: 'Gesund',
 							offset: {x: 0, y: -30},
 							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+						},
+						children: {
+							priceLabel: {
+								type: 'Label',
+								anchor: {x: 0.5, y: 0.5},
+								pos: {x: 100, y: 70},
+								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							}
 						}
 					}
 				}
@@ -179,28 +209,26 @@ var supermarketInsideTemplate = ( function() {
 
 function SupermarketInsideScene() {
 	Scene.apply(this);
-}
-SupermarketInsideScene.extends(Scene, {
-	init: function() {
-		var self = this;
-		this.children.clear();
-		Node.loadFromTemplate(supermarketInsideTemplate, this);
-		var foreground = this.foreground;
+	var self = this;
+	this.children.clear();
+	Node.loadFromTemplate(supermarketInsideTemplate, this);
+	var foreground = this.foreground;
 
-		var sprite = foreground.playerBody;
-		var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
+	var sprite = foreground.playerBody;
+	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
 	animation.addFrame(new Rect(0, 0, 150, 250));
 	animation.addFrame(new Rect(150, 0, 150, 250));
 	animation.addFrame(new Rect(300, 0, 150, 250));
 	animation.addFrame(new Rect(450, 0, 150, 250));
-		sprite.addAction(animation);
-		this.playerBody = sprite;
-		
-		var buyOverlay = this.buyOverlay;
-		buyOverlay.exitButton.onClicked = function() { if (self.onExit) self.onExit(); };		
-		buyOverlay.buyCheapButton.onClicked = function() { if (self.onBuyCheapFood) { self.onBuyCheapFood(); } };
-		buyOverlay.buyExpensiveButton.onClicked = function() { if (self.onBuyExpensiveFood) { self.onBuyExpensiveFood(); } };
-		buyOverlay.buyHealthyButton.onClicked = function() { if (self.onBuyHealthyFood) { self.onBuyHealthyFood(); } };
-	}
+	sprite.addAction(animation);
+	this.playerBody = sprite;
+	
+	var buyOverlay = this.buyOverlay;
+	buyOverlay.exitButton.onClicked = function() { if (self.onExit) self.onExit(); };		
+	buyOverlay.buyCheapButton.onClicked = function() { if (self.onBuyCheapFood) { self.onBuyCheapFood(); } };
+	buyOverlay.buyExpensiveButton.onClicked = function() { if (self.onBuyExpensiveFood) { self.onBuyExpensiveFood(); } };
+	buyOverlay.buyHealthyButton.onClicked = function() { if (self.onBuyHealthyFood) { self.onBuyHealthyFood(); } };
+}
+SupermarketInsideScene.extends(Scene, {
 });
 	

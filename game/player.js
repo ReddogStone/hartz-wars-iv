@@ -30,7 +30,7 @@ Player.extends(Object, {
 		}
 	},
 	canTakeProduct: function(product) {
-		return (this.productInventory.length <= 3);
+		return (this.productInventory.length < 3);
 	},
 	takeProduct: function(product) {
 		this.productInventory.push(product);
