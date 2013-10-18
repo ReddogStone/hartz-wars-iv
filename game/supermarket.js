@@ -5,7 +5,7 @@ function Supermarket() {
 }
 
 Supermarket.extends(Object, {
-	addProduct: function(name, product) {
-		this.products[name] = product;
+	addProduct: function(product) {
+		this.products[product.type] = product;
 	}
 });

@@ -28,18 +28,38 @@ SupermarketInsideController.extends(Object, {
 		buyOverlay.buyHealthyButton.label.text = supermarket.products['healthy_food'].label;
 		buyOverlay.buyHealthyButton.priceLabel.text = supermarket.products['healthy_food'].price.toFixed(2) + ' €';
 		
+		var self = this;
 		scene.onBuyCheapFood = function() {
 			buyProduct(player, supermarket.products['cheap_food']);
-		}
+			self.updatePlayerProductInventory();
+		};
 		scene.onBuyExpensiveFood = function() {
 			buyProduct(player, supermarket.products['expensive_food']);
-		}
+			self.updatePlayerProductInventory();
+		};
 		scene.onBuyHealthyFood = function() {
 			buyProduct(player, supermarket.products['healthy_food']);
-		}		
+			self.updatePlayerProductInventory();
+		};
+		this.updatePlayerProductInventory();
 	},
 	set onExit(value) {
 		this.scene.onExit = value;
+	},
+	updatePlayerProductInventory: function() {
+		var scene = this.scene;
+		scene.clearAllPlayerInventorySlots();
+		var productInventory = this._world.player.productInventory;
+		productInventory.forEach(function(element, index) {
+			var type;
+			switch (element.type) {
+				case 'cheap_food': type = 'cheap'; break;
+				case 'expensive_food': type = 'expensive'; break;
+				case 'healthy_food': type = 'healthy'; break;
+				default: 'invalid'; break;
+			}
+			scene.setPlayerInventorySlot(index, type);
+		}, this);
+		scene.playerInventoryFill.text = productInventory.length + ' / 3';
 	}
 });
-	

@@ -45,6 +45,7 @@ Node.loadFromTemplate = ( function() {
 		module.loadNode(template, button);
 		
 		if (template.texture) { button.texture = loadImage(template.texture); }
+		if (template.sourceRect) { button.sprite.sourceRect = Rect.clone(template.sourceRect); }
 		if (template.effects) { button.addEffects(template.effects); }
 		if (template.label) {
 			var label = template.label;

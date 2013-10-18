@@ -1,14 +1,13 @@
 'use strict';
 
-function Product(price, label) {
+function Product(type, price, label) {
+	this.type = type;
 	this.price = price;
 	this.label = label;
 }
 
-Product.extends(Object, {
-	
-});
+Product.extends(Object);
 
 Product.clone = function(value) {
-	return new Product(value.price, value.label);
+	return new Product(value.type, value.price, value.label);
 }

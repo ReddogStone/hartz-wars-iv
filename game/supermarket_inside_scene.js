@@ -147,7 +147,8 @@ var supermarketInsideTemplate = ( function() {
 					buyCheapButton: {
 						type: 'Button',
 						size: {x: 200, y: 125},
-						texture: 'data/supermarket_cheap_food.png',
+						texture: 'data/supermarket_food.png',
+						sourceRect: {x: 0, y: 0, sx: 200, sy: 125},
 						pos: {x: 9, y: 70},
 						effects: cheapButtonEffects,
 						label: {
@@ -166,7 +167,8 @@ var supermarketInsideTemplate = ( function() {
 					buyExpensiveButton: {
 						type: 'Button',
 						size: {x: 193, y: 125},
-						texture: 'data/supermarket_expensive_food.png',
+						texture: 'data/supermarket_food.png',
+						sourceRect: {x: 200, y: 0, sx: 200, sy: 125},
 						pos: {x: 214, y: 70},
 						effects: expensiveButtonEffects,
 						label: {
@@ -185,7 +187,8 @@ var supermarketInsideTemplate = ( function() {
 					buyHealthyButton: {
 						type: 'Button',
 						size: {x: 200, y: 131},
-						texture: 'data/supermarket_healthy_food.png',
+						texture: 'data/supermarket_food.png',
+						sourceRect: {x: 0, y: 125, sx: 200, sy: 125},
 						pos: {x: 9, y: 200},
 						effects: healthyButtonEffects,
 						label: {
@@ -200,6 +203,38 @@ var supermarketInsideTemplate = ( function() {
 								font: {family: 'Comic Sans MS', size: 24, weight: 900}
 							}
 						}
+					},
+					playerInventory1: {
+						type: 'Sprite',
+						texture: 'data/supermarket_food.png',
+						z: 1,
+						anchor: {x: 0.5, y: 0},
+						pos: {x: 495, y: 75},
+						size: {x: 100, y: 67.5}
+					},
+					playerInventory2: {
+						type: 'Sprite',
+						texture: 'data/supermarket_food.png',
+						z: 1,
+						anchor: {x: 0.5, y: 0},
+						pos: {x: 495, y: 150},
+						size: {x: 100, y: 67.5}
+					},
+					playerInventory3: {
+						type: 'Sprite',
+						texture: 'data/supermarket_food.png',
+						z: 1,
+						anchor: {x: 0.5, y: 0},
+						pos: {x: 495, y: 225},
+						size: {x: 100, y: 67.5}
+					},
+					playerInventoryFill: {
+						type: 'Label',
+						z: 1,
+						anchor: {x: 0.5, y: 0},
+						pos: {x: 495, y: 300},
+						color: {r: 0, g: 0, b: 0},
+						font: {family: 'Comic Sans MS', size: 24, weight: 900}
 					}
 				}
 			}
@@ -228,7 +263,38 @@ function SupermarketInsideScene() {
 	buyOverlay.buyCheapButton.onClicked = function() { if (self.onBuyCheapFood) { self.onBuyCheapFood(); } };
 	buyOverlay.buyExpensiveButton.onClicked = function() { if (self.onBuyExpensiveFood) { self.onBuyExpensiveFood(); } };
 	buyOverlay.buyHealthyButton.onClicked = function() { if (self.onBuyHealthyFood) { self.onBuyHealthyFood(); } };
+	
+	this.playerInventorySlots = [buyOverlay.playerInventory1, buyOverlay.playerInventory2, buyOverlay.playerInventory3];
+	this.clearAllPlayerInventorySlots();
+	this.playerInventoryFill = buyOverlay.playerInventoryFill;
 }
 SupermarketInsideScene.extends(Scene, {
+	clearPlayerInventorySlot: function(index) {
+		this.playerInventorySlots[index].visible = false;
+	},
+	clearAllPlayerInventorySlots: function() {
+		this.playerInventorySlots.forEach(function(element, index) {
+			this.clearPlayerInventorySlot(index);
+		}, this);
+	},
+	setPlayerInventorySlot: function(index, type) {
+		var sourceRect;
+		switch (type) {
+			case 'cheap':
+				sourceRect = new Rect(0, 0, 200, 125);
+				break;
+			case 'expensive':
+				sourceRect = new Rect(200, 0, 200, 125);
+				break;
+			case 'healthy':
+				sourceRect = new Rect(0, 125, 200, 125);
+				break;
+			default:
+				throw new Error('Slot type should be: "cheap", "expensive" or "healthy", but was "' + type + '"');
+		}
+		var slotSprite = this.playerInventorySlots[index];
+		slotSprite.visible = true;
+		slotSprite.sourceRect = sourceRect;
+	}
 });
 	
