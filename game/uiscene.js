@@ -42,6 +42,7 @@ var uiSceneTemplate = ( function() {
 				progress: 0.5,
 				children: {
 					label: {
+						z: 2,
 						type: 'Label',
 						text: 'Sättigung',
 						font: {family: 'Comic Sans MS', size: 14, weight: 900},
@@ -64,6 +65,7 @@ var uiSceneTemplate = ( function() {
 				progress: 0.5,
 				children: {
 					label: {
+						z: 2,
 						type: 'Label',
 						text: 'Energie',
 						font: {family: 'Comic Sans MS', size: 14, weight: 900},
@@ -86,6 +88,7 @@ var uiSceneTemplate = ( function() {
 				progress: 0.5,
 				children: {
 					label: {
+						z: 2,
 						type: 'Label',
 						text: 'Lebenslust',
 						font: {family: 'Comic Sans MS', size: 14, weight: 900},
