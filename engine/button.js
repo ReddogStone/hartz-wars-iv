@@ -202,9 +202,15 @@ Button.extends(Node, {
 					} else {
 						this._setState(ButtonState.HOVERED);
 					}
+					if (this.onEnter) {
+						this.onEnter();
+					}				
 				}
 			} else {
 				this._setState(ButtonState.ACTIVE);
+				if (this.onExit) {
+					this.onExit();
+				}
 			}
 		}
 	},

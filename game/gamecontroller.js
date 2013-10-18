@@ -1,6 +1,6 @@
 'use strict';
 
-function GameController(canvas) {
+function GameController() {
 }
 
 GameController.extends(Object, {
@@ -31,13 +31,13 @@ GameController.extends(Object, {
 		
 		var world = this.world = new World();
 		var player = world.player;
-		var supermarket = world.supermarket;
 		var home = world.playerHome;
 		
 		// create scenes
 		var barScene = this.barScene = new BarScene();
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
+		var uiScene = this.uiScene = new UIScene();
 		
 		// create controllers
 		var roomController = this.roomController = new RoomController(world);
@@ -51,12 +51,7 @@ GameController.extends(Object, {
 		supermarketInsideController.onExit = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromSupermarket);
 		streetScene.onEnterBar = this.transitToScene(barScene);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
-		var enterHome = this.transitToController(roomController);
-		streetScene.onEnterHome = function() {
-			var products = player.dropAllProducts();
-			home.storeProducts(products);
-			enterHome();
-		};
+		streetScene.onEnterHome = this.transitToController(roomController, roomController.enter);
 		
 		// events
 		barScene.onEatDoener = function() {
@@ -64,10 +59,9 @@ GameController.extends(Object, {
 				player.saturation += 10;
 				player.money -= 3.2;
 			}
-		}
+		};
 		
-		// create UI scene
-		var uiScene = this.uiScene = new UIScene();
+		// wire-up UI scene
 		player.onValueChanged = function(valueName, newValue) {
 			switch (valueName) {
 				case 'energy':
@@ -83,7 +77,7 @@ GameController.extends(Object, {
 					uiScene.moneyAmountLabel.text = newValue.toFixed(2) + '€';
 					break;
 			}
-		}
+		};
 		player.energy = 80;
 		player.saturation = 75;
 		player.fun = 5;
