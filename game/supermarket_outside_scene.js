@@ -2,16 +2,11 @@
 
 var supermarketOutsideTemplate = ( function() {
 	var highlightEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-			} else {
-				button.sprite.blend = 'source-over';
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
 
 	return {
 		type: 'Scene',

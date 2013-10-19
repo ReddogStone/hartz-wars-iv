@@ -122,8 +122,7 @@ Node.extends(Object, {
 		var templChildren = template.children || {};
 		for (var childName in templChildren) {
 			var childTemplate = templChildren[childName];
-			var child = new globalScope[childTemplate.type]();
-			child.deserialize(childTemplate);
+			var child = createFromTemplate(childTemplate);
 			children.push({name: childName, node: child});
 		}
 		

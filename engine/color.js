@@ -17,7 +17,16 @@ Color.extends(Object, {
 });
 
 Color.clone = function(value) {
-	return value ? new Color(value.red, value.green, value.blue, value.alpha) : undefined;
+	if (value) {
+		if (typeof value == 'string') {
+			if (value in Color) {
+				return Color[value];
+			}
+		} else {
+			return new Color(value.red, value.green, value.blue, value.alpha);
+		}
+	}
+	return undefined;
 }
 Object.defineProperty(Color, 'white', {get: function() { return new Color(1, 1, 1, 1); } })
 Object.defineProperty(Color, 'black', {get: function() { return new Color(0, 0, 0, 1); } })

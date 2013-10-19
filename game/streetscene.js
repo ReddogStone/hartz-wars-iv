@@ -1,45 +1,22 @@
 'use strict';
 
 var streetSceneTemplate = ( function() {
-	var mapHomeButtonEffects = [new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state == ButtonState.ACTIVE) {
-				button.label.color = Color.black;
-				button.labelOffset = new Point(0, 0);
-			} else if (state == ButtonState.PRESSED) {
-				button.label.color = Color.red;
-				button.labelOffset = new Point(2, 2);
-			} else if (state == ButtonState.HOVERED) {
-				button.label.color = new Color(0, 0.47, 0);
-				button.labelOffset = new Point(0, 0);
-			}
-		})];
+	var mapHomeButtonEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.47} },
+	];
 		
 	var doorButtonEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.47, 0)),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-			} else {
-				button.sprite.blend = 'source-over';
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
 		
-	var mapButtonEffects = [new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state == ButtonState.ACTIVE) {
-				button.label.color = Color.white;
-				button.labelOffset = new Point(0, 0);
-			} else if (state == ButtonState.PRESSED) {
-				button.label.color = Color.red;
-				button.labelOffset = new Point(2, 2);
-			} else if (state == ButtonState.HOVERED) {
-				button.label.color = new Color(0, 0.47, 0);
-				button.labelOffset = new Point(0, 0);
-			}
-		})];
+	var mapButtonEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
+	];
 	
 	return {
 		type: 'Scene',

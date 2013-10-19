@@ -1,98 +1,30 @@
 'use strict';
 
+function ChangingPriceLabelColor(active, pressed, hovered, inactive) {
+	initChangingValueEffect(this, active, pressed, hovered, inactive, Color);
+}
+makeChangingValueEffect(ChangingPriceLabelColor, function(button, value) {
+	if (button.priceLabel) {
+		button.priceLabel.color = value;
+	}
+}, Color);
+
 var supermarketInsideTemplate = ( function() {
 	var exitButtonEffects = [
-		new JumpingLabel(2, 2),		
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			var color = Color.black;
-			switch (state) {
-				case ButtonState.ACTIVE:
-					color = Color.black;
-					break;
-				case ButtonState.HOVERED:
-					color = Color.red;
-					break;
-				case ButtonState.PRESSED:
-					color = new Color(0, 0.8, 0);
-					break;
-			}
-			button.label.color = color;
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.8}, hovered: 'red' },
+	];
 	var cheapButtonEffects = [
-		new JumpingLabel(2, 2),		
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			var color = Color.black;
-			switch (state) {
-				case ButtonState.ACTIVE:
-					color = Color.white;
-					break;
-				case ButtonState.HOVERED:
-					color = Color.red;
-					break;
-				case ButtonState.PRESSED:
-					color = new Color(0, 0.8, 0);
-					break;
-			}
-			button.label.color = color;
-			if (button.priceLabel) {
-				button.priceLabel.color = color;
-			}
-		})];
-	var healthyButtonEffects = [
-		new JumpingLabel(2, 2),		
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			var color = Color.black;
-			switch (state) {
-				case ButtonState.ACTIVE:
-					color = Color.white;
-					break;
-				case ButtonState.HOVERED:
-					color = Color.red;
-					break;
-				case ButtonState.PRESSED:
-					color = new Color(0, 0.8, 0);
-					break;
-			}
-			button.label.color = color;
-			if (button.priceLabel) {
-				button.priceLabel.color = color;
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: {green: 0.8}, hovered: 'red' },
+		{ type: 'ChangingPriceLabelColor', active: 'white', pressed: {green: 0.8}, hovered: 'red' },
+	];
+	var healthyButtonEffects = cheapButtonEffects;
 	var expensiveButtonEffects = [
-		new JumpingLabel(2, 2),		
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			var color = Color.black;
-			switch (state) {
-				case ButtonState.ACTIVE:
-					color = Color.black;
-					break;
-				case ButtonState.HOVERED:
-					color = Color.red;
-					break;
-				case ButtonState.PRESSED:
-					color = new Color(0, 0.3, 0);
-					break;
-			}
-			button.label.color = color;
-			if (button.priceLabel) {
-				button.priceLabel.color = color;
-			}
-		})];
-	var highlightEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-			} else {
-				button.sprite.blend = 'source-over';
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
+		{ type: 'ChangingPriceLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
+	];
 
 	return {
 		type: 'Scene',

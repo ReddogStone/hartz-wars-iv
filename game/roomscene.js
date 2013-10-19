@@ -2,77 +2,21 @@
 
 var roomSceneTemplate = ( function() {
 	var highlightEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-			} else {
-				button.sprite.blend = 'source-over';
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
 	var fridgeEffects = [
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-				button.sprite.color = new Color(0, 0.78, 0);
-				button.label.color = Color.white;
-			} else {
-				button.sprite.blend = 'destination-over';
-				button.label.color = Color.transparentBlack;
-			}
-		})];
-	var cheapEffects = [
-		new JumpingLabel(2, 2),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			switch (state) {
-				case ButtonState.PRESSED:
-					button.label.color = Color.red;
-					break;
-				case ButtonState.HOVERED:
-					button.label.color = new Color(0, 0.78, 0);
-					break;
-				default:
-					button.label.color = Color.white;
-					break;
-			}
-		})];
-	var expensiveEffects = [
-		new JumpingLabel(2, 2),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			switch (state) {
-				case ButtonState.PRESSED:
-					button.label.color = Color.red;
-					break;
-				case ButtonState.HOVERED:
-					button.label.color = new Color(0, 0.78, 0);
-					break;
-				default:
-					button.label.color = Color.white;
-					break;
-			}
-		})];
-	var healthyEffects = [
-		new JumpingLabel(2, 2),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			switch (state) {
-				case ButtonState.PRESSED:
-					button.label.color = Color.red;
-					break;
-				case ButtonState.HOVERED:
-					button.label.color = new Color(0, 0.78, 0);
-					break;
-				default:
-					button.label.color = Color.white;
-					break;
-			}
-		})];
-
+		{ type: 'ChangingSpriteColor', pressed: {green: 0.78}, hovered: {green: 0.78} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'white', hovered: 'white' },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
+	var cookEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.78} }
+	];
+	
 	return {
 		type: 'Scene',
 		children: {
@@ -148,7 +92,7 @@ var roomSceneTemplate = ( function() {
 					},
 					fridgeCheapFoodButton: {
 						type: 'Button',
-						effects: cheapEffects,
+						effects: cookEffects,
 						pos: {x: 425, y: 330},
 						anchor: {x: 0.5, y: 0.5},
 						z: 4,
@@ -168,7 +112,7 @@ var roomSceneTemplate = ( function() {
 					},
 					fridgeExpensiveFoodButton: {
 						type: 'Button',
-						effects: expensiveEffects,
+						effects: cookEffects,
 						pos: {x: 425, y: 380},
 						anchor: {x: 0.5, y: 0.5},
 						z: 4,
@@ -188,7 +132,7 @@ var roomSceneTemplate = ( function() {
 					},
 					fridgeHealthyFoodButton: {
 						type: 'Button',
-						effects: healthyEffects,
+						effects: cookEffects,
 						pos: {x: 425, y: 430},
 						anchor: {x: 0.5, y: 0.5},
 						z: 4,

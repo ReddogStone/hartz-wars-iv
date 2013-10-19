@@ -7,64 +7,6 @@ var ButtonState = {
 	INACTIVE: {name: 'INACTIVE', index: 3},
 };
 
-function GenericButtonEffect(callback) {
-	this.apply = callback;
-}
-
-function JumpingLabel(offsetX, offsetY) {
-	this.offsetX = offsetX;
-	this.offsetY = offsetY;
-	this._applied = false;
-}
-JumpingLabel.prototype.apply = function(button) {
-	var state = button.getState();
-	var offset = button.labelOffset;
-	if (state == ButtonState.PRESSED) {
-		offset.x += this.offsetX;
-		offset.y += this.offsetY;
-		this._applied = true;
-	} else if (this._applied) {
-		offset.x -= this.offsetX;
-		offset.y -= this.offsetY;
-		this._applied = false;
-	}
-};
-
-function ChangingColor(active, pressed, hovered, inactive) {
-	this._colors = [Color.clone(active), Color.clone(pressed), Color.clone(hovered), Color.clone(inactive)];
-}
-ChangingColor.prototype.apply = function(button) {
-	var state = button.getState();
-	var color = this._colors[state.index];
-	if (!color) {
-		color = this._colors[ButtonState.ACTIVE.index];
-	}
-	if (color) {
-		button.label.color = color;
-		button.sprite.color = color;
-	}
-};
-ChangingColor.prototype.setColor = function(state, value) {
-	this._colors[state.index] = value;
-};
-
-function ChangingFrames(active, pressed, hovered, inactive) {
-	this._rects = [active, pressed, hovered, inactive];
-}
-ChangingFrames.prototype.apply = function(button) {
-	var state = button.getState();
-	var rect = this._rects[state.index];
-	if (!rect) {
-		rect = this._rects[ButtonState.ACTIVE.index];
-	}
-	if (rect) {
-		button.sprite.sourceRect = rect;
-	}
-};
-ChangingFrames.prototype.setRect = function(state, value) {
-	this._rects[state.index] = value;
-};
-
 function Button(size, texture, effects) {
 	Node.apply(this);
 	
@@ -96,9 +38,7 @@ function Button(size, texture, effects) {
 		effects.forEach(function(element, index, array) {
 			this.addEffect(element);
 		}, this);
-	}/* else {
-		this.addEffect(new ChangingColor('#000000', '#0000FF', '#FF0000', '#909090'));
-	}*/
+	}
 	this._z;
 	
 	this.onPressed = null;
@@ -219,7 +159,13 @@ Button.extends(Node, {
 		
 		if (template.texture) { this.texture = loadImage(template.texture); }
 		if (template.sourceRect) { this.sprite.sourceRect = Rect.clone(template.sourceRect); }
-		if (template.effects) { this.addEffects(template.effects); }
+		if (template.effects) { 
+//			this.addEffects(template.effects);
+			template.effects.forEach(function(element) {
+				var effect = createFromTemplate(element);
+				this.addEffect(effect);
+			}, this);
+		}
 		if (template.label) {
 			var label = template.label;
 			if (label.offset) { this.labelOffset = Point.clone(label.offset); }

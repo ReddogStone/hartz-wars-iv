@@ -2,20 +2,18 @@
 
 var barSceneTemplate = ( function() {
 	var roomDoorEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, Color.red, new Color(0, 0.78, 0)),
-		new GenericButtonEffect( function(button) {
-			var state = button.getState();
-			if (state != ButtonState.ACTIVE) {
-				button.sprite.blend = 'lighter';
-			} else {
-				button.sprite.blend = 'source-over';
-			}
-		})];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
 
 	var foodButtonEffects = [
-		new JumpingLabel(2, 2), 
-		new ChangingColor(Color.transparentBlack, new Color(0.39, 1, 0.39), Color.white)];
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'source-over', hovered: 'source-over' }
+	];
 		
 	return {
 		type: 'Scene',
