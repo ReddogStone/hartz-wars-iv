@@ -1,6 +1,7 @@
 'use strict';
 
 var uiSceneTemplate = ( function() {
+	var font = {family: 'Comic Sans MS', size: 14, weight: 900};
 	return {
 		type: 'Scene',
 		children: {
@@ -16,7 +17,7 @@ var uiSceneTemplate = ( function() {
 				type: 'Label',
 				anchor: {x: 1, y: 0},
 				text: 'Geld: ',
-				font: {family: 'Comic Sans MS', size: 14, weight: 900},
+				font: font,
 				color: Color.white,
 				pos: {x: 450, y: 10},
 				z: 1
@@ -24,7 +25,7 @@ var uiSceneTemplate = ( function() {
 			moneyAmountLabel: {
 				type: 'Label',
 				text: '100€',
-				font: {family: 'Comic Sans MS', size: 14, weight: 900},
+				font: font,
 				color: Color.white,
 				pos: {x: 450, y: 10},
 				z: 1
@@ -45,7 +46,7 @@ var uiSceneTemplate = ( function() {
 						z: 2,
 						type: 'Label',
 						text: 'Sättigung',
-						font: {family: 'Comic Sans MS', size: 14, weight: 900},
+						font: font,
 						color: Color.white,
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
@@ -68,7 +69,7 @@ var uiSceneTemplate = ( function() {
 						z: 2,
 						type: 'Label',
 						text: 'Energie',
-						font: {family: 'Comic Sans MS', size: 14, weight: 900},
+						font: font,
 						color: {red: 1, green: 1, blue: 1},
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
@@ -91,7 +92,7 @@ var uiSceneTemplate = ( function() {
 						z: 2,
 						type: 'Label',
 						text: 'Lebenslust',
-						font: {family: 'Comic Sans MS', size: 14, weight: 900},
+						font: font,
 						color: {red: 1, green: 1, blue: 1},
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}

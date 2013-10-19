@@ -25,6 +25,7 @@ var supermarketInsideTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
 		{ type: 'ChangingPriceLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
 	];
+	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
 
 	return {
 		type: 'Scene',
@@ -73,7 +74,7 @@ var supermarketInsideTemplate = ( function() {
 						anchor: {x: 1, y: 1},
 						label: {
 							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+							font: font
 						}
 					},
 					buyCheapButton: {
@@ -85,14 +86,14 @@ var supermarketInsideTemplate = ( function() {
 						effects: cheapButtonEffects,
 						label: {
 							offset: {x: 0, y: -30},
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+							font: font
 						},
 						children: {
 							priceLabel: {
 								type: 'Label',
 								anchor: {x: 0.5, y: 0.5},
 								pos: {x: 100, y: 70},
-								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+								font: font
 							}
 						}
 					},
@@ -105,14 +106,14 @@ var supermarketInsideTemplate = ( function() {
 						effects: expensiveButtonEffects,
 						label: {
 							offset: {x: 0, y: -30},
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+							font: font
 						},
 						children: {
 							priceLabel: {
 								type: 'Label',
 								anchor: {x: 0.5, y: 0.5},
 								pos: {x: 100, y: 70},
-								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+								font: font
 							}
 						}
 					},
@@ -125,14 +126,14 @@ var supermarketInsideTemplate = ( function() {
 						effects: healthyButtonEffects,
 						label: {
 							offset: {x: 0, y: -30},
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}							
+							font: font
 						},
 						children: {
 							priceLabel: {
 								type: 'Label',
 								anchor: {x: 0.5, y: 0.5},
 								pos: {x: 100, y: 70},
-								font: {family: 'Comic Sans MS', size: 24, weight: 900}
+								font: font
 							}
 						}
 					},
@@ -166,7 +167,7 @@ var supermarketInsideTemplate = ( function() {
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 300},
 						color: {r: 0, g: 0, b: 0},
-						font: {family: 'Comic Sans MS', size: 24, weight: 900}
+						font: font
 					}
 				}
 			}
