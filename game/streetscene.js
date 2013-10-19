@@ -18,6 +18,8 @@ var streetSceneTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
 	];
 	
+	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
+	
 	return {
 		type: 'Scene',
 		children: {
@@ -51,7 +53,7 @@ var streetSceneTemplate = ( function() {
 						label: {
 							offset: {x: -150, y: -50},
 							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					barDoorButton: {
@@ -63,7 +65,7 @@ var streetSceneTemplate = ( function() {
 						label: {
 							offset: {x: 130, y: 65},
 							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							font: font,
 							z: 10
 						}
 					},
@@ -77,7 +79,7 @@ var streetSceneTemplate = ( function() {
 							offset: {x: 40, y: 100},
 							anchor: {x: 0, y: 0.5},
 							text: 'Zum Supermarkt',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					mapButton: {
@@ -87,7 +89,7 @@ var streetSceneTemplate = ( function() {
 						effects: mapButtonEffects,
 						label: {
 							text: 'Karte',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					}
 				}
@@ -108,7 +110,7 @@ var streetSceneTemplate = ( function() {
 						pos: {x: 462, y: 190},
 						label: {
 							text: 'Zuhause',
-							font: {family: 'Comic Sans MS', size: 16, weight: 900}
+							font: font
 						}
 					}
 				}

@@ -16,6 +16,7 @@ var roomSceneTemplate = ( function() {
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
 		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.78} }
 	];
+	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
 	
 	return {
 		type: 'Scene',
@@ -52,7 +53,7 @@ var roomSceneTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: -170},
 							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							font: font
 						},
 						z: 5
 					},
@@ -65,7 +66,7 @@ var roomSceneTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: -100},
 							text: 'Schlafen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						},
 						z: 5
 					},
@@ -87,7 +88,7 @@ var roomSceneTemplate = ( function() {
 							offset: {x: 0, y: -150},
 							text: 'Essen kochen',
 							color: {r: 1, g: 1, b: 1},
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					fridgeCheapFoodButton: {
@@ -98,7 +99,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						label: {
 							text: 'Billig',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					fridgeCheapAmount: {
@@ -108,7 +109,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						text: '0',
 						color: {red: 1, green: 1, blue: 1},
-						font: {family: 'Comic Sans MS', size: 24, weight: 900}
+						font: font
 					},
 					fridgeExpensiveFoodButton: {
 						type: 'Button',
@@ -118,7 +119,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						label: {
 							text: 'Vornehm',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					fridgeExpensiveAmount: {
@@ -128,7 +129,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						text: '0',
 						color: {red: 1, green: 1, blue: 1},
-						font: {family: 'Comic Sans MS', size: 24, weight: 900}
+						font: font
 					},
 					fridgeHealthyFoodButton: {
 						type: 'Button',
@@ -138,7 +139,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						label: {
 							text: 'Gesund',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					fridgeHealthyAmount: {
@@ -148,7 +149,7 @@ var roomSceneTemplate = ( function() {
 						z: 4,
 						text: '0',
 						color: {red: 1, green: 1, blue: 1},
-						font: {family: 'Comic Sans MS', size: 24, weight: 900}
+						font: font
 					}
 				}
 			}

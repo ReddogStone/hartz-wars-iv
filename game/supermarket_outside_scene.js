@@ -7,6 +7,7 @@ var supermarketOutsideTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
 		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
 	];
+	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
 
 	return {
 		type: 'Scene',
@@ -45,7 +46,7 @@ var supermarketOutsideTemplate = ( function() {
 						label: {
 							offset: {x: -40, y: -320},
 							text: 'Zur Straße',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							font: font,
 							z: 3
 						}
 					},
@@ -59,7 +60,7 @@ var supermarketOutsideTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: 150},
 							text: 'Reingehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900},
+							font: font,
 							z: 3
 						}
 					},
