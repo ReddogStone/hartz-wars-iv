@@ -216,7 +216,7 @@ function RoomScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(roomSceneTemplate, this);
+	this.deserialize(roomSceneTemplate);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;

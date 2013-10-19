@@ -214,4 +214,16 @@ Button.extends(Node, {
 			}
 		}
 	},
+	deserializeSelf: function(template) {
+		Node.prototype.deserializeSelf.call(this, template);
+		
+		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.sourceRect) { this.sprite.sourceRect = Rect.clone(template.sourceRect); }
+		if (template.effects) { this.addEffects(template.effects); }
+		if (template.label) {
+			var label = template.label;
+			if (label.offset) { this.labelOffset = Point.clone(label.offset); }
+			this.label.deserialize(template.label);
+		}
+	}	
 });

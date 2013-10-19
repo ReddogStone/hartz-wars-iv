@@ -106,7 +106,7 @@ function UIScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(uiSceneTemplate, this);
+	this.deserialize(uiSceneTemplate);
 	var foreground = this.foreground;
 }
 UIScene.extends(Scene);

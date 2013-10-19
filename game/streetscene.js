@@ -144,7 +144,7 @@ function StreetScene() {
 	var self = this;
 	Scene.apply(this);
 	
-	Node.loadFromTemplate(streetSceneTemplate, this);
+	this.deserialize(streetSceneTemplate);
 
 	// MAP OVERLAY
 	var mapOverlay = this.mapOverlay;

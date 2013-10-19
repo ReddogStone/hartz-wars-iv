@@ -68,5 +68,13 @@ Sprite.extends(Node, {
 		}
 		
 		context.globalCompositeOperation = saveOp;
+	},
+	deserializeSelf: function(template) {
+		Node.prototype.deserializeSelf.call(this, template);
+		
+		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.sourceRect) { this.sourceRect = Rect.clone(template.sourceRect); }
+		if (template.color) { this.color = Color.clone(template.color); }
+		if (template.blend)	{ this.blend = template.blend; }
 	}
 });

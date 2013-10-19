@@ -78,7 +78,7 @@ function SupermarketOutsideScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(supermarketOutsideTemplate, this);
+	this.deserialize(supermarketOutsideTemplate);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;

@@ -246,7 +246,7 @@ function SupermarketInsideScene() {
 	Scene.apply(this);
 	var self = this;
 	this.children.clear();
-	Node.loadFromTemplate(supermarketInsideTemplate, this);
+	this.deserialize(supermarketInsideTemplate);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;

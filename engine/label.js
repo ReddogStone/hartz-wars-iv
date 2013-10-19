@@ -96,5 +96,12 @@ Label.extends(Node, {
 		context.textAlign = 'start';
 		var sy = this._font.size;
 		context.fillText(this.text, 0, sy);
+	},
+	deserializeSelf: function(template) {
+		Node.prototype.deserializeSelf.call(this, template);
+		
+		if (template.text) { this.text = template.text; }
+		if (template.font) { this.font = Font.clone(template.font); }
+		if (template.color) { this.color = Color.clone(template.color); }
 	}
 });

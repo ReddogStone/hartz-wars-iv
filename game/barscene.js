@@ -75,7 +75,7 @@ function BarScene() {
 	var self = this;
 	Scene.apply(this);
 
-	Node.loadFromTemplate(barSceneTemplate, this);
+	this.deserialize(barSceneTemplate);
 	var foreground = this.foreground;
 
 	var sprite = foreground.playerBody;

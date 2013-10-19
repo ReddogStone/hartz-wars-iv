@@ -1,5 +1,7 @@
 'use strict';
 
+var globalScope = this;
+
 function Node() {
 	this.pos = new Pos();
 	this.anchor = new Point();
@@ -104,5 +106,32 @@ Node.extends(Object, {
 		this.children.forEach(function(element, index, array) {
 			element.update(deltaTime);
 		});
+	},
+	deserializeSelf: function(template) {
+		if (template.pos) { this.pos = Pos.clone(template.pos); }
+		if (template.anchor) { this.anchor = Point.clone(template.anchor); }
+		if (template.size) { this.size = Size.clone(template.size); }
+		if (template.visible !== undefined) { this.visible = template.visible; }
+		if (template.selfVisible !== undefined) { this.selfVisible = template.selfVisible; }
+		if (template.scale) { this.scale = Size.clone(template.scale); }
+		if (template.alpha !== undefined) { this.alpha = template.alpha; }
+		if (template.z !== undefined) { this.z = template.z; }		
+	},
+	deserialize: function(template) {
+		var children = [];
+		var templChildren = template.children || {};
+		for (var childName in templChildren) {
+			var childTemplate = templChildren[childName];
+			var child = new globalScope[childTemplate.type]();
+			child.deserialize(childTemplate);
+			children.push({name: childName, node: child});
+		}
+		
+		this.deserializeSelf(template);
+				
+		children.forEach( function(element, index, array) {
+			this.addChild(element.node);
+			this[element.name] = element.node;
+		}, this);
 	}
 });

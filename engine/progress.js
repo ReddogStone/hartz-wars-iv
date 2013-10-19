@@ -92,5 +92,15 @@ Progress.extends(Node, {
 		this._fillSpriteMiddle.scale.x = value;
 		this._fillSpriteMiddle.pos.x = Math.floor(this._fillSpriteLeft.size.x);
 		this._fillSpriteRight.pos.x = Math.floor(this._fillSpriteLeft.size.x + this._fillSpriteMiddle.size.x * this._fillSpriteMiddle.scale.x);
+	},
+	deserializeSelf: function(template) {
+		Node.prototype.deserializeSelf.call(this, template);
+		
+		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.frameRect) { this.frameRect = Rect.clone(template.frameRect); }
+		if (template.fillRect) { this.fillRect = Rect.clone(template.fillRect); }
+		if (template.frameColor) { this.frameColor = Color.clone(template.frameColor); }
+		if (template.fillColor) { this.fillColor = Color.clone(template.fillColor); }
+		if (template.progress) { this.progress = template.progress; }
 	}
 });
