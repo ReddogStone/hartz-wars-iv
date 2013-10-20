@@ -9,6 +9,8 @@ function Scene() {
 	this.size = new Size(w, h);
 	this.anchor = new Point(0.5, 0.5);
 	this.pos = new Pos(0.5 * w, 0.5 * h);
+	
+	this.focussed = null;
 }
 Scene.extends(Node, {
 	_handleMouseEvent: function(event, methodName, handleMethodName) {
@@ -30,11 +32,18 @@ Scene.extends(Node, {
 						inverse();
 					var childEvent = inverseTransform.apply(event);
 					childEvent.down = event.down;
+					
+					if (child == this.focussed) {
+						childEvent.focussed = true;
+					}
 				
 					if ((methodName in child) && child[methodName](childEvent)) {
 						return true;
 					}
 					if ((handleMethodName in child) && child[handleMethodName](childEvent)) {
+						if (methodName == 'mouseDown') {
+							this.focussed = child;
+						}
 						return true;
 					}
 				}
@@ -53,7 +62,22 @@ Scene.extends(Node, {
 		return this._handleMouseEvent(event, 'mouseDown', 'handleMouseDown');
 	},
 	mouseUp: function(event) {
-		return this._handleMouseEvent(event, 'mouseUp', 'handleMouseUp');
+		var handled = false;
+		var focussed = this.focussed;
+		if (focussed) {
+			if ('handleMouseUp' in focussed) {
+				var inverseTransform = focussed.getTransform().inverse();
+				var childEvent = inverseTransform.apply(event);
+				childEvent.down = event.down;			
+				handled = focussed.handleMouseUp(childEvent);
+				if (handled) {
+					this.focussed = null;
+				}
+			}
+		}
+		if (!handled) {
+			return this._handleMouseEvent(event, 'mouseUp', 'handleMouseUp');
+		}
 	},
 	mouseMove: function(event) {
 		return this._handleMouseEvent(event, 'mouseMove', 'handleMouseMove');

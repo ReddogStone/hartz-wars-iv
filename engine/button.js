@@ -127,17 +127,17 @@ Button.extends(Node, {
 				if (this.onClicked) {
 					this.onClicked();
 				}
-				return true;
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}
+			return true;
 		}
 	},
 	handleMouseMove: function(event) {
 		if (this._enabled) {
 			if (this.getLocalRect().containsPoint(event)) {
 				if (this._state == ButtonState.ACTIVE) {
-					if (event.down) {
+					if (event.focussed) {
 						this._setState(ButtonState.PRESSED);
 					} else {
 						this._setState(ButtonState.HOVERED);
