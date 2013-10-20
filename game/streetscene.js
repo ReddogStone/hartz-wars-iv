@@ -110,7 +110,7 @@ var streetSceneTemplate = ( function() {
 						pos: {x: 462, y: 190},
 						label: {
 							text: 'Zuhause',
-							font: font
+							font: {family: 'Comic Sans MS', size: 16, weight: 900}
 						}
 					}
 				}
