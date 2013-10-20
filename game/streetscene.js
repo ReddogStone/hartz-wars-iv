@@ -93,27 +93,6 @@ var streetSceneTemplate = ( function() {
 						}
 					}
 				}
-			},
-			mapOverlay: {
-				type: 'Scene',
-				children: {
-					sprite: {
-						type: 'Sprite',
-						texture: 'data/map.png',
-						size: {x: 800, y: 598},
-						anchor: {x: 0.5, y: 0.5},
-						pos: {x: 512, y: 320},
-					},
-					homeButton: {
-						type: 'Button',
-						effects: mapHomeButtonEffects,
-						pos: {x: 462, y: 190},
-						label: {
-							text: 'Zuhause',
-							font: {family: 'Comic Sans MS', size: 16, weight: 900}
-						}
-					}
-				}
 			}
 		}
 	};
@@ -125,31 +104,9 @@ function StreetScene() {
 	
 	this.deserialize(streetSceneTemplate);
 
-	// MAP OVERLAY
-	var mapOverlay = this.mapOverlay;
-	mapOverlay.handleMouseDown = function(event) {
-		self.deactivateMap();
-		return true;
-	}
-	mapOverlay.handleMouseUp = mapOverlay.handleMouseMove =function(event) {
-		return true; 
-	};
-	var sprite = mapOverlay.sprite;
-	sprite.handleMouseDown = sprite.handleMouseUp = sprite.handleMouseMove = function(event) {
-		if (this.getLocalRect().containsPoint(event)) { 
-			return true; 
-		}
-	};
-	var button = mapOverlay.homeButton;
-	button.size = Size.clone(button.label.size);
-	button.onClicked = function() {
-		if (self.onEnterHome) self.onEnterHome();
-		mapOverlay.visible = false;
-	};
-	
 	// FOREGROUND
 	var foreground = this.foreground;
-	sprite = foreground.playerBody;
+	var sprite = foreground.playerBody;
 	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
 	animation.addFrame(new Rect(0, 0, 150, 250));
 	animation.addFrame(new Rect(150, 0, 150, 250));
@@ -157,38 +114,10 @@ function StreetScene() {
 	animation.addFrame(new Rect(450, 0, 150, 250));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
-	foreground.homeDoorButton.onClicked = function() { 
-		if (self.onEnterHome) { self.onEnterHome(); }
-	};
-	foreground.barDoorButton.onClicked = function() { 
-		if (self.onEnterBar) { self.onEnterBar(); }
-	};
-	foreground.toSupermarketButton.onClicked = function() { 
-		if (self.onExitToSupermarket) { self.onExitToSupermarket(); }
-	};
-	button = foreground.mapButton;
+	var button = foreground.mapButton;
 	button.size = Size.clone(button.label.size);
-	button.onClicked = function() { 
-		self.activateMap();
-	};
 };
 StreetScene.extends(Scene, {
-	initSelf: function() {
-		this.deactivateMap();
-	},
-	activateMap: function() {
-		var map = this.mapOverlay;
-		map.visible = true;
-		map.addAction(new LinearAction(0.2, function(value) {	
-			map.scale.x = value;
-			map.scale.y = value;
-			map.pos.rot = value * 2 * Math.PI;
-			map.color = 'rgba(255,255,255,' + value + ')';
-		}));
-	},
-	deactivateMap: function() {
-		this.mapOverlay.visible = false;
-	},
 	enterFromRoom: function() {
 		var playerBody = this.playerBody;
 		playerBody.pos = new Pos(850, 280);
@@ -203,5 +132,17 @@ StreetScene.extends(Scene, {
 		var playerBody = this.playerBody;
 		playerBody.pos = new Pos(60, 170);
 		playerBody.scale = new Size(0.4, 0.4);
+	},
+	set onEnterHome(value) {
+		this.foreground.homeDoorButton.onClicked = value;
+	},
+	set onEnterBar(value) {
+		this.foreground.barDoorButton.onClicked = value;
+	},
+	set onExitToSupermarket(value) {
+		this.foreground.toSupermarketButton.onClicked = value;
+	},
+	set onShowMap(value) {
+		this.foreground.mapButton.onClicked = value;
 	}
 });

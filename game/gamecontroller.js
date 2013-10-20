@@ -10,7 +10,11 @@ GameController.extends(Object, {
 			if (func) {
 				func.call(scene);
 			}
-			self.rootScene = scene;
+			self.controller = null;
+			self.rootScene.children[0] = scene;
+			self.mapScene.visible = false;
+			self.rootScene.removeChild(self.mapScene);
+			
 			scene.init();
 		};
 	},
@@ -20,7 +24,11 @@ GameController.extends(Object, {
 			if (func) {
 				func.call(controller);
 			}
-			self.rootScene = controller.scene;
+			self.controller = controller;
+			self.rootScene.children[0] = controller.scene;
+			self.mapScene.visible = false;
+			self.rootScene.removeChild(self.mapScene);
+			
 			controller.init();
 		};		
 	},
@@ -28,6 +36,9 @@ GameController.extends(Object, {
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
 		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
 		this.uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
+		
+		this.rootScene = new Scene();
+		this.controller = null;
 		
 		var world = this.world = new World();
 		var player = world.player;
@@ -38,6 +49,7 @@ GameController.extends(Object, {
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
 		var uiScene = this.uiScene = new UIScene();
+		var mapScene = this.mapScene = new MapScene();
 		
 		// create controllers
 		var roomController = this.roomController = new RoomController(world);
@@ -52,6 +64,24 @@ GameController.extends(Object, {
 		streetScene.onEnterBar = this.transitToScene(barScene);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
 		streetScene.onEnterHome = this.transitToController(roomController, roomController.enter);
+		
+		var self = this;
+		streetScene.onShowMap = function() {
+			var map = self.mapScene;
+			map.visible = true;
+			map.addAction(new LinearAction(0.2, function(value) {	
+				map.scale.x = value;
+				map.scale.y = value;
+				map.pos.rot = value * 2 * Math.PI;
+				map.sprite.alpha = value;
+			}));
+			self.rootScene.children[1] = map;
+		}
+
+		mapScene.visible = false;
+		mapScene.onGoHome = function() {
+			self.transitToController(roomController, roomController.enter)();
+		}
 		
 		// events
 		barScene.onEatDoener = function() {
@@ -90,7 +120,8 @@ GameController.extends(Object, {
 		this.rootScene.update(delta);
 	},
 	render: function(context) {
-		this.mainViewport.render(context, this.rootScene);
+		this.mainViewport.render(context, this.rootScene.children[0]);
+		this.mainViewport.render(context, this.mapScene);
 		this.uiViewport.render(context, this.uiScene);
 	},
 	handleMouseEvent: function(type, mouse) {
