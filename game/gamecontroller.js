@@ -12,8 +12,7 @@ GameController.extends(Object, {
 			}
 			self.controller = null;
 			self.rootScene.children[0] = scene;
-			self.mapScene.visible = false;
-			self.rootScene.removeChild(self.mapScene);
+			self.hideMap();
 			
 			scene.init();
 		};
@@ -26,11 +25,10 @@ GameController.extends(Object, {
 			}
 			self.controller = controller;
 			self.rootScene.children[0] = controller.scene;
-			self.mapScene.visible = false;
-			self.rootScene.removeChild(self.mapScene);
+			self.hideMap();
 			
 			controller.init();
-		};		
+		};
 	},
 	initMainGame: function(canvas) {
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
@@ -67,15 +65,10 @@ GameController.extends(Object, {
 		
 		var self = this;
 		streetScene.onShowMap = function() {
-			var map = self.mapScene;
-			map.visible = true;
-			map.addAction(new LinearAction(0.2, function(value) {	
-				map.scale.x = value;
-				map.scale.y = value;
-				map.pos.rot = value * 2 * Math.PI;
-				map.sprite.alpha = value;
-			}));
-			self.rootScene.children[1] = map;
+			self.showMap();
+		}
+		mapScene.onHideMap = function() {
+			self.hideMap();
 		}
 
 		mapScene.visible = false;
@@ -129,5 +122,20 @@ GameController.extends(Object, {
 		var transformedEvent = {x: mouse.x, y: mouse.y, down: mouse.down};
 		Vec.set(transformedEvent, rootScene.getTransform().inverse().apply(transformedEvent));
 		rootScene[type](transformedEvent);
+	},
+	showMap: function() {
+		var map = this.mapScene;
+		map.visible = true;
+		map.addAction(new LinearAction(0.2, function(value) {	
+			map.scale.x = value;
+			map.scale.y = value;
+			map.pos.rot = value * 2 * Math.PI;
+			map.sprite.alpha = value;
+		}));
+		this.rootScene.children[1] = map;
+	},
+	hideMap: function() {
+		this.mapScene.visible = false;
+		this.rootScene.removeChild(self.mapScene);
 	}
 });

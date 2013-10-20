@@ -30,7 +30,6 @@ var mapSceneTemplate = ( function() {
 })();
 
 function MapScene() {
-	var self = this;
 	Scene.apply(this);
 	
 	this.deserialize(mapSceneTemplate);
@@ -46,12 +45,15 @@ function MapScene() {
 };
 MapScene.extends(Scene, {
 	handleMouseDown: function() {
-		if (self.onDeactivateMap) {
-			self.onDeactivateMap();
+		if (this.onHideMap) {
+			this.onHideMap();
 		}
 		return true;
 	},
 	handleMouseUp: function() {
+		return true;
+	},
+	handleMouseMove: function() {
 		return true;
 	},
 	set onGoHome(value) {
