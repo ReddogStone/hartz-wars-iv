@@ -1,0 +1,71 @@
+'use strict';
+
+var officeTemplate = ( function() {
+	var highlightEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
+	var mapButtonEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
+	];
+	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
+
+	return {
+		type: 'Scene',
+		children: {
+			background: {
+				type: 'Scene',
+				children: {
+					sprite: {
+						type: 'Sprite',
+						texture: 'data/office_bg.png',
+						size: {x: 1024, y: 640},
+						z: 0
+					}
+				}
+			},
+			foreground: {
+				type: 'Scene',
+				children: {
+					playerBody: {
+						type: 'Sprite',
+						texture: 'data/walk_anim.png',
+						size: {x: 180, y: 300},
+						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
+						pos: {x: 250, y: 700},
+						anchor: {x: 0, y: 1},
+						z: 2
+					}
+				}
+			}
+		}
+	};
+})();
+
+function OfficeScene() {
+	var self = this;
+	Scene.apply(this);
+
+	this.deserialize(officeTemplate);
+	var foreground = this.foreground;
+
+	var sprite = foreground.playerBody;
+	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
+	animation.addFrame(new Rect(0, 0, 150, 250));
+	animation.addFrame(new Rect(150, 0, 150, 250));
+	animation.addFrame(new Rect(300, 0, 150, 250));
+	animation.addFrame(new Rect(450, 0, 150, 250));
+	sprite.addAction(animation);
+	this.playerBody = sprite;
+}
+OfficeScene.extends(Scene, {
+	enterFromBus: function() {
+		var playerBody = this.playerBody;
+		playerBody.pos = new Pos(1000, 700);
+		playerBody.scale = new Size(-0.4, 0.4);
+	}
+});
+	

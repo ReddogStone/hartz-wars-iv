@@ -15,13 +15,25 @@ var mapSceneTemplate = ( function() {
 				size: {x: 800, y: 598},
 				anchor: {x: 0.5, y: 0.5},
 				pos: {x: 512, y: 320},
+				z: 0
 			},
 			homeButton: {
 				type: 'Button',
 				effects: mapHomeButtonEffects,
 				pos: {x: 462, y: 190},
+				z: 1,
 				label: {
 					text: 'Zuhause',
+					font: {family: 'Comic Sans MS', size: 16, weight: 900}
+				}
+			},
+			workButton: {
+				type: 'Button',
+				effects: mapHomeButtonEffects,
+				pos: {x: 550, y: 450},
+				z: 1,
+				label: {
+					text: 'Arbeit',
 					font: {family: 'Comic Sans MS', size: 16, weight: 900}
 				}
 			}
@@ -42,6 +54,8 @@ function MapScene() {
 	
 	var button = this.homeButton;
 	button.size = Size.clone(button.label.size);
+	button = this.workButton;
+	button.size = Size.clone(button.label.size);
 };
 MapScene.extends(Scene, {
 	handleMouseDown: function() {
@@ -58,5 +72,8 @@ MapScene.extends(Scene, {
 	},
 	set onGoHome(value) {
 		this.homeButton.onClicked = value;
+	},
+	set onGoToWork(value) {
+		this.workButton.onClicked = value;
 	}
 });

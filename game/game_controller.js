@@ -46,6 +46,7 @@ GameController.extends(Object, {
 		var barScene = this.barScene = new BarScene();
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
+		var officeScene = this.officeScene = new OfficeScene();
 		var uiScene = this.uiScene = new UIScene();
 		var mapScene = this.mapScene = new MapScene();
 		
