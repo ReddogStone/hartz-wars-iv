@@ -38,7 +38,31 @@ var officeTemplate = ( function() {
 						pos: {x: 250, y: 700},
 						anchor: {x: 0, y: 1},
 						z: 2
-					}
+					},
+					doorButton: {
+						type: 'Button',
+						size: {x: 187, y: 72},
+						texture: 'data/office_door_highlight.png',
+						effects: highlightEffects,
+						pos: {x: 223, y: 511},
+						z: 1,
+						label: {
+							offset: {x: 0, y: -50},
+							text: 'Arbeiten gehen',
+							font: font
+						}
+					},
+					mapButton: {
+						type: 'Button',
+						pos: {x: 20, y: 620},
+						z: 1,
+						anchor: {x: 0, y: 1},
+						effects: mapButtonEffects,
+						label: {
+							text: 'Karte',
+							font: font
+						}
+					}					
 				}
 			}
 		}
@@ -60,12 +84,21 @@ function OfficeScene() {
 	animation.addFrame(new Rect(450, 0, 150, 250));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
+	
+	var button = foreground.mapButton;
+	button.size = Size.clone(button.label.size);
 }
 OfficeScene.extends(Scene, {
 	enterFromBus: function() {
 		var playerBody = this.playerBody;
-		playerBody.pos = new Pos(1000, 700);
+		playerBody.pos = new Pos(900, 650);
 		playerBody.scale = new Size(-0.4, 0.4);
-	}
+	},
+	set onEnterOffice(value) {
+		this.foreground.doorButton.onClicked = value;
+	},
+	set onShowMap(value) {
+		this.foreground.mapButton.onClicked = value;
+	}	
 });
 	

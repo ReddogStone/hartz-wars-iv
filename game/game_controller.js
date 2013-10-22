@@ -46,13 +46,13 @@ GameController.extends(Object, {
 		var barScene = this.barScene = new BarScene();
 		var streetScene = this.streetScene = new StreetScene();
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
-		var officeScene = this.officeScene = new OfficeScene();
 		var uiScene = this.uiScene = new UIScene();
 		var mapScene = this.mapScene = new MapScene();
 		
 		// create controllers
 		var roomController = this.roomController = new RoomController(world);
 		var supermarketInsideController = this.supermarketInsideController = new SupermarketInsideController(world);
+		var officeController = this.officeController = new OfficeController(world);
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
@@ -64,9 +64,10 @@ GameController.extends(Object, {
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
 		streetScene.onEnterHome = this.transitToController(roomController, roomController.enter);
 		mapScene.onGoHome = this.transitToController(roomController, roomController.enter);
+		mapScene.onGoToWork = this.transitToController(officeController, officeController.enterFromBus);
 		
 		var self = this;
-		streetScene.onShowMap = function() {
+		streetScene.onShowMap = officeController.onShowMap = function() {
 			self.showMap();
 		}
 		mapScene.onHideMap = function() {
@@ -106,10 +107,12 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(roomController)();
+//		this.transitToController(roomController)();
+		this.transitToController(officeController, officeController.enterFromBus)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
+		this.world.update(delta);
 	},
 	render: function(context) {
 		this.mainViewport.render(context, this.rootScene.children[0]);

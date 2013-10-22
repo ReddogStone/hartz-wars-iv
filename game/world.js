@@ -10,3 +10,9 @@ function World() {
 	this.playerHome = new Home();
 	this.clock = new Clock(new Date());
 }
+
+World.extends(Object, {
+	update: function(delta) {
+		this.clock.advance(delta / 6);
+	}
+})
