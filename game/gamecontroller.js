@@ -62,6 +62,7 @@ GameController.extends(Object, {
 		streetScene.onEnterBar = this.transitToScene(barScene);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
 		streetScene.onEnterHome = this.transitToController(roomController, roomController.enter);
+		mapScene.onGoHome = this.transitToController(roomController, roomController.enter);
 		
 		var self = this;
 		streetScene.onShowMap = function() {
@@ -72,9 +73,6 @@ GameController.extends(Object, {
 		}
 
 		mapScene.visible = false;
-		mapScene.onGoHome = function() {
-			self.transitToController(roomController, roomController.enter)();
-		}
 		
 		// events
 		barScene.onEatDoener = function() {
