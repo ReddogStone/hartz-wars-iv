@@ -107,8 +107,7 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-//		this.transitToController(roomController)();
-		this.transitToController(officeController, officeController.enterFromBus)();
+		this.transitToController(roomController)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
