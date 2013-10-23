@@ -1,7 +1,7 @@
 'use strict';
 
 var uiSceneTemplate = ( function() {
-	var font = {family: 'Comic Sans MS', size: 14, weight: 900};
+	var font = Fonts.inGameSmall;
 	return {
 		type: 'Scene',
 		children: {

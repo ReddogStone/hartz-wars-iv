@@ -18,7 +18,7 @@ var streetSceneTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
 	];
 	
-	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
+	var font = Fonts.inGameBig;
 	
 	return {
 		type: 'Scene',

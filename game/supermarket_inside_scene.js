@@ -25,7 +25,7 @@ var supermarketInsideTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
 		{ type: 'ChangingPriceLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
 	];
-	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
+	var font = Fonts.inGameBig;
 
 	return {
 		type: 'Scene',

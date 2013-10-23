@@ -5,7 +5,8 @@ var mapSceneTemplate = ( function() {
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
 		{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.47} },
 	];
-		
+	var font = Fonts.inGameMiddle;
+	
 	return {
 		type: 'Scene',
 		children: {
@@ -24,7 +25,7 @@ var mapSceneTemplate = ( function() {
 				z: 1,
 				label: {
 					text: 'Zuhause',
-					font: {family: 'Comic Sans MS', size: 16, weight: 900}
+					font: font
 				}
 			},
 			workButton: {
@@ -34,7 +35,7 @@ var mapSceneTemplate = ( function() {
 				z: 1,
 				label: {
 					text: 'Arbeit',
-					font: {family: 'Comic Sans MS', size: 16, weight: 900}
+					font: font
 				}
 			}
 		}

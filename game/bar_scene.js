@@ -14,6 +14,7 @@ var barSceneTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
 		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'source-over', hovered: 'source-over' }
 	];
+	var font = Fonts.inGameBig;
 		
 	return {
 		type: 'Scene',
@@ -48,7 +49,7 @@ var barSceneTemplate = ( function() {
 						label: {
 							offset: {x: 50, y: 310},
 							text: 'Rausgehen',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 					doenerButton: {
@@ -60,7 +61,7 @@ var barSceneTemplate = ( function() {
 						label: {
 							offset: {x: 0, y: 100},
 							text: 'Döner - 3,20€',
-							font: {family: 'Comic Sans MS', size: 24, weight: 900}
+							font: font
 						}
 					},
 				}

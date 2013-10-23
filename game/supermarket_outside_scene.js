@@ -7,7 +7,7 @@ var supermarketOutsideTemplate = ( function() {
 		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: 'red', hovered: {green: 0.78} },
 		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
 	];
-	var font = {family: 'Comic Sans MS', size: 24, weight: 900};
+	var font = Fonts.inGameBig;
 
 	return {
 		type: 'Scene',

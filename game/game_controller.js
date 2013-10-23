@@ -97,7 +97,7 @@ GameController.extends(Object, {
 					uiScene.funProgress.progress = newValue * 0.01;
 					break;
 				case 'money':
-					uiScene.moneyAmountLabel.text = newValue.toFixed(2) + '€';
+					uiScene.moneyAmountLabel.text = newValue.toFixed(2) + ' EURO';
 					break;
 			}
 		};
