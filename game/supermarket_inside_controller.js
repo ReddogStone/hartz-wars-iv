@@ -22,11 +22,11 @@ SupermarketInsideController.extends(Object, {
 		
 		var buyOverlay = scene.buyOverlay;
 		buyOverlay.buyCheapButton.label.text = supermarket.products['cheap_food'].label;
-		buyOverlay.buyCheapButton.priceLabel.text = supermarket.products['cheap_food'].price.toFixed(2) + ' €';
+		buyOverlay.buyCheapButton.priceLabel.text = supermarket.products['cheap_food'].price.toFixed(2) + ' EURO';
 		buyOverlay.buyExpensiveButton.label.text = supermarket.products['expensive_food'].label;
-		buyOverlay.buyExpensiveButton.priceLabel.text = supermarket.products['expensive_food'].price.toFixed(2) + ' €';
+		buyOverlay.buyExpensiveButton.priceLabel.text = supermarket.products['expensive_food'].price.toFixed(2) + ' EURO';
 		buyOverlay.buyHealthyButton.label.text = supermarket.products['healthy_food'].label;
-		buyOverlay.buyHealthyButton.priceLabel.text = supermarket.products['healthy_food'].price.toFixed(2) + ' €';
+		buyOverlay.buyHealthyButton.priceLabel.text = supermarket.products['healthy_food'].price.toFixed(2) + ' EURO';
 		
 		var self = this;
 		scene.onBuyCheapFood = function() {

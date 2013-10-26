@@ -52,8 +52,8 @@ Node.extends(Object, {
 	removeChild: function(child) {
 		this.children.remove(child);
 	},
-	repositionChild: function(child) {
-		
+	clearChildren: function() {
+		this.children.clear();
 	},
 	addAction: function(action) {
 		if (action.start) {
@@ -99,6 +99,7 @@ Node.extends(Object, {
 		this.actions.forEach(function(element, index, array) {
 			element.update(deltaTime);
 			if (element.finished) {
+				element.stop();
 				this.actions.splice(index, 1);
 			}
 		}, this);

@@ -42,6 +42,14 @@ RoomController.extends(Object, {
 				self._updateFoodAmount();
 			}
 		};
+		scene.onPhoneCall = function() {
+			var dialogController = new MotherDialogController(world);
+			scene.addChild(dialogController.scene);
+			dialogController.onExit = function() {
+				scene.removeChild(dialogController.scene);
+			}
+			dialogController.init();
+		};
 		this._updateFoodAmount();
 	},
 	enter: function() {

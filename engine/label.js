@@ -59,13 +59,13 @@ function Label(text, font, color) {
 	this._context = canvas.getContext('2d');
 	this._text = text || '';
 	
-	this._font = font || new Font();
+	this._font = Font.clone(font) || new Font();
 	var self = this;
 	this._font.onChanged = function() {
 		self._adjustSize();
 	}
 	
-	this.color = color || new Color();
+	this.color = Color.clone(color) || new Color();
 	
 	this._adjustSize();
 }

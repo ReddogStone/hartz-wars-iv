@@ -75,7 +75,7 @@ var roomSceneTemplate = ( function() {
 						size: {x: 188, y: 277},
 						texture: 'data/fridge.png',
 						pos: {x: 360, y: 230},
-						z: 3
+						z: 2
 					},
 					fridgeButton: {
 						type: 'Button',
@@ -150,7 +150,28 @@ var roomSceneTemplate = ( function() {
 						text: '0',
 						color: {red: 1, green: 1, blue: 1},
 						font: font
-					}
+					},
+					phone: {
+						type: 'Sprite',
+						size: {x: 115, y: 96},
+						pos: {x: 825, y: 305},
+						texture: 'data/phone.png',
+						z: 2
+					},
+					phoneButton: {
+						type: 'Button',
+						size: {x: 115, y: 96},
+						effects: highlightEffects,
+						texture: 'data/phone_highlight.png',
+						pos: {x: 825, y: 305},
+						z: 3,
+						label: {
+							offset: {x: 0, y: 250},
+							text: 'Mutter anrufen',
+							color: {r: 1, g: 1, b: 1},
+							font: font
+						}
+					},					
 				}
 			}
 		}
@@ -172,9 +193,6 @@ function RoomScene() {
 	animation.addFrame(new Rect(450, 0, 150, 250));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
-	
-	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) { self.onExitToStreet(); } };
-	foreground.chestButton.onClicked = function() { if (self.onSleep) { self.onSleep(); } };
 	
 	var cheapButton = foreground.fridgeCheapFoodButton;
 	cheapButton.size = Size.clone(cheapButton.label.size);
@@ -202,10 +220,25 @@ function RoomScene() {
 	foreground.fridgeButton.onExit = function() {
 		setCookVisibility(false);
 	};
-	
-	cheapButton.onClicked = function() { if (self.onCookCheap) { self.onCookCheap(); } };
-	expensiveButton.onClicked = function() { if (self.onCookExpensive) { self.onCookExpensive(); } };
-	healthyButton.onClicked = function() { if (self.onCookHealthy) { self.onCookHealthy(); } };
 }
-RoomScene.extends(Scene);
+RoomScene.extends(Scene, {
+	set onCookCheap(value) {
+		this.foreground.fridgeCheapFoodButton.onClicked = value;
+	},
+	set onCookExpensive(value) {
+		this.foreground.fridgeExpensiveFoodButton.onClicked = value;
+	},
+	set onCookHealthy(value) {
+		this.foreground.fridgeHealthyFoodButton.onClicked = value;
+	},
+	set onExitToStreet(value) {
+		this.foreground.doorButton.onClicked = value;
+	},
+	set onSleep(value) {
+		this.foreground.chestButton.onClicked = value;
+	},
+	set onPhoneCall(value) {
+		this.foreground.phoneButton.onClicked = value;
+	}
+});
 	
