@@ -1,12 +1,12 @@
 'use strict';
 
+var highlightEffects = [
+	{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+	{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.78} },
+];
+var font = Fonts.inGameMiddle;
+
 var dialogSceneTemplate = ( function() {
-	var highlightEffects = [
-		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
-		{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.78} },
-	];
-	var font = Fonts.inGameMiddle;
-	
 	return {
 		type: 'Scene',
 		children: {
@@ -37,16 +37,29 @@ var dialogSceneTemplate = ( function() {
 			},
 			dialogScene: {
 				type: 'Scene'
+			},
+			optionScene: {
+				type: 'Scene'
 			}
 		}
 	};
 })();
+
+var dialogButtonTemplate = {
+	type: 'Button',
+	effects: highlightEffects,
+	z: 101,
+	label: {
+		font: font
+	}
+};
 
 function DialogScene() {
 	var self = this;
 	Scene.apply(this);
 	
 	this.lines = [];
+	this.optionButtons = [];
 
 	this.deserialize(dialogSceneTemplate);
 	
@@ -66,7 +79,7 @@ DialogScene.extends(Scene, {
 		for (var i = lines.length - 1; i >= 0; --i) {
 			var line = lines[i];
 			var amISpeaker = (line.speaker == 'self');
-			var label = new Label(line.text, Fonts.inGameMiddle, amISpeaker ? 'black' : 'blue');
+			var label = new Label(line.text, font, amISpeaker ? 'black' : 'blue');
 			totalHeight += label.size.y + yBorder;
 			if (totalHeight > maxHeight) {
 				break;
@@ -102,5 +115,41 @@ DialogScene.extends(Scene, {
 	addTheirLine: function(text) {
 		this.lines.push({speaker: 'other', text: text});
 		this._showLines();
+	},
+	addOption: function(message, callback) {
+		var button = new Button();
+		button.deserialize(dialogButtonTemplate);
+		
+		button.label.text += '*' + message + '*';
+		button.size = button.label.size;
+		button.z = 101;
+		
+		var optionButtons = this.optionButtons;
+		var left = 120;
+		var right = left + 700;
+		var top = 450;
+		var xBorder = 20;
+		var yBorder = 10;
+		if (optionButtons.length == 0) {
+			button.pos = new Pos(left, top);
+		} else {
+			var lastButton = optionButtons.last();
+			var pos = Pos.clone(lastButton.pos);
+			pos.x += lastButton.size.x + xBorder;
+			if ((pos.x + button.size.x) > right) {
+				pos.x = left;
+				pos.y += lastButton.size.y + yBorder;
+			} else {
+				
+			}
+			button.pos = pos;
+		}
+		optionButtons.push(button);
+		this.optionScene.addChild(button);
+		button.onClicked = callback;
+	},
+	clearOptions: function() {
+		this.optionButtons.clear();
+		this.optionScene.clearChildren();
 	}
 });

@@ -14,6 +14,19 @@ Array.prototype.remove = function(element) {
 Array.prototype.clear = function() {
 	this.splice(0, this.length);
 }
+Array.prototype.first = function() {
+	if (this.length > 0) {
+		return this[0];
+	}
+	return null;
+}
+Array.prototype.last = function() {
+	var length = this.length;
+	if (length > 0) {
+		return this[length - 1];
+	}
+	return null;
+}
 
 Function.prototype.extends = function(parent, methods) {
     this.prototype = Object.create(parent.prototype);

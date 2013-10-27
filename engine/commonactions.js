@@ -45,10 +45,19 @@ WaitAction.extends(LinearAction);
 
 function SequenceAction(action /* any amount of actions can be passed afterwards */) {
 	if (!action) { throw new Error('A SequenceAction has to be created with at least one child action'); }
-	this.actions = new Array(arguments.length);
-	for (var i = 0; i < arguments.length; ++i) {
-		this.actions[i] = arguments[i];
+	
+	if (Array.isArray(action)) {
+		this.actions = new Array(action.length);
+		action.forEach(function(element, index) {
+			this.actions[index] = element;
+		}, this);
+	} else {
+		this.actions = new Array(arguments.length);
+		for (var i = 0; i < arguments.length; ++i) {
+			this.actions[i] = arguments[i];
+		}
 	}
+
 	this.currentIndex = 0;
 	this.finished = false;
 }

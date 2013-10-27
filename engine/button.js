@@ -111,6 +111,9 @@ Button.extends(Node, {
 		}, this);
 		this._adjust();
 	},
+	clearEffects: function() {
+		this._effects.clear();
+	},
 	handleMouseDown: function(event) {
 		if (this._enabled && this.getLocalRect().containsPoint(event)) {
 			this._setState(ButtonState.PRESSED);
@@ -160,7 +163,6 @@ Button.extends(Node, {
 		if (template.texture) { this.texture = loadImage(template.texture); }
 		if (template.sourceRect) { this.sprite.sourceRect = Rect.clone(template.sourceRect); }
 		if (template.effects) { 
-//			this.addEffects(template.effects);
 			template.effects.forEach(function(element) {
 				var effect = createFromTemplate(element);
 				this.addEffect(effect);
