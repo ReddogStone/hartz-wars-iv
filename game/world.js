@@ -3,9 +3,9 @@
 function World() {
 	this.player = new Player();
 	var supermarket = new Supermarket();
-	supermarket.addProduct(new Product('cheap_food', 10, 'Billig'));
-	supermarket.addProduct(new Product('expensive_food', 30, 'Vornehm'));
-	supermarket.addProduct(new Product('healthy_food', 15, 'Gesund'));
+	supermarket.addProduct(CHEAP_FOOD);
+	supermarket.addProduct(HEALTHY_FOOD);
+	supermarket.addProduct(EXPENSIVE_FOOD);
 	this.supermarket = supermarket;
 	this.playerHome = new Home();
 	this.clock = new Clock(new Date());

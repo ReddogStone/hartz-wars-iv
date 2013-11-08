@@ -9,7 +9,12 @@ function Player() {
 };
 Player.extends(Object, {
 	setValue: function(valueName, value) {
-		if ((value < 0) || (value > 100)) return;
+		if (value < 0) {
+			value = 0;
+		}
+		if (value > 100) {
+			value = 100;
+		}
 		
 		this['_' + valueName] = value;
 		if (this.onValueChanged) {

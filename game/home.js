@@ -6,7 +6,13 @@ function Home() {
 
 Home.extends(Object, {
 	storeProduct: function(product) {
-		this.products.push(product);
+		if (product.kind == 'food') {
+			for (var i = 0; i < product.meals; ++i) {
+				var meal = Food.clone(product);
+				meal.meals = 1;
+				this.products.push(meal);
+			}
+		}
 	},
 	storeProducts: function(products) {
 		products.forEach(function(element, index, array) {

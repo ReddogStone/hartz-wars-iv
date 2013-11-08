@@ -5,6 +5,20 @@ function RoomController(world) {
 	this.scene = new RoomScene();
 }
 RoomController.extends(Object, {
+	_consumeFood: function(type) {
+		var world = this._world;
+		var player = world.player;
+		var home = world.playerHome;
+		var product = home.consumeProduct(type);
+		if (product) {
+			if (product.condition(world, player)) {
+				product.consequence(world, player);
+			} else {
+				home.storeProduct(product);
+			}
+		}
+		this._updateFoodAmount();
+	},	
 	init: function() {
 		var scene = this.scene;
 		var world = this._world;
@@ -19,28 +33,13 @@ RoomController.extends(Object, {
 		
 		var self = this;
 		scene.onCookCheap = function() {
-			var product = world.playerHome.consumeProduct('cheap_food');
-			if (product) {
-				player.saturation += 20;
-				player.energy -= 5;
-				self._updateFoodAmount();
-			}
+			self._consumeFood('cheap_food');
 		};
 		scene.onCookExpensive = function() {
-			var product = world.playerHome.consumeProduct('expensive_food');
-			if (product) {
-				player.saturation += 15;
-				player.energy -= 10;
-				self._updateFoodAmount();
-			}
+			self._consumeFood('expensive_food');
 		};
 		scene.onCookHealthy = function() {
-			var product = world.playerHome.consumeProduct('healthy_food');
-			if (product) {
-				player.saturation += 15;
-				player.energy -= 5;
-				self._updateFoodAmount();
-			}
+			self._consumeFood('healthy_food');
 		};
 		scene.onPhoneCall = function() {
 			var dialogController = new MotherDialogController(world);
