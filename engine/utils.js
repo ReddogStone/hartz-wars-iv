@@ -42,3 +42,7 @@ Function.prototype.extends = function(parent, methods) {
 		}
 	}
 }
+
+function padNumber(number, width) {
+	return ('00000000' + number).slice(-width);
+}

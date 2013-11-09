@@ -20,5 +20,8 @@ World.extends(Object, {
 	advanceGameTime: function(minutes) {
 		this.clock.advance(minutes);
 		this.player.advanceGameTime(minutes);
+	},
+	jumpGameTime: function(minutes) {
+		this.clock.advance(minutes);		
 	}
 })

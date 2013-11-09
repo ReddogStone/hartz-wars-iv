@@ -16,6 +16,9 @@ var roomSceneTemplate = ( function() {
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
 		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.78} }
 	];
+	var alarmButtonEffects = [
+		{ type: 'ChangingSpriteColor', active: 'white', pressed: 'red', hovered: {green: 0.78} },
+	];
 	var font = Fonts.inGameBig;
 	
 	return {
@@ -69,6 +72,41 @@ var roomSceneTemplate = ( function() {
 							font: font
 						},
 						z: 5
+					},
+					alarmLabel: {
+						type: 'Label',
+						font: font,
+						text: 'Wecker',
+						pos: {x: 160, y: 360},
+						color: 'white',
+						z: 6
+					},
+					alarmTimeLabel: {
+						type: 'Label',
+						font: font,
+						text: '8:00',
+						pos: {x: 160, y: 410},
+						color: 'white',
+						z: 6						
+					},
+					alarmUpButton: {
+						type: 'Button',
+						size: {x: 16, y: 16},
+						pos: {x: 250, y: 425},
+						anchor: {x: 0, y: 1},
+						texture: 'data/arrow_buttons.png',
+						sourceRect: {x: 0, y: 0, sx: 16, sy: 16},
+						effects: alarmButtonEffects,
+						z: 6
+					},
+					alarmDownButton: {
+						type: 'Button',
+						size: {x: 16, y: 16},
+						pos: {x: 250, y: 425},
+						texture: 'data/arrow_buttons.png',
+						sourceRect: {x: 0, y: 16, sx: 16, sy: 16},
+						effects: alarmButtonEffects,
+						z: 6
 					},
 					fridge: {
 						type: 'Sprite',
@@ -241,8 +279,22 @@ function RoomScene() {
 	foreground.fridgeButton.onExit = function() {
 		setCookVisibility(false);
 	};
+
+	foreground.chestButton.onEnter = function() {
+		self._setAlarmClockVisibility(true);
+	};
+	foreground.chestButton.onExit = function() {
+		self._setAlarmClockVisibility(false);
+	};
+	this._setAlarmClockVisibility(false);
 }
 RoomScene.extends(Scene, {
+	_setAlarmClockVisibility: function(value) {
+		this.foreground.alarmLabel.visible = value;
+		this.foreground.alarmTimeLabel.visible = value;
+		this.foreground.alarmUpButton.visible = value;
+		this.foreground.alarmDownButton.visible = value;
+	},
 	set onCookCheap(value) {
 		this.foreground.fridgeCheapFoodButton.onClicked = value;
 	},
@@ -263,6 +315,12 @@ RoomScene.extends(Scene, {
 	},
 	set onReadBook(value) {
 		this.foreground.booksButton.onClicked = value;
+	},
+	set onAlarmUp(value) {
+		this.foreground.alarmUpButton.onClicked = value;		
+	},
+	set onAlarmDown(value) {
+		this.foreground.alarmDownButton.onClicked = value;		
 	}
 });
 	

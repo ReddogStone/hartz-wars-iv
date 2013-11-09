@@ -2,6 +2,7 @@
 
 function Home() {
 	this.products = [];
+	this._alarmTime = 7;
 }
 
 Home.extends(Object, {
@@ -36,5 +37,17 @@ Home.extends(Object, {
 			return product;
 		}
 		return null;
+	},
+	get alarmTime() {
+		return this._alarmTime;
+	},
+	set alarmTime(value) {
+		while (value < 0) {
+			value += 24;
+		}
+		while (value > 24) {
+			value -= 24;
+		}
+		this._alarmTime = value;
 	}
 });

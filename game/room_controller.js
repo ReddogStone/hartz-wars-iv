@@ -17,21 +17,30 @@ RoomController.extends(Object, {
 				home.storeProduct(product);
 			}
 		}
-		this._updateFoodAmount();
 	},	
 	init: function() {
 		var scene = this.scene;
 		var world = this._world;
 		var player = world.player;
+		var home = world.playerHome;
 		
 		scene.init();
-		
-		scene.onSleep = function() {
-			player.saturation -= 5;
-			player.energy += 5;
-		};
-		
+
 		var self = this;
+		scene.onAlarmUp = function() {
+			home.alarmTime += 0.5;
+			self._updateAlarmTime();
+		};
+		scene.onAlarmDown = function() {
+			home.alarmTime -= 0.5;
+			self._updateAlarmTime();
+		};
+		scene.onSleep = function() {
+			var duration = Clock.timeDiff(world.clock.time, home.alarmTime);
+			player.saturation -= 100 * duration / 24;
+			player.energy += 12 * duration;
+			world.jumpGameTime(duration * 60);
+		};
 		scene.onCookCheap = function() {
 			self._consumeFood('cheap_food');
 		};
@@ -54,6 +63,7 @@ RoomController.extends(Object, {
 			world.advanceGameTime(60);
 		};
 		this._updateFoodAmount();
+		this._updateAlarmTime();
 	},
 	enter: function() {
 		var world = this._world;
@@ -74,5 +84,11 @@ RoomController.extends(Object, {
 		scene.cheapAmount.text = cheap.length;
 		scene.expensiveAmount.text = expensive.length;
 		scene.healthyAmount.text = healthy.length;
+	},
+	_updateAlarmTime: function() {
+		var alarmTime = this._world.playerHome.alarmTime;
+		var alarmHours = Math.floor(alarmTime);
+		var alarmMinutes = Math.floor((alarmTime - alarmHours) * 60);
+		this.scene.foreground.alarmTimeLabel.text = padNumber(alarmHours, 2) + ':' + padNumber(alarmMinutes, 2);
 	}
 });
