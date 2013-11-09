@@ -47,5 +47,10 @@ Player.extends(Object, {
 			res.unshift(productInventory.pop());
 		}
 		return res;
+	},
+	advanceGameTime: function(minutes) {
+		this.energy -= 100 * minutes / (16 * 60);
+		this.saturation -= 100 * minutes / (12 * 60);
+		this.fun -= 100 * minutes / (4 * 24 * 60);
 	}
 });

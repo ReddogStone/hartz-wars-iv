@@ -171,7 +171,28 @@ var roomSceneTemplate = ( function() {
 							color: {r: 1, g: 1, b: 1},
 							font: font
 						}
-					},					
+					},
+					books: {
+						type: 'Sprite',
+						size: {x: 120, y: 119},
+						pos: {x: 827, y: 189},
+						texture: 'data/home_books.png',
+						z: 2
+					},
+					booksButton: {
+						type: 'Button',
+						size: {x: 120, y: 119},
+						effects: highlightEffects,
+						texture: 'data/home_books_highlight.png',
+						pos: {x: 827, y: 189},
+						z: 3,
+						label: {
+							offset: {x: 0, y: -70},
+							text: 'Lesen',
+							color: {r: 1, g: 1, b: 1},
+							font: font
+						}
+					}
 				}
 			}
 		}
@@ -239,6 +260,9 @@ RoomScene.extends(Scene, {
 	},
 	set onPhoneCall(value) {
 		this.foreground.phoneButton.onClicked = value;
+	},
+	set onReadBook(value) {
+		this.foreground.booksButton.onClicked = value;
 	}
 });
 	

@@ -1,5 +1,7 @@
 'use strict';
 
+var GAME_TIME_SPEED = 10;
+
 function World() {
 	this.player = new Player();
 	var supermarket = new Supermarket();
@@ -13,6 +15,10 @@ function World() {
 
 World.extends(Object, {
 	update: function(delta) {
-		this.clock.advance(delta / 6);
+		this.advanceGameTime(delta / 60 * GAME_TIME_SPEED);
+	},
+	advanceGameTime: function(minutes) {
+		this.clock.advance(minutes);
+		this.player.advanceGameTime(minutes);
 	}
 })

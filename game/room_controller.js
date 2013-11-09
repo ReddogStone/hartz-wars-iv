@@ -49,6 +49,10 @@ RoomController.extends(Object, {
 			}
 			dialogController.init();
 		};
+		scene.onReadBook = function() {
+			player.fun += 15;
+			world.advanceGameTime(60);
+		};
 		this._updateFoodAmount();
 	},
 	enter: function() {
