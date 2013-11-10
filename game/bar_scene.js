@@ -75,6 +75,30 @@ var barSceneTemplate = ( function() {
 							text: 'Currywurst - 2,00 EURO',
 							font: font
 						}
+					},
+					burgerButton: {
+						type: 'Button',
+						size: {x: 160, y: 90},
+						texture: 'data/burger_menu.png',
+						effects: foodButtonEffects,
+						pos: {x: 565, y: 50},
+						label: {
+							offset: {x: 0, y: 100},
+							text: 'Burgermenü - 5,50 EURO',
+							font: font
+						}
+					},
+					beerButton: {
+						type: 'Button',
+						size: {x: 70, y: 90},
+						texture: 'data/beer_bottle.png',
+						effects: foodButtonEffects,
+						pos: {x: 740, y: 55},
+						label: {
+							offset: {x: 0, y: 100},
+							text: 'Bier - 1,50 EURO',
+							font: font
+						}
 					}
 				}
 			}
@@ -107,6 +131,12 @@ BarScene.extends(Scene, {
 	},
 	set onEatSausage(value) {
 		this.foreground.sausageButton.onClicked = value;
+	},
+	set onEatBurger(value) {
+		this.foreground.burgerButton.onClicked = value;
+	},
+	set onDrinkBeer(value) {
+		this.foreground.beerButton.onClicked = value;
 	}
 });
 	

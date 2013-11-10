@@ -1,5 +1,7 @@
 'use strict';
 
+var TRANSITION_TIME = 1;
+
 function GameController() {
 }
 
@@ -7,27 +9,37 @@ GameController.extends(Object, {
 	transitToScene: function(scene, func) {
 		var self = this;
 		return function() {
+			self.hideMap();
+			scene.init();
 			if (func) {
 				func.call(scene);
 			}
-			self.controller = null;
-			self.rootScene.children[0] = scene;
-			self.hideMap();
-			
-			scene.init();
+
+			var from = self.rootScene.children[0];
+			var transition = new TransitionScene(TRANSITION_TIME, from, scene, function() {
+				self.controller = null;
+				self.rootScene.children[0] = scene;
+			});
+			self.rootScene.children[0] = transition;
+			transition.init();
 		};
 	},
 	transitToController: function(controller, func) {
 		var self = this;
 		return function() {
+			self.hideMap();
+			controller.init();
 			if (func) {
 				func.call(controller);
 			}
-			self.controller = controller;
-			self.rootScene.children[0] = controller.scene;
-			self.hideMap();
-			
-			controller.init();
+
+			var from = self.rootScene.children[0];
+			var transition = new TransitionScene(TRANSITION_TIME, from, controller.scene, function() {
+				self.controller = controller;
+				self.rootScene.children[0] = controller.scene;
+			});
+			self.rootScene.children[0] = transition;
+			transition.init();
 		};
 	},
 	initMainGame: function(canvas) {
@@ -56,6 +68,7 @@ GameController.extends(Object, {
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
+		roomController.onSleep = this.transitToController(roomController);
 		barScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromBar);
 		supermarketOutsideScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromSupermarket);
 		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController);
@@ -89,6 +102,18 @@ GameController.extends(Object, {
 				player.money -= 2.0;
 			}
 		};
+		barScene.onEatBurger = function() {
+			if (player.money >= 5.5) {
+				player.saturation += 30;
+				player.money -= 5.5;
+			}
+		};
+		barScene.onDrinkBeer = function() {
+			if (player.money >= 1.5) {
+				player.fun += 5;
+				player.money -= 1.5;
+			}
+		};
 		
 		// wire-up UI scene
 		player.onValueChanged = function(valueName, newValue) {
@@ -113,8 +138,7 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToScene(streetScene)();
-		this.showMap();
+		this.transitToController(roomController)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);

@@ -85,7 +85,6 @@ Node.extends(Object, {
 			this.renderSelf(context);
 		}		
 		
-//		this.children.resort();
 		this.children.forEach(function(element, index, array) {
 			element.render(context);
 		});

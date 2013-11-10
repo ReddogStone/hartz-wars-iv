@@ -40,6 +40,10 @@ RoomController.extends(Object, {
 			player.saturation -= 100 * duration / 24;
 			player.energy += 12 * duration;
 			world.jumpGameTime(duration * 60);
+			
+			if (self.onSleep) {
+				self.onSleep();
+			}
 		};
 		scene.onCookCheap = function() {
 			self._consumeFood('cheap_food');

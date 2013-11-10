@@ -38,6 +38,27 @@ LinearAction.extends(Object, {
 	}
 });
 
+function EaseInAction(duration, callback) {
+	LinearAction.call(this, duration, function(progress) {
+		callback(Math.sin(progress * Math.PI * 0.5));
+	});
+}
+EaseInAction.extends(LinearAction);
+
+function EaseOutAction(duration, callback) {
+	LinearAction.call(this, duration, function(progress) {
+		callback(1.0 - Math.cos(progress * Math.PI * 0.5));
+	});
+}
+EaseOutAction.extends(LinearAction);
+
+function EaseInOutAction(duration, callback) {
+	LinearAction.call(this, duration, function(progress) {
+		callback(1.0 - 0.5 * (Math.cos(progress * Math.PI) + 1));
+	});
+}
+EaseInOutAction.extends(LinearAction);
+
 function WaitAction(duration) {
 	LinearAction.call(this, duration, function() {});
 }
