@@ -15,13 +15,17 @@ var otherTopicDialogTemplate = [
 	]}
 ];
 
-var goodWorkOptionTemplate = [
-	{left: 'Es ist sehr schön. Die Kollegen sind sehr nett und der Chef auch.', wait: 1},
+var goodWorkReplyTemplate = [
 	{right: 'Na siehst du.', wait: 1},
 	{right: 'Ich war mir sicher, dass du alles gut schaffst.', wait: 1},
 	function(scene, world) { world.player.fun += 10; },
 	{left: 'Danke, Mama.', wait: 2},
 	{right: 'Und gibt\'s sonst noch etwas?', wait: 1}
+];
+
+var goodWorkOptionTemplate = [
+	{left: 'Es ist sehr schön. Die Kollegen sind sehr nett und der Chef auch.', wait: 1},
+	goodWorkReplyTemplate
 ];
 
 var badWorkReplyTemplate = [
@@ -106,7 +110,12 @@ var motherDialogTemplate = [
 			{right: 'Ach, hallo mein Junge. So gut gelaunt?', wait: 0.5},
 			{options: [
 				{text: 'Einfach gute Laune', consequence: goodMoodDialogTemplate},
-				{text: 'Neue Arbeit läuft toll', consequence: []}
+				{text: 'Neue Arbeit läuft toll', consequence: [
+					{left: 'Die neue Arbeit ist einfach super!', wait: 1},
+					{left: 'Alle Kollegen sind sehr nett und der Chef auch.', wait: 1},
+					goodWorkReplyTemplate,
+					otherTopicDialogTemplate
+				]}
 			]}
 		]},
 		{text: 'Schluchze traurig', consequence: [
