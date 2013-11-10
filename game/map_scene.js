@@ -4,6 +4,14 @@ var mapSceneTemplate = ( function() {
 	var mapHomeButtonEffects = [
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
 		{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
+	];
+	var mapWorkButtonEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingSpriteColor', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'lighter', hovered: 'lighter' }
 	];
 	var font = Fonts.inGameMiddle;
 	
@@ -12,30 +20,50 @@ var mapSceneTemplate = ( function() {
 		children: {
 			sprite: {
 				type: 'Sprite',
-				texture: 'data/map.png',
+				texture: 'data/map_bg.png',
 				size: {x: 800, y: 598},
 				anchor: {x: 0.5, y: 0.5},
 				pos: {x: 512, y: 320},
 				z: 0
 			},
+			homeTextBg: {
+				type: 'Sprite',
+				color: 'white',
+				pos: {x: 770, y: 267},
+				anchor: {x: 0.5, y: 0.5},
+				z: 1
+			},
 			homeButton: {
 				type: 'Button',
+				size: {x: 70, y: 120},
+				texture: 'data/map_selection.png',
 				effects: mapHomeButtonEffects,
-				pos: {x: 462, y: 190},
-				z: 1,
+				pos: {x: 735, y: 277},
+				z: 2,
 				label: {
 					text: 'Zuhause',
-					font: font
+					font: font,
+					offset: {x: 0, y: -70}
 				}
+			},
+			workTextBg: {
+				type: 'Sprite',
+				color: 'white',
+				pos: {x: 251, y: 332},
+				anchor: {x: 0.5, y: 0.5},
+				z: 1
 			},
 			workButton: {
 				type: 'Button',
+				size: {x: 70, y: 114},
+				texture: 'data/map_selection.png',
 				effects: mapHomeButtonEffects,
-				pos: {x: 550, y: 450},
-				z: 1,
+				pos: {x: 216, y: 345},
+				z: 2,
 				label: {
 					text: 'Arbeit',
-					font: font
+					font: font,
+					offset: {x: 0, y: -70}
 				}
 			}
 		}
@@ -53,10 +81,11 @@ function MapScene() {
 		}
 	};
 	
-	var button = this.homeButton;
-	button.size = Size.clone(button.label.size);
-	button = this.workButton;
-	button.size = Size.clone(button.label.size);
+	var size = this.homeButton.label.size;
+	this.homeTextBg.size = new Size(size.x + 10, size.y + 10);
+
+	var size = this.workButton.label.size;
+	this.workTextBg.size = new Size(size.x + 10, size.y + 10);
 };
 MapScene.extends(Scene, {
 	handleMouseDown: function() {

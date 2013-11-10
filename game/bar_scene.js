@@ -60,10 +60,22 @@ var barSceneTemplate = ( function() {
 						pos: {x: 205, y: 50},
 						label: {
 							offset: {x: 0, y: 100},
-							text: 'Döner - 3,20€',
+							text: 'Döner - 3,20 EURO',
 							font: font
 						}
 					},
+					sausageButton: {
+						type: 'Button',
+						size: {x: 160, y: 90},
+						texture: 'data/sausage.png',
+						effects: foodButtonEffects,
+						pos: {x: 385, y: 50},
+						label: {
+							offset: {x: 0, y: 100},
+							text: 'Currywurst - 2,00 EURO',
+							font: font
+						}
+					}
 				}
 			}
 		}
@@ -85,9 +97,16 @@ function BarScene() {
 	animation.addFrame(new Rect(450, 0, 150, 250));
 	sprite.addAction(animation);
 	this.playerBody = sprite;
-	
-	foreground.doorButton.onClicked = function() { if (self.onExitToStreet) { self.onExitToStreet(); } };
-	foreground.doenerButton.onClicked = function() { if (self.onEatDoener) { self.onEatDoener(); } };
 }
-BarScene.extends(Scene);
+BarScene.extends(Scene, {
+	set onExitToStreet(value) {
+		this.foreground.doorButton.onClicked = value;
+	},
+	set onEatDoener(value) {
+		this.foreground.doenerButton.onClicked = value;
+	},
+	set onEatSausage(value) {
+		this.foreground.sausageButton.onClicked = value;
+	}
+});
 	

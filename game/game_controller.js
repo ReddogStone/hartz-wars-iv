@@ -79,8 +79,14 @@ GameController.extends(Object, {
 		// events
 		barScene.onEatDoener = function() {
 			if (player.money >= 3.2) {
-				player.saturation += 10;
+				player.saturation += 20;
 				player.money -= 3.2;
+			}
+		};
+		barScene.onEatSausage = function() {
+			if (player.money >= 2.0) {
+				player.saturation += 10;
+				player.money -= 2.0;
 			}
 		};
 		
@@ -107,7 +113,8 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(roomController)();
+		this.transitToScene(streetScene)();
+		this.showMap();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
