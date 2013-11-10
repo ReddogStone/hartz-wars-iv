@@ -17,6 +17,7 @@ RoomController.extends(Object, {
 				home.storeProduct(product);
 			}
 		}
+		this._updateFoodAmount();		
 	},	
 	init: function() {
 		var scene = this.scene;

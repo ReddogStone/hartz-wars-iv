@@ -67,6 +67,9 @@ Scene.extends(Node, {
 		if (focussed) {
 			if ('handleMouseUp' in focussed) {
 				var inverseTransform = focussed.getTransform().inverse();
+				if (inverseTransform == null) {
+					throw new Error('InverseTransform is null!');
+				}
 				var childEvent = inverseTransform.apply(event);
 				childEvent.down = event.down;			
 				handled = focussed.handleMouseUp(childEvent);
