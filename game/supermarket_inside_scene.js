@@ -16,14 +16,14 @@ var supermarketInsideTemplate = ( function() {
 	];
 	var cheapButtonEffects = [
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
-		{ type: 'ChangingLabelColor', active: 'white', pressed: {green: 0.8}, hovered: 'red' },
-		{ type: 'ChangingPriceLabelColor', active: 'white', pressed: {green: 0.8}, hovered: 'red' },
+		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.8}, hovered: 'red' },
+		{ type: 'ChangingPriceLabelColor', active: 'black', pressed: {green: 0.8}, hovered: 'red' },
 	];
 	var healthyButtonEffects = cheapButtonEffects;
 	var expensiveButtonEffects = [
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
-		{ type: 'ChangingLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
-		{ type: 'ChangingPriceLabelColor', active: 'black', pressed: {green: 0.3}, hovered: 'red' },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: {green: 0.3}, hovered: 'red' },
+		{ type: 'ChangingPriceLabelColor', active: 'white', pressed: {green: 0.3}, hovered: 'red' },
 	];
 	var font = Fonts.inGameBig;
 
