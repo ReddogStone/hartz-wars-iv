@@ -4,7 +4,7 @@ var otherTopicDialogTemplate = [
 	{options: [
 		{text: 'Nichts', consequence: [
 			{left: 'Nein, Mama. War schön mit dir zu reden.', wait: 1},
-			{right: 'OK. Dann meld dich mal wieder. Bis dann.', wait: 4},
+			{right: 'OK. Dann meld dich mal wieder. Bis dann.', wait: 3},
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
@@ -15,17 +15,56 @@ var otherTopicDialogTemplate = [
 	]}
 ];
 
+var goodWorkOptionTemplate = [
+	{left: 'Es ist sehr schön. Die Kollegen sind sehr nett und der Chef auch.', wait: 1},
+	{right: 'Na siehst du.', wait: 1},
+	{right: 'Ich war mir sicher, dass du alles gut schaffst.', wait: 1},
+	function(scene, world) { world.player.fun += 10; },
+	{left: 'Danke, Mama.', wait: 2},
+	{right: 'Und gibt\'s sonst noch etwas?', wait: 1}
+];
+
+var badWorkReplyTemplate = [
+	{right: 'Du kommst schon noch rein.', wait: 1},
+	{right: 'Ich bin mir sicher, dass du alles gut schaffst.', wait: 1},
+	function(scene, world) { world.player.fun += 5; },
+	{left: 'Ja, bestimmt hast du recht.', wait: 2},
+	{right: 'Und gibt\'s sonst noch etwas?', wait: 1}
+];
+
+var badWorkOptionTemplate = [
+	{left: 'Es geht so. Ich bin noch nicht so gut reingekommen.', wait: 1},
+	badWorkReplyTemplate
+];
+
 var workDialogTemplate = [
 	{options: [
 		{text: 'Sehr gut', consequence: [
-			{left: 'Es ist sehr schön. Die Kollegen sind sehr nett und der Chef auch.', wait: 1},
-			{right: 'Na siehst du.', wait: 1},
-			{right: 'Ich war mir sicher, dass du alles gut schaffst.', wait: 1},
-			function(scene, world) { world.player.fun += 10; },
-			{right: 'Und gibt\'s sonst noch etwas?', wait: 1},
+			goodWorkOptionTemplate,
 			otherTopicDialogTemplate
 		]},
-		{text: 'Nicht so gut', consequence: []}
+		{text: 'Nicht so gut', consequence: [
+			badWorkOptionTemplate,
+			otherTopicDialogTemplate
+		]}
+	]}
+];
+
+var goodWorkDialogTemplate = [
+	{options: [
+		{text: 'Sehr gut', consequence: [
+			goodWorkOptionTemplate,
+			otherTopicDialogTemplate
+		]}
+	]}
+];
+
+var badWorkDialogTemplate = [
+	{options: [
+		{text: 'Nicht so gut', consequence: [
+			badWorkOptionTemplate,
+			otherTopicDialogTemplate
+		]}
 	]}
 ];
 
@@ -33,7 +72,14 @@ var goodMoodDialogTemplate = [
 	{left: 'Gerade läuft einfach alles sehr gut.', wait: 1},
 	{right: 'Das freut mich aber.', wait: 1},
 	{right: 'Wie läuft denn die neue Arbeit?', wait: 1},
-	workDialogTemplate
+	goodWorkDialogTemplate
+];
+
+var badMoodDialogTemplate = [
+	{left: 'Naja, im Moment läuft alles nicht so toll.', wait: 1},
+	{right: 'Ist es irgendwas bei der neuen Arbeit?', wait: 1},
+	{right: 'Wie läuft\'s denn auf der Arbeit?', wait: 1},
+	badWorkDialogTemplate
 ];
 
 var motherDialogTemplate = [
@@ -49,9 +95,10 @@ var motherDialogTemplate = [
 				{text: 'Alles ok', consequence: [
 					{left: 'Es ist alles in Ordnung. Wie geht\'s dir, denn?', wait: 1},
 					{right: 'Ach alles ist beim alten, wie läuft deine neue Arbeit?', wait: 1},
+					workDialogTemplate
 				]},
 				{text: 'Alles super!', consequence: goodMoodDialogTemplate},
-				{text: 'So la-la', consequence: []}
+				{text: 'So la-la', consequence: badMoodDialogTemplate}
 			]}
 		]},
 		{text: 'Grüße sie fröhlich', consequence: [
@@ -66,8 +113,17 @@ var motherDialogTemplate = [
 			{left: 'Hallo *schluchz*, Mama.', wait: 1},
 			{right: 'Mein Junge, was ist denn passiert?', wait: 0.5},
 			{options: [
-				{text: '[Lügen] Nichts...', consequence: []},
-				{text: 'Neue Arbeit läuft schlecht', consequence: []}
+				{text: '[Lügen] Nichts...', consequence: [
+					{left: 'Es ist gar nichts, Mama, keine Sorge.', wait: 1},
+					{right: 'Hmm, nagut. Wie läuft denn die neue Arbeit?', wait: 1},
+					workDialogTemplate
+				]},
+				{text: 'Neue Arbeit läuft schlecht', consequence: [
+					{left: 'Naja, die neue Arbeit läuft nicht so toll.', wait: 1},
+					{left: 'Ich bin noch nicht so gut reingekommen.', wait: 1},
+					badWorkReplyTemplate,
+					otherTopicDialogTemplate
+				]}
 			]}
 		]}
 	]},
