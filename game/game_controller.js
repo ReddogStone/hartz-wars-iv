@@ -138,7 +138,7 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(roomController)();
+		this.transitToController(supermarketInsideController)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);

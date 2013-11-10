@@ -11,6 +11,7 @@ function buyProduct(buyer, product) {
 function SupermarketInsideController(world) {
 	this._world = world;
 	this.scene = new SupermarketInsideScene();
+	this._selectedProduct = null;
 }
 SupermarketInsideController.extends(Object, {
 	init: function() {
@@ -20,33 +21,35 @@ SupermarketInsideController.extends(Object, {
 
 		scene.init();
 		
-		var buyOverlay = scene.buyOverlay;
-		buyOverlay.buyCheapButton.label.text = supermarket.products['cheap_food'].label;
-		buyOverlay.buyCheapButton.priceLabel.text = supermarket.products['cheap_food'].price.toFixed(2) + ' EURO';
-		buyOverlay.buyExpensiveButton.label.text = supermarket.products['expensive_food'].label;
-		buyOverlay.buyExpensiveButton.priceLabel.text = supermarket.products['expensive_food'].price.toFixed(2) + ' EURO';
-		buyOverlay.buyHealthyButton.label.text = supermarket.products['healthy_food'].label;
-		buyOverlay.buyHealthyButton.priceLabel.text = supermarket.products['healthy_food'].price.toFixed(2) + ' EURO';
-		
 		var self = this;
 		scene.onBuyCheapFood = function() {
 			buyProduct(player, supermarket.products['cheap_food']);
-			self.updatePlayerProductInventory();
+			self._updatePlayerProductInventory();
 		};
 		scene.onBuyExpensiveFood = function() {
 			buyProduct(player, supermarket.products['expensive_food']);
-			self.updatePlayerProductInventory();
+			self._updatePlayerProductInventory();
 		};
 		scene.onBuyHealthyFood = function() {
 			buyProduct(player, supermarket.products['healthy_food']);
-			self.updatePlayerProductInventory();
+			self._updatePlayerProductInventory();
 		};
-		this.updatePlayerProductInventory();
+		scene.onSelectProduct = function(productType) {
+			switch (productType) {
+				case 'cheap': self._selectedProduct = supermarket.products['cheap_food']; break;
+				case 'expensive': self._selectedProduct = supermarket.products['expensive_food']; break;
+				case 'healthy': self._selectedProduct = supermarket.products['healthy_food']; break;
+				default: self._selectedProduct = null; break;
+			}
+			self._updateProductDescription();
+		};
+		this._updatePlayerProductInventory();
+		this._updateProductDescription();
 	},
 	set onExit(value) {
 		this.scene.onExit = value;
 	},
-	updatePlayerProductInventory: function() {
+	_updatePlayerProductInventory: function() {
 		var scene = this.scene;
 		scene.clearAllPlayerInventorySlots();
 		var productInventory = this._world.player.productInventory;
@@ -61,5 +64,26 @@ SupermarketInsideController.extends(Object, {
 			scene.setPlayerInventorySlot(index, type);
 		}, this);
 		scene.playerInventoryFill.text = productInventory.length + ' / 3';
+	},
+	_updateProductDescription: function() {
+		var scene = this.scene;
+		var buyOverlay = scene.buyOverlay;
+		if (this._selectedProduct) {
+			var product = this._selectedProduct;
+			buyOverlay.productKindLabel.visible = true;
+			buyOverlay.productTypeLabel.visible = true;
+			buyOverlay.productPriceLabel.visible = true;
+			buyOverlay.productMealsLabel.visible = true;
+
+			buyOverlay.productKindLabel.text = 'Essen';
+			buyOverlay.productTypeLabel.text = product.label;
+			buyOverlay.productPriceLabel.text = product.price.toFixed(2) + ' EURO';
+			buyOverlay.productMealsLabel.text = product.meals + ' Mahlzeiten';
+		} else {
+			buyOverlay.productKindLabel.visible = false;
+			buyOverlay.productTypeLabel.visible = false;
+			buyOverlay.productPriceLabel.visible = false;
+			buyOverlay.productMealsLabel.visible = false;
+		}
 	}
 });

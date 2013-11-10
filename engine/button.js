@@ -149,7 +149,7 @@ Button.extends(Node, {
 						this.onEnter();
 					}				
 				}
-			} else {
+			} else if ((this._state == ButtonState.PRESSED) || (this._state == ButtonState.HOVERED)) {
 				this._setState(ButtonState.ACTIVE);
 				if (this.onExit) {
 					this.onExit();
