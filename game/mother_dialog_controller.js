@@ -138,52 +138,6 @@ var motherDialogTemplate = [
 	]},
 ];
 
-function loadDialogElement(element, actions, scene, world) {
-	if (element.left || element.right) {
-		if (element.left) {
-			actions.push(new InstantAction(function() { 
-				scene.addMyLine(element.left);
-			}));
-		} else if (element.right) {
-			actions.push(new InstantAction(function() { 
-				scene.addTheirLine(element.right);
-			}));
-		}
-		if (element.wait) {
-			actions.push(new WaitAction(element.wait));
-		}
-	} else if (element.options) {
-		actions.push(new InstantAction(function() {
-			element.options.forEach(function(option) {
-				scene.addOption(option.text, function() {
-					scene.clearOptions();
-					loadDialog(option.consequence, scene, world);
-				});
-			});
-		}));		
-	} else if (Array.isArray(element)) {
-		loadDialogTemplate(element, actions, scene, world);
-	} else if ((typeof element) == 'function') {
-		actions.push(new InstantAction(function() {
-			element(scene, world);
-		}));
-	}
-}
-
-function loadDialogTemplate(template, actions, scene, world) {
-	template.forEach(function(element) {
-		loadDialogElement(element, actions, scene, world);
-	});
-}
-
-function loadDialog(template, scene, world) {
-	var actions = [];
-	loadDialogTemplate(template, actions, scene, world);
-	if (actions.length > 0) {
-		scene.addAction(new SequenceAction(actions));
-	}
-}
-
 function MotherDialogController(world) {
 	this._world = world;
 	this.scene = new DialogScene();
@@ -192,6 +146,6 @@ MotherDialogController.extends(Object, {
 	init: function() {
 		var scene = this.scene;
 		scene.onExit = this.onExit;
-		loadDialog(motherDialogTemplate, scene, this._world);
+		Dialog.load(motherDialogTemplate, scene, this._world);
 	}
 });
