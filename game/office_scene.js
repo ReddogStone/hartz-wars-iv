@@ -30,15 +30,6 @@ var officeTemplate = ( function() {
 			foreground: {
 				type: 'Scene',
 				children: {
-					playerBody: {
-						type: 'Sprite',
-						texture: 'data/walk_anim.png',
-						size: {x: 180, y: 300},
-						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
-						pos: {x: 250, y: 700},
-						anchor: {x: 0, y: 1},
-						z: 2
-					},
 					doorButton: {
 						type: 'Button',
 						size: {x: 187, y: 72},
@@ -76,14 +67,8 @@ function OfficeScene() {
 	this.deserialize(officeTemplate);
 	var foreground = this.foreground;
 
-	var sprite = foreground.playerBody;
-	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
-	animation.addFrame(new Rect(0, 0, 150, 250));
-	animation.addFrame(new Rect(150, 0, 150, 250));
-	animation.addFrame(new Rect(300, 0, 150, 250));
-	animation.addFrame(new Rect(450, 0, 150, 250));
-	sprite.addAction(animation);
-	this.playerBody = sprite;
+	var playerBody = this.playerBody = new PlayerBody();
+	PlayerBody.addToScene(playerBody, this, 10);
 	
 	var button = foreground.mapButton;
 	button.size = Size.clone(button.label.size);

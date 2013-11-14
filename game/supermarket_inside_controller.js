@@ -85,5 +85,8 @@ SupermarketInsideController.extends(Object, {
 			buyOverlay.productPriceLabel.visible = false;
 			buyOverlay.productMealsLabel.visible = false;
 		}
+	},
+	enter: function() {
+		this.scene.enter();
 	}
 });

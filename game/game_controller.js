@@ -6,6 +6,12 @@ function GameController() {
 }
 
 GameController.extends(Object, {
+	get _mainScene() {
+		return this.rootScene.children[0];
+	},
+	set _mainScene(value) {
+		this.rootScene.children[0] = value;
+	},
 	transitToScene: function(scene, func) {
 		var self = this;
 		return function() {
@@ -15,12 +21,11 @@ GameController.extends(Object, {
 				func.call(scene);
 			}
 
-			var from = self.rootScene.children[0];
-			var transition = new TransitionScene(TRANSITION_TIME, from, scene, function() {
+			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, scene, function() {
 				self.controller = null;
-				self.rootScene.children[0] = scene;
+				self._mainScene = scene;
 			});
-			self.rootScene.children[0] = transition;
+			self._mainScene = transition;
 			transition.init();
 		};
 	},
@@ -33,12 +38,11 @@ GameController.extends(Object, {
 				func.call(controller);
 			}
 
-			var from = self.rootScene.children[0];
-			var transition = new TransitionScene(TRANSITION_TIME, from, controller.scene, function() {
+			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, controller.scene, function() {
 				self.controller = controller;
-				self.rootScene.children[0] = controller.scene;
+				self._mainScene = controller.scene;
 			});
-			self.rootScene.children[0] = transition;
+			self._mainScene = transition;
 			transition.init();
 		};
 	},
@@ -71,9 +75,9 @@ GameController.extends(Object, {
 		roomController.onSleep = this.transitToController(roomController);
 		barScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromBar);
 		supermarketOutsideScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromSupermarket);
-		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController);
+		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController, supermarketInsideController.enter);
 		supermarketInsideController.onExit = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromSupermarket);
-		streetScene.onEnterBar = this.transitToScene(barScene);
+		streetScene.onEnterBar = this.transitToScene(barScene, barScene.enter);
 		streetScene.onExitToSupermarket = this.transitToScene(supermarketOutsideScene, supermarketOutsideScene.enterFromStreet);
 		streetScene.onEnterHome = this.transitToController(roomController, roomController.enter);
 		mapScene.onGoHome = this.transitToController(roomController, roomController.enter);
@@ -126,6 +130,9 @@ GameController.extends(Object, {
 					break;
 				case 'fun':
 					uiScene.funProgress.progress = newValue * 0.01;
+					if (self._mainScene && self._mainScene.playerBody) {
+						self._mainScene.playerBody.colorBody.alpha = newValue * 0.01;
+					}
 					break;
 				case 'money':
 					uiScene.moneyAmountLabel.text = newValue.toFixed(2) + ' EURO';
@@ -138,14 +145,14 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(roomController)();
+		this.transitToController(roomController, roomController.enter)();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
 		this.world.update(delta);
 	},
 	render: function(context) {
-		this.mainViewport.render(context, this.rootScene.children[0]);
+		this.mainViewport.render(context, this._mainScene);
 		this.mainViewport.render(context, this.mapScene);
 		this.uiViewport.render(context, this.uiScene);
 	},

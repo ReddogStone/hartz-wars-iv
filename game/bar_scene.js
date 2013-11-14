@@ -32,14 +32,6 @@ var barSceneTemplate = ( function() {
 			foreground: {
 				type: 'Scene',
 				children: {
-					playerBody: {
-						type: 'Sprite',
-						texture: 'data/walk_anim.png',
-						size: {x: 180, y: 300},
-						sourceRect: {x: 30, y: 30, sx: 100, sy: 200},
-						pos: {x: 250, y: 700},
-						anchor: {x: 0, y: 1}
-					},
 					doorButton: {
 						type: 'Button',
 						size: {x: 80, y: 570},
@@ -111,16 +103,9 @@ function BarScene() {
 	Scene.apply(this);
 
 	this.deserialize(barSceneTemplate);
-	var foreground = this.foreground;
 
-	var sprite = foreground.playerBody;
-	var animation = new FrameAnimation(0.4, function() {return sprite.sourceRect;} );
-	animation.addFrame(new Rect(0, 0, 150, 250));
-	animation.addFrame(new Rect(150, 0, 150, 250));
-	animation.addFrame(new Rect(300, 0, 150, 250));
-	animation.addFrame(new Rect(450, 0, 150, 250));
-	sprite.addAction(animation);
-	this.playerBody = sprite;
+	var playerBody = this.playerBody = new PlayerBody();
+	PlayerBody.addToScene(playerBody, this, 10);
 }
 BarScene.extends(Scene, {
 	set onExitToStreet(value) {
@@ -137,6 +122,9 @@ BarScene.extends(Scene, {
 	},
 	set onDrinkBeer(value) {
 		this.foreground.beerButton.onClicked = value;
+	},
+	enter: function() {
+		this.playerBody.pos = new Pos(10, 700);
 	}
 });
 	

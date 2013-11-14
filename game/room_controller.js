@@ -75,6 +75,7 @@ RoomController.extends(Object, {
 		var products = world.player.dropAllProducts();
 		world.playerHome.storeProducts(products);
 		this._updateFoodAmount();
+		this.scene.enter();
 	},
 	set onExitToStreet(value) {
 		this.scene.onExitToStreet = value;

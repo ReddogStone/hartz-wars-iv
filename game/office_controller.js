@@ -15,7 +15,8 @@ OfficeController.extends(Object, {
 		scene.onEnterOffice = function() {
 			player.energy -= 60;
 			player.saturation -= 60;
-			world.clock.advance(60 * 8.5);
+			player.fun -= 25;
+			world.jumpGameTime(60 * 8.5);
 		};
 	},
 	enterFromBus: function() {
