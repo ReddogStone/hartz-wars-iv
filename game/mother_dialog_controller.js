@@ -10,7 +10,7 @@ var otherTopicDialogTemplate = [
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
-			function(scene, world) { scene.onExit(); }
+			function(scene, world) { scene.exit(); }
 		]}
 	]}
 ];

@@ -108,8 +108,8 @@ DialogScene.extends(Scene, {
 	set onExit(value) {
 		this.exitButton.onClicked = value;
 	},
-	get onExit() {
-		return this.exitButton.onClicked;
+	exit: function() {
+		this.exitButton.onClicked();
 	},
 	addMyLine: function(text) {
 		this.lines.push({speaker: 'self', text: text});
