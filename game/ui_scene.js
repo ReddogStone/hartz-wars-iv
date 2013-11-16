@@ -36,9 +36,9 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 10},
+				pos: {x: 200, y: 95},
 				frameColor: {green: 0.56},
-				fillColor: {red: 0.5},
+				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
 				z: 1,
 				progress: 0.5,
 				children: {
@@ -59,7 +59,7 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 50},
+				pos: {x: 200, y: 60},
 				frameColor: {green: 0.56},
 				fillColor: {red: 1, green: 1},
 				z: 1,
@@ -78,13 +78,13 @@ var uiSceneTemplate = ( function() {
 			},
 			funProgress: {
 				type: 'Progress',
-				size: {x: 100, y: 30},
+				size: {x: 150, y: 45},
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 90},
+				pos: {x: 200, y: 10},
 				frameColor: {green: 0.56},
-				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
+				fillColor: {red: 0.5},
 				z: 1,
 				progress: 0.5,
 				children: {
@@ -94,7 +94,7 @@ var uiSceneTemplate = ( function() {
 						text: 'Lebenslust',
 						font: font,
 						color: {red: 1, green: 1, blue: 1},
-						pos: {x: -10, y: 12},
+						pos: {x: -10, y: 17},
 						anchor: {x: 1, y: 0.5}
 					}
 				}

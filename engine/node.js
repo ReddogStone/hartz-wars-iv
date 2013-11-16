@@ -42,6 +42,28 @@ Node.extends(Object, {
 			scale(scale.x, scale.y).
 			translate(-size.x * anchor.x, - size.y * anchor.y);
 	},
+	getBoundingBox: function() {
+		var transform = this.getTransform();
+		var size = this.size;
+		var points = [
+			transform.apply(Vec.create(0, 0)),
+			transform.apply(Vec.create(size.x, 0)),
+			transform.apply(Vec.create(0, size.y)),
+			transform.apply(Vec.create(size.x, size.y))
+		];
+		var left = points[0].x;
+		var top = points[0].y;
+		var right = left;
+		var bottom = top;
+		for (var i = 1; i < points.length; ++i) {
+			var point = points[i];
+			if (point.x < left) { left = point.x; }
+			if (point.y < top) { top = point.y;	}
+			if (point.x > right) { right = point.x; }
+			if (point.y > bottom) { bottom = point.y; }
+		}
+		return new Rect(left, top, right - left, bottom - top);
+	},
 	getLocalRect: function() {
 		var size = this.size;
 		return new Rect(0, 0, size.x, size.y);

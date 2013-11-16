@@ -24,14 +24,14 @@ var mapSceneTemplate = ( function() {
 				size: {x: 800, y: 598},
 				anchor: {x: 0.5, y: 0.5},
 				pos: {x: 512, y: 320},
-				z: 0
+				z: 50
 			},
 			homeTextBg: {
 				type: 'Sprite',
 				color: 'white',
 				pos: {x: 770, y: 267},
 				anchor: {x: 0.5, y: 0.5},
-				z: 1
+				z: 51
 			},
 			homeButton: {
 				type: 'Button',
@@ -39,7 +39,7 @@ var mapSceneTemplate = ( function() {
 				texture: 'data/map_selection.png',
 				effects: mapHomeButtonEffects,
 				pos: {x: 735, y: 277},
-				z: 2,
+				z: 52,
 				label: {
 					text: 'Zuhause',
 					font: font,
@@ -51,7 +51,7 @@ var mapSceneTemplate = ( function() {
 				color: 'white',
 				pos: {x: 251, y: 332},
 				anchor: {x: 0.5, y: 0.5},
-				z: 1
+				z: 51
 			},
 			workButton: {
 				type: 'Button',
@@ -59,7 +59,7 @@ var mapSceneTemplate = ( function() {
 				texture: 'data/map_selection.png',
 				effects: mapHomeButtonEffects,
 				pos: {x: 216, y: 345},
-				z: 2,
+				z: 52,
 				label: {
 					text: 'Arbeit',
 					font: font,

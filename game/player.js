@@ -16,9 +16,10 @@ Player.extends(Object, {
 			value = 100;
 		}
 		
+		var oldValue = this['_' + valueName];
 		this['_' + valueName] = value;
 		if (this.onValueChanged) {
-			this.onValueChanged(valueName, value);
+			this.onValueChanged(valueName, oldValue, value);
 		}
 	},
 	get energy() { return this._energy; },

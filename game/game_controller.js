@@ -64,7 +64,15 @@ GameController.extends(Object, {
 			transition.init();
 		};
 	},
+	_newController: function(type, world) {
+		var result = new type(world);
+		var self = this;
+		result.showMessage = function(message, callback) { self.showMessage(message, callback); };
+		result.restartGame = function() { self.initMainGame(self.canvas); };
+		return result;
+	},
 	initMainGame: function(canvas) {
+		this.canvas = canvas;
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
 		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
 		this.uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
@@ -84,9 +92,9 @@ GameController.extends(Object, {
 		var mapScene = this.mapScene = new MapScene();
 		
 		// create controllers
-		var roomController = this.roomController = new RoomController(world);
-		var supermarketInsideController = this.supermarketInsideController = new SupermarketInsideController(world);
-		var officeController = this.officeController = new OfficeController(world);
+		var roomController = this.roomController = this._newController(RoomController, world);
+		var supermarketInsideController = this.supermarketInsideController = this._newController(SupermarketInsideController, world);
+		var officeController = this.officeController = this._newController(OfficeController, world);
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
@@ -117,6 +125,17 @@ GameController.extends(Object, {
 				player.saturation += 20;
 				player.money -= 3.2;
 			}
+			
+			if (self._mainScene) {
+				if (self._mainScene.playerBody) {
+					var playerBody = self._mainScene.playerBody;
+					var playerBB = playerBody.getBoundingBox();
+					var pos = new Pos(playerBB.x + playerBB.sx * 0.5, playerBB.y);
+					self.showTempMessage('Sättigung +20', pos);
+					pos.y -= 30;
+					self.showTempMessage('-3.20 EURO', pos);
+				}
+			}
 		};
 		barScene.onEatSausage = function() {
 			if (player.money >= 2.0) {
@@ -138,7 +157,7 @@ GameController.extends(Object, {
 		};
 		
 		// wire-up UI scene
-		player.onValueChanged = function(valueName, newValue) {
+		player.onValueChanged = function(valueName, oldValue, newValue) {
 			if (self._mainScene) {
 				self._updatePlayerValues(self.world.player, self._mainScene);
 			}
@@ -150,14 +169,14 @@ GameController.extends(Object, {
 		
 		// initial transit
 		this.transitToController(roomController, roomController.enter)();
+		this.showMessage('Viel Spaß beim spielen!');
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);
 		this.world.update(delta);
 	},
 	render: function(context) {
-		this.mainViewport.render(context, this._mainScene);
-		this.mainViewport.render(context, this.mapScene);
+		this.mainViewport.render(context, this.rootScene);
 		this.uiViewport.render(context, this.uiScene);
 	},
 	handleMouseEvent: function(type, mouse) {
@@ -179,6 +198,35 @@ GameController.extends(Object, {
 	},
 	hideMap: function() {
 		this.mapScene.visible = false;
-		this.rootScene.removeChild(self.mapScene);
+		this.rootScene.removeChild(this.mapScene);
+	},
+	showMessage: function(message, callback) {
+		var messageScene = new MessageScene(message);
+		var rootScene = this.rootScene;
+		rootScene.addChild(messageScene);
+		
+		messageScene.onOK = function() {
+			rootScene.removeChild(messageScene);
+			if (callback) {
+				callback();
+			}
+		};
+	},
+	showTempMessage: function(message, pos) {
+		var label = new Label(message, Fonts.inGameMiddle, 'white');
+		label.pos = Pos.clone(pos);
+		label.anchor = new Pos(0.5, 1);
+		label.z = 100;
+		label.addAction(new SequenceAction(
+			new EaseOutAction(2, function(progress) {
+				label.alpha = 1.0 - progress;
+			}),
+			new InstantAction(function() {
+				rootScene.removeChild(label);
+			}))
+		);
+		
+		var rootScene = this.rootScene;
+		rootScene.addChild(label);
 	}
 });
