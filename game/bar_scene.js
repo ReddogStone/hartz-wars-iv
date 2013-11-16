@@ -25,7 +25,8 @@ var barSceneTemplate = ( function() {
 					sprite: {
 						type: 'Sprite',
 						texture: 'data/bar_bg.png',
-						size: {x: 1024, y: 640}
+						size: {x: 1024, y: 640},
+						z: 0
 					}
 				}
 			},
@@ -38,10 +39,12 @@ var barSceneTemplate = ( function() {
 						texture: 'data/bar_door_highlight.png',
 						effects: roomDoorEffects,
 						pos: {x: 0, y: 23},
+						z: 1,
 						label: {
 							offset: {x: 50, y: 310},
 							text: 'Rausgehen',
-							font: font
+							font: font,
+							z: 3
 						}
 					},
 					doenerButton: {
@@ -50,10 +53,12 @@ var barSceneTemplate = ( function() {
 						texture: 'data/doener.png',
 						effects: foodButtonEffects,
 						pos: {x: 205, y: 50},
+						z: 1,
 						label: {
 							offset: {x: 0, y: 100},
 							text: 'Döner - 3,20 EURO',
-							font: font
+							font: font,
+							z: 3
 						}
 					},
 					sausageButton: {
@@ -62,10 +67,12 @@ var barSceneTemplate = ( function() {
 						texture: 'data/sausage.png',
 						effects: foodButtonEffects,
 						pos: {x: 385, y: 50},
+						z: 1,
 						label: {
 							offset: {x: 0, y: 100},
 							text: 'Currywurst - 2,00 EURO',
-							font: font
+							font: font,
+							z: 3
 						}
 					},
 					burgerButton: {
@@ -74,10 +81,12 @@ var barSceneTemplate = ( function() {
 						texture: 'data/burger_menu.png',
 						effects: foodButtonEffects,
 						pos: {x: 565, y: 50},
+						z: 1,
 						label: {
 							offset: {x: 0, y: 100},
 							text: 'Burgermenü - 5,50 EURO',
-							font: font
+							font: font,
+							z: 3
 						}
 					},
 					beerButton: {
@@ -86,10 +95,12 @@ var barSceneTemplate = ( function() {
 						texture: 'data/beer_bottle.png',
 						effects: foodButtonEffects,
 						pos: {x: 740, y: 55},
+						z: 1,
 						label: {
 							offset: {x: 0, y: 100},
 							text: 'Bier - 1,50 EURO',
-							font: font
+							font: font,
+							z: 3
 						}
 					}
 				}
@@ -105,7 +116,7 @@ function BarScene() {
 	this.deserialize(barSceneTemplate);
 
 	var playerBody = this.playerBody = new PlayerBody();
-	PlayerBody.addToScene(playerBody, this, 10);
+	PlayerBody.addToScene(playerBody, this, 2);
 }
 BarScene.extends(Scene, {
 	set onExitToStreet(value) {
@@ -124,7 +135,7 @@ BarScene.extends(Scene, {
 		this.foreground.beerButton.onClicked = value;
 	},
 	enter: function() {
-		this.playerBody.pos = new Pos(10, 700);
+		this.playerBody.pos = new Pos(150, 700);
 	}
 });
 	

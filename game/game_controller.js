@@ -12,6 +12,16 @@ GameController.extends(Object, {
 	set _mainScene(value) {
 		this.rootScene.children[0] = value;
 	},
+	_updatePlayerValues: function(player, scene) {
+		var uiScene = this.uiScene;
+		uiScene.energyProgress.progress = player.energy * 0.01;
+		uiScene.saturationProgress.progress = player.saturation * 0.01;
+		uiScene.funProgress.progress = player.fun * 0.01;
+		if (scene.playerBody) {
+			scene.playerBody.colorBody.alpha = player.fun * 0.01;
+		}
+		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';		
+	},
 	transitToScene: function(scene, func) {
 		var self = this;
 		return function() {
@@ -21,10 +31,14 @@ GameController.extends(Object, {
 				func.call(scene);
 			}
 
-			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, scene, function() {
-				self.controller = null;
-				self._mainScene = scene;
-			});
+			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, scene, 
+				function() {
+					self._updatePlayerValues(self.world.player, scene);
+				},
+				function() {
+					self.controller = null;
+					self._mainScene = scene;
+				});
 			self._mainScene = transition;
 			transition.init();
 		};
@@ -38,10 +52,14 @@ GameController.extends(Object, {
 				func.call(controller);
 			}
 
-			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, controller.scene, function() {
-				self.controller = controller;
-				self._mainScene = controller.scene;
-			});
+			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, controller.scene, 
+				function() {
+					self._updatePlayerValues(self.world.player, controller.scene);
+				},
+				function() {
+					self.controller = controller;
+					self._mainScene = controller.scene;
+				});
 			self._mainScene = transition;
 			transition.init();
 		};
@@ -121,22 +139,8 @@ GameController.extends(Object, {
 		
 		// wire-up UI scene
 		player.onValueChanged = function(valueName, newValue) {
-			switch (valueName) {
-				case 'energy':
-					uiScene.energyProgress.progress = newValue * 0.01;
-					break;
-				case 'saturation':
-					uiScene.saturationProgress.progress = newValue * 0.01;
-					break;
-				case 'fun':
-					uiScene.funProgress.progress = newValue * 0.01;
-					if (self._mainScene && self._mainScene.playerBody) {
-						self._mainScene.playerBody.colorBody.alpha = newValue * 0.01;
-					}
-					break;
-				case 'money':
-					uiScene.moneyAmountLabel.text = newValue.toFixed(2) + ' EURO';
-					break;
+			if (self._mainScene) {
+				self._updatePlayerValues(self.world.player, self._mainScene);
 			}
 		};
 		player.energy = 80;

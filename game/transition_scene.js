@@ -15,7 +15,7 @@ var transitionTemplate = ( function() {
 	};
 })();
 
-function TransitionScene(duration, from, to, callback) {
+function TransitionScene(duration, from, to, onNewScene, onFinished) {
 	Scene.apply(this);
 	
 	this.deserialize(transitionTemplate);
@@ -23,7 +23,8 @@ function TransitionScene(duration, from, to, callback) {
 	this.fromScene = from;
 	this.toScene = to;
 	this.duration = duration;
-	this.onFinished = callback;
+	this.onNewScene = onNewScene;
+	this.onFinished = onFinished;
 	
 	var overlay = this.overlay;
 	overlay.handleMouseDown = overlay.handleMouseUp = overlay.handleMouseMove = function() {
@@ -47,6 +48,7 @@ TransitionScene.extends(Scene, {
 			new InstantAction(function() {
 				self.removeChild(self.fromScene);
 				self.addChild(self.toScene);
+				self.onNewScene();
 			}),
 			new EaseInOutAction(0.5 * duration, function(progress) {
 				overlay.alpha = 1.0 - progress;
