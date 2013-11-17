@@ -54,9 +54,12 @@ Player.extends(Object, {
 		var saturation = this.saturation;
 		var fun = this.fun;
 	
-		this.energy += activity.getEnergyChangeRate() * minutes;
-		this.saturation += activity.getSaturationChangeRate() * minutes;
-		this.fun += activity.getFunChangeRate() * minutes;
+		this.energy += activity.getEnergyChangeRate(this) * minutes;
+		this.saturation += activity.getSaturationChangeRate(this) * minutes;
+		this.fun += activity.getFunChangeRate(this) * minutes;
+		
+		this.tired = (this.energy <= 0);
+		this.hungry = (this.saturation <= 0);
 		
 		var messages = [];
 		var energyChange = integerDifference(this.energy, energy);

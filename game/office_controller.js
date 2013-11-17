@@ -14,10 +14,14 @@ OfficeController.extends(Object, {
 		scene.init();
 		
 		scene.onEnterOffice = function() {
-			player.energy -= 60;
-			player.saturation -= 60;
-			player.fun -= 25;
-			world.jumpGameTime(60 * 8.5);
+			var activity = new WorkActivity(8.5 * 60);
+			ControllerUtils.performActivity(world, activity, function(messages) {
+					self.showPlayerTempMessages(messages);					
+				},
+				function(rejectionReason) {
+					home.storeProduct(product);
+					self.showPlayerTempMessages([rejectionReason]);
+				});
 		};
 	},
 	enterFromBus: function() {

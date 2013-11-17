@@ -10,7 +10,11 @@ function World() {
 	supermarket.addProduct(EXPENSIVE_FOOD);
 	this.supermarket = supermarket;
 	this.playerHome = new Home();
-	this.clock = new Clock(new Date());
+	
+	var date = new Date();
+	date.setHours(7);
+	date.setMinutes(0);
+	this.clock = new Clock(date);
 }
 
 World.extends(Object, {

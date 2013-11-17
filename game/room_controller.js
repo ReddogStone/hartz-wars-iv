@@ -46,9 +46,9 @@ RoomController.extends(Object, {
 			if (rejectionReason) {
 				self.showPlayerTempMessages([rejectionReason]);
 			} else {
-				world.performActivity(activity);
+				var messages = world.performActivity(activity);
 				if (self.onSleep) {
-					self.onSleep(activity.getSuccessMessages());
+					self.onSleep(messages);
 				}
 			}
 		};

@@ -4,14 +4,18 @@ function RegularActivity(duration) {
 	this._duration = duration;
 }
 RegularActivity.extends(Object, {
-	getEnergyChangeRate: function() {
+	getEnergyChangeRate: function(player) {
 		return -100 / (16 * 60);
 	},
-	getSaturationChangeRate: function() {
+	getSaturationChangeRate: function(player) {
 		return -100 / (12 * 60);
 	},
-	getFunChangeRate: function() {
-		return -100 / (4 * 24 * 60);
+	getFunChangeRate: function(player) {
+		if (player.hungry || player.tired) {
+			return -0.5;
+		} else {
+			return -100 / (4 * 24 * 60);
+		}
 	},
 	getSuccessMessages: function() {
 		var duration = this.getDuration();
@@ -94,6 +98,27 @@ SleepActivity.extends(RegularActivity, {
 	reject: function(world) {
 		if (world.player.energy >= 80) {
 			return 'Nicht müde';
+		}
+		return null;
+	}
+});
+
+function WorkActivity(duration) {
+	RegularActivity.call(this, duration);
+}
+WorkActivity.extends(RegularActivity, {
+	getEnergyChangeRate: function() {
+		return -60 / (8.5 * 60);
+	},
+	getSaturationChangeRate: function() {
+		return -60 / (8.5 * 60);
+	},
+	getFunChangeRate: function() {
+		return -25 / (8.5 * 60);
+	},
+	reject: function(world) {
+		if (world.player.energy < 40) {
+			return 'Nicht genug Energie';
 		}
 		return null;
 	}

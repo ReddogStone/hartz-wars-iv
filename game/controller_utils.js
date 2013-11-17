@@ -8,9 +8,9 @@ var ControllerUtils = {
 				onReject(rejectionReason);
 			}
 		} else {
-			world.performActivity(activity);
+			var messages = world.performActivity(activity);
 			if (onSuccess) {
-				onSuccess(activity.getSuccessMessages());
+				onSuccess(messages);
 			}
 		}
 	},

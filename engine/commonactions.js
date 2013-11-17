@@ -20,6 +20,8 @@ function LinearAction(duration, callback) {
 }
 LinearAction.extends(Object, {
 	start: function() {
+		this.time = 0;
+		this.finished = false;
 		this.callback(0.0);
 	},
 	stop: function() {
@@ -99,6 +101,8 @@ SequenceAction.extends(Object, {
 		this.currentIndex = currentIndex;
 	},
 	start: function() {
+		this.currentIndex = 0;
+		this.finished = false;
 		this._startAction();
 	},
 	stop: function() {
@@ -121,6 +125,7 @@ SequenceAction.extends(Object, {
 			current = actions[this.currentIndex];
 			timeLeft = current.update(timeLeft);
 		}
+		return timeLeft;
 	}
 });
 
@@ -150,6 +155,48 @@ ParallelAction.extends(Object, {
 		this.actions.forEach(function(action) {action.stop()});		
 	},
 	update: function(deltaTime) {
-		this.actions.forEach(function(action) {action.update(deltaTime)});		
+		var minRest = Infinity;
+		this.actions.forEach(function(action) {
+			var rest = action.update(deltaTime);
+			if (rest < minRest) {
+				minRest = rest;
+			}
+		});
+		return minRest;
+	}
+});
+
+function RepeatAction(action) {
+	this.action = action;
+}
+RepeatAction.extends(Object, {
+	get finished() {
+		return false;
+	},
+	start: function() {
+		var action = this.action;
+		action.start();
+		if (action.finished) {
+			action.stop();
+			action.start();
+		}
+	},
+	stop: function() {
+		this.action.stop();
+	},
+	update: function(deltaTime) {
+		var action = this.action;
+		var rest = action.update(deltaTime);
+		if (action.finished) {
+			action.stop();
+			action.start();
+		}
+		while (rest > 0) {
+			rest = this.action.update(rest);
+			if (action.finished) {
+				action.stop();
+				action.start();
+			}			
+		}
 	}
 });

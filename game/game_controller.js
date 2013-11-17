@@ -182,9 +182,9 @@ GameController.extends(Object, {
 				self._updatePlayerValues(self.world.player, self._mainScene);
 			}
 		};
-		player.energy = 80;
-		player.saturation = 75;
-		player.fun = 5;
+		player.energy = 100;
+		player.saturation = 100;
+		player.fun = 100;
 		player.money = 391;
 		
 		this.updatePaused = true;
@@ -200,6 +200,42 @@ GameController.extends(Object, {
 				'Viel Spaß beim spielen!');
 			this.updatePaused = false;
 		})();
+		
+		this.tempMessageQueue = [];
+		this.rootScene.addAction(new RepeatAction(new SequenceAction(
+			new WaitAction(0.5),
+			new InstantAction(function() {
+				if (self.tempMessageQueue.length <= 0) {
+					return;
+				}
+				var messageEntry = self.tempMessageQueue.shift();
+				var message = messageEntry.message;
+				var pos = messageEntry.pos;
+				var rootScene = self.rootScene;
+				var label = new Label(message, Fonts.inGameMiddle, 'white');
+				label.anchor = new Pos(0.5, 1);
+				label.z = 100;
+				
+				var endPos = Pos.clone(pos);
+				endPos.y -= 100;
+				label.addAction(new SequenceAction(
+					new ParallelAction(
+						new LinearAction(2, function(progress) {
+							label.pos = Pos.clone(Vec.lerp(pos, endPos, progress));
+						}),
+						new EaseOutAction(2, function(progress) {
+							label.alpha = 1.0 - progress;
+						})
+					),
+					new InstantAction(function() {
+						rootScene.removeChild(label);
+					}))
+				);
+					
+				rootScene.addChild(label);
+				console.log('Check');
+			})
+		)));
 	},
 	update: function(delta) {
 		var self = this;
@@ -259,30 +295,8 @@ GameController.extends(Object, {
 		};
 	},
 	showTempMessages: function(messages, pos) {
-		var endPos = Pos.clone(pos);
-		endPos.y -= 100;
-		
-		messages.forEach(function(message, index) {
-			var rootScene = this.rootScene;
-			var label = new Label(message, Fonts.inGameMiddle, 'white');
-			label.anchor = new Pos(0.5, 1);
-			label.z = 100;
-			label.addAction(new SequenceAction(
-				new WaitAction(index * 0.5),
-				new ParallelAction(
-					new LinearAction(2, function(progress) {
-						label.pos = Pos.clone(Vec.lerp(pos, endPos, progress));
-					}),
-					new EaseOutAction(2, function(progress) {
-						label.alpha = 1.0 - progress;
-					})
-				),
-				new InstantAction(function() {
-					rootScene.removeChild(label);
-				}))
-			);
-			
-			rootScene.addChild(label);
+		messages.forEach(function(message) {
+			this.tempMessageQueue.push({message: message, pos: pos});
 		}, this);
 	}
 });
