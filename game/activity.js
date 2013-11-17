@@ -95,6 +95,9 @@ SleepActivity.extends(RegularActivity, {
 	getEnergyChangeRate: function() {
 		return 100 / (12 * 60);
 	},
+	getFunChangeRate: function() {
+		return 0;
+	},
 	reject: function(world) {
 		if (world.player.energy >= 80) {
 			return 'Nicht müde';

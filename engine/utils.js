@@ -52,5 +52,5 @@ function numberToStringWithSign(number) {
 }
 
 function integerDifference(number1, number2) {
-	return Math.floor(number1) - Math.floor(number2);
+	return Math.ceil(number1) - Math.ceil(number2);
 }
