@@ -6,16 +6,19 @@ function RoomController(world) {
 }
 RoomController.extends(Object, {
 	_consumeFood: function(type) {
+		var self = this;
 		var world = this._world;
-		var player = world.player;
 		var home = world.playerHome;
 		var product = home.consumeProduct(type);
 		if (product) {
-			if (product.condition(world, player)) {
-				product.consequence(world, player);
-			} else {
-				home.storeProduct(product);
-			}
+			var activity = new ConsumeMealActivity(product);
+			ControllerUtils.performActivity(this._world, activity, function(messages) {
+					self.showPlayerTempMessages(messages);					
+				},
+				function(rejectionReason) {
+					home.storeProduct(product);
+					self.showPlayerTempMessages([rejectionReason]);
+				});
 		}
 		this._updateFoodAmount();		
 	},	
@@ -37,13 +40,16 @@ RoomController.extends(Object, {
 			self._updateAlarmTime();
 		};
 		scene.onSleep = function() {
-			var duration = Clock.timeDiff(world.clock.time, home.alarmTime);
-			player.saturation -= 100 * duration / 24;
-			player.energy += 12 * duration;
-			world.jumpGameTime(duration * 60);
-			
-			if (self.onSleep) {
-				self.onSleep();
+			var hours = Clock.timeDiff(world.clock.time, home.alarmTime);
+			var activity = new SleepActivity(hours * 60);
+			var rejectionReason = activity.reject(world);
+			if (rejectionReason) {
+				self.showPlayerTempMessages([rejectionReason]);
+			} else {
+				world.performActivity(activity);
+				if (self.onSleep) {
+					self.onSleep(activity.getSuccessMessages());
+				}
 			}
 		};
 		scene.onCookCheap = function() {
@@ -64,13 +70,16 @@ RoomController.extends(Object, {
 			dialogController.init();
 		};
 		scene.onReadBook = function() {
-			player.fun += 15;
-			world.advanceGameTime(60);
+			self._performActivity(READ_ACTIVITY, function(rejectionReason) {
+				self.showPlayerTempMessages([rejectionReason]);
+			});
 		};
 		this._updateFoodAmount();
 		this._updateAlarmTime();
 		
 		home.storeProduct(CHEAP_FOOD);
+		home.storeProduct(EXPENSIVE_FOOD);
+		home.storeProduct(HEALTHY_FOOD);
 	},
 	enter: function() {
 		var world = this._world;

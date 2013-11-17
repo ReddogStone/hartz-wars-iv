@@ -9,7 +9,7 @@ Home.extends(Object, {
 	storeProduct: function(product) {
 		if (product.kind == 'food') {
 			for (var i = 0; i < product.meals; ++i) {
-				var meal = Food.clone(product);
+				var meal = FoodProduct.clone(product);
 				meal.meals = 1;
 				this.products.push(meal);
 			}

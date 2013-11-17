@@ -10,9 +10,9 @@ var barSceneTemplate = ( function() {
 
 	var foodButtonEffects = [
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
-		{ type: 'ChangingSpriteColor', pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
+		{ type: 'ChangingSpriteColor', active: {alpha: 0.5}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
 		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
-		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'source-over', hovered: 'source-over' }
+//		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'source-over', hovered: 'source-over' }
 	];
 	var font = Fonts.inGameBig;
 		
@@ -135,7 +135,7 @@ BarScene.extends(Scene, {
 		this.foreground.beerButton.onClicked = value;
 	},
 	enter: function() {
-		this.playerBody.pos = new Pos(150, 700);
+		this.playerBody.pos = new Pos(250, 700);
 	}
 });
 	

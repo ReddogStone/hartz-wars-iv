@@ -15,13 +15,16 @@ function World() {
 
 World.extends(Object, {
 	update: function(delta) {
-		this.advanceGameTime(delta / 60 * GAME_TIME_SPEED);
+		this.advanceGameTime(delta / 60 * GAME_TIME_SPEED, REGULAR_ACTIVITY);
 	},
-	advanceGameTime: function(minutes) {
+	advanceGameTime: function(minutes, activity) {
 		this.clock.advance(minutes);
-		this.player.advanceGameTime(minutes);
+		this.player.advanceGameTime(minutes, activity);
 	},
 	jumpGameTime: function(minutes) {
 		this.clock.advance(minutes);		
+	},
+	performActivity: function(activity) {
+		this.advanceGameTime(activity.getDuration(), activity);
 	}
 })

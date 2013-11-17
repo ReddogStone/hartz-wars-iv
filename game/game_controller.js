@@ -22,56 +22,95 @@ GameController.extends(Object, {
 		}
 		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';		
 	},
-	transitToScene: function(scene, func) {
+	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
 		return function() {
 			self.hideMap();
-			scene.init();
-			if (func) {
-				func.call(scene);
-			}
+			var args = arguments;
 
 			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, scene, 
 				function() {
 					self._updatePlayerValues(self.world.player, scene);
+					scene.init();
+					if (onEnter) {
+						onEnter.apply(scene, args);
+					}
 				},
 				function() {
 					self.controller = null;
 					self._mainScene = scene;
+					if (onFinished) {
+						onFinished.apply(scene, args);
+					}
 				});
 			self._mainScene = transition;
 			transition.init();
 		};
 	},
-	transitToController: function(controller, func) {
+	transitToController: function(controller, onEnter, onFinished) {
 		var self = this;
 		return function() {
 			self.hideMap();
-			controller.init();
-			if (func) {
-				func.call(controller);
-			}
-
+			var args = arguments;
+			
 			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, controller.scene, 
 				function() {
 					self._updatePlayerValues(self.world.player, controller.scene);
+					controller.init();
+					if (onEnter) {
+						onEnter.apply(controller, args);
+					}					
 				},
 				function() {
 					self.controller = controller;
 					self._mainScene = controller.scene;
+					if (onFinished) {
+						onFinished.apply(controller, args);
+					}
 				});
 			self._mainScene = transition;
 			transition.init();
 		};
+	},
+	_showPlayerTempMessages: function(messages) {
+		if (this._mainScene) {
+			if (this._mainScene.playerBody) {
+				var playerBody = this._mainScene.playerBody;
+				var playerBB = playerBody.getBoundingBox();
+				var pos = new Pos(playerBB.x + playerBB.sx * 0.5, playerBB.y);
+				this.showTempMessages(messages, pos);
+			}
+		}
 	},
 	_newController: function(type, world) {
 		var result = new type(world);
 		var self = this;
 		result.showMessage = function(message, callback) { self.showMessage(message, callback); };
+		result.showPlayerTempMessages = function(messages) { 
+			self._showPlayerTempMessages(messages);
+		};
 		result.restartGame = function() { self.initMainGame(self.canvas); };
 		return result;
 	},
+	_buyMeal: function(meal, price) {
+		var self = this;
+		var world = this.world;
+		var player = world.player;
+		if (player.money >= price) {
+			ControllerUtils.performActivity(world, new ConsumeMealActivity(meal), function(messages) {
+					player.money -= price;
+					messages.push('-' + price.toFixed(2) + ' EURO');
+					self._showPlayerTempMessages(messages);
+				},
+				function(rejectionReason) {
+					self._showPlayerTempMessages([rejectionReason]);
+				});		
+		} else {
+			self._showPlayerTempMessages('Nicht genug Geld');
+		}
+	},
 	initMainGame: function(canvas) {
+		var self = this;
 		this.canvas = canvas;
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
 		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
@@ -98,7 +137,9 @@ GameController.extends(Object, {
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
-		roomController.onSleep = this.transitToController(roomController);
+		roomController.onSleep = this.transitToController(roomController, undefined, function(messages) {
+			self._showPlayerTempMessages(messages);
+		});
 		barScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromBar);
 		supermarketOutsideScene.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromSupermarket);
 		supermarketOutsideScene.onEnterSupermarket = this.transitToController(supermarketInsideController, supermarketInsideController.enter);
@@ -109,7 +150,6 @@ GameController.extends(Object, {
 		mapScene.onGoHome = this.transitToController(roomController, roomController.enter);
 		mapScene.onGoToWork = this.transitToController(officeController, officeController.enterFromBus);
 		
-		var self = this;
 		streetScene.onShowMap = officeController.onShowMap = function() {
 			self.showMap();
 		}
@@ -121,37 +161,16 @@ GameController.extends(Object, {
 		
 		// events
 		barScene.onEatDoener = function() {
-			if (player.money >= 3.2) {
-				player.saturation += 20;
-				player.money -= 3.2;
-			}
-			
-			if (self._mainScene) {
-				if (self._mainScene.playerBody) {
-					var playerBody = self._mainScene.playerBody;
-					var playerBB = playerBody.getBoundingBox();
-					var pos = new Pos(playerBB.x + playerBB.sx * 0.5, playerBB.y);
-					self.showTempMessages(['Sättigung +20', '-3.20 EURO'], pos);
-				}
-			}
+			self._buyMeal(DOENER_MEAL, 3.2);
 		};
 		barScene.onEatSausage = function() {
-			if (player.money >= 2.0) {
-				player.saturation += 10;
-				player.money -= 2.0;
-			}
+			self._buyMeal(SAUSAGE_MEAL, 2);
 		};
 		barScene.onEatBurger = function() {
-			if (player.money >= 5.5) {
-				player.saturation += 30;
-				player.money -= 5.5;
-			}
+			self._buyMeal(BURGER_MEAL, 5.5);
 		};
 		barScene.onDrinkBeer = function() {
-			if (player.money >= 1.5) {
-				player.fun += 5;
-				player.money -= 1.5;
-			}
+			self._buyMeal(BEER_MEAL, 1.5);
 		};
 		
 		// wire-up UI scene
