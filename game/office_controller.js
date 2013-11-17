@@ -19,7 +19,6 @@ OfficeController.extends(Object, {
 					self.showPlayerTempMessages(messages);					
 				},
 				function(rejectionReason) {
-					home.storeProduct(product);
 					self.showPlayerTempMessages([rejectionReason]);
 				});
 		};

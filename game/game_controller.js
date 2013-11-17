@@ -233,7 +233,6 @@ GameController.extends(Object, {
 				);
 					
 				rootScene.addChild(label);
-				console.log('Check');
 			})
 		)));
 	},
