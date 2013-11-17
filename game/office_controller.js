@@ -18,15 +18,6 @@ OfficeController.extends(Object, {
 			player.saturation -= 60;
 			player.fun -= 25;
 			world.jumpGameTime(60 * 8.5);
-			
-			if (player.fun <= 0) {
-				self.showMessage('Du hast verloren!\n\n' +
-					'Du bist nur noch ein graues Rädchen in einer grauen Welt\n' +
-					'und deine Existenz ist nicht mehr von Belang.', 
-				function() {
-					self.restartGame();
-				});
-			}
 		};
 	},
 	enterFromBus: function() {

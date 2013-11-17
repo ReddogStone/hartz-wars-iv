@@ -1,6 +1,7 @@
 'use strict';
 
-function RegularActivity() {
+function RegularActivity(duration) {
+	this._duration = duration;
 }
 RegularActivity.extends(Object, {
 	getEnergyChangeRate: function() {
@@ -22,11 +23,14 @@ RegularActivity.extends(Object, {
 			numberToStringWithSign(Math.floor(saturationChange)) + ' Sättigung',
 			numberToStringWithSign(Math.floor(funChange)) + ' Lebenslust'
 		];
-	}	
+	},
+	getDuration: function() {
+		return this._duration;
+	}
 });
-var REGULAR_ACTIVITY = new RegularActivity();
 
 function ConsumeMealActivity(meal) {
+	RegularActivity.call(this, meal.timeToConsume);
 	this.meal = meal;
 }
 ConsumeMealActivity.extends(RegularActivity, {
@@ -41,9 +45,6 @@ ConsumeMealActivity.extends(RegularActivity, {
 	getFunChangeRate: function() {
 		var meal = this.meal;
 		return meal.funChange / meal.timeToConsume;
-	},
-	getDuration: function() {
-		return this.meal.timeToConsume;
 	},
 	getSuccessMessages: function() {
 		var meal = this.meal;
@@ -68,11 +69,9 @@ ConsumeMealActivity.extends(RegularActivity, {
 });
 
 function ReadActivity() {
+	RegularActivity.call(this, 60);
 }
 ReadActivity.extends(RegularActivity, {
-	getDuration: function() {
-		return 60;
-	},
 	getFunChangeRate: function() {
 		return 15 / this.getDuration();
 	},
@@ -86,14 +85,11 @@ ReadActivity.extends(RegularActivity, {
 var READ_ACTIVITY = new ReadActivity();
 
 function SleepActivity(duration) {
-	this._duration = duration;
+	RegularActivity.call(this, duration);
 }
 SleepActivity.extends(RegularActivity, {
 	getEnergyChangeRate: function() {
 		return 100 / (12 * 60);
-	},
-	getDuration: function() {
-		return this._duration;
 	},
 	reject: function(world) {
 		if (world.player.energy >= 80) {

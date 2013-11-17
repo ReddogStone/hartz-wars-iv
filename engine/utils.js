@@ -50,3 +50,7 @@ function padNumber(number, width) {
 function numberToStringWithSign(number) {
 	return (number >= 0) ? ('+' + number) : number.toString();
 }
+
+function integerDifference(number1, number2) {
+	return Math.floor(number1) - Math.floor(number2);
+}

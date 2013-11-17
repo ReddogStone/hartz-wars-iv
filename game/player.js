@@ -50,8 +50,27 @@ Player.extends(Object, {
 		return res;
 	},
 	advanceGameTime: function(minutes, activity) {
+		var energy = this.energy;
+		var saturation = this.saturation;
+		var fun = this.fun;
+	
 		this.energy += activity.getEnergyChangeRate() * minutes;
 		this.saturation += activity.getSaturationChangeRate() * minutes;
 		this.fun += activity.getFunChangeRate() * minutes;
+		
+		var messages = [];
+		var energyChange = integerDifference(this.energy, energy);
+		var saturationChange = integerDifference(this.saturation, saturation);
+		var funChange = integerDifference(this.fun, fun);
+		if (energyChange != 0) {
+			messages.push(numberToStringWithSign(energyChange) + ' Energie');
+		}
+		if (saturationChange != 0) {
+			messages.push(numberToStringWithSign(saturationChange) + ' Sättigung');
+		}
+		if (funChange != 0) {
+			messages.push(numberToStringWithSign(funChange) + ' Lebenslust');
+		}
+		return messages;
 	}
 });

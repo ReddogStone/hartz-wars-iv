@@ -109,6 +109,9 @@ GameController.extends(Object, {
 			self._showPlayerTempMessages('Nicht genug Geld');
 		}
 	},
+	_restartGame: function() {
+		this.initMainGame(this.canvas);
+	},
 	initMainGame: function(canvas) {
 		var self = this;
 		this.canvas = canvas;
@@ -184,19 +187,36 @@ GameController.extends(Object, {
 		player.fun = 5;
 		player.money = 391;
 		
+		this.updatePaused = true;
+
 		// initial transit
-		this.transitToController(roomController, roomController.enter, function() {
+		this.transitToController(roomController, function() {
+			roomController.enter();
 			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
 				'\n' +
 				'Unten siehst Du deine Lebenslust. Diese darf auf keinen Fall\n' +
 				'auf Null fallen, sonst hast Du verloren.\n' +
 				'\n' +
 				'Viel Spaß beim spielen!');
+			this.updatePaused = false;
 		})();
 	},
 	update: function(delta) {
+		var self = this;
 		this.rootScene.update(delta);
-		this.world.update(delta);
+		if (!this.updatePaused) {
+			var messages = this.world.performActivity(new RegularActivity(delta / 6));
+			this._showPlayerTempMessages(messages);
+		
+			if (this.world.player.fun <= 0) {
+				this.showMessage('Du hast verloren!\n\n' +
+					'Du bist nur noch ein graues Rädchen in einer grauen Welt\n' +
+					'und deine Existenz ist nicht mehr von Belang.', 
+				function() {
+					self._restartGame();
+				});
+			}
+		}
 	},
 	render: function(context) {
 		this.mainViewport.render(context, this.rootScene);
@@ -224,15 +244,18 @@ GameController.extends(Object, {
 		this.rootScene.removeChild(this.mapScene);
 	},
 	showMessage: function(message, callback) {
+		var self = this;
 		var messageScene = new MessageScene(message);
 		var rootScene = this.rootScene;
 		rootScene.addChild(messageScene);
+		this.updatePaused = true;
 		
 		messageScene.onOK = function() {
 			rootScene.removeChild(messageScene);
 			if (callback) {
 				callback();
 			}
+			self.updatePaused = false;
 		};
 	},
 	showTempMessages: function(messages, pos) {

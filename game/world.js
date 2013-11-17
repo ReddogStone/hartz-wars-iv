@@ -14,17 +14,14 @@ function World() {
 }
 
 World.extends(Object, {
-	update: function(delta) {
-		this.advanceGameTime(delta / 60 * GAME_TIME_SPEED, REGULAR_ACTIVITY);
-	},
 	advanceGameTime: function(minutes, activity) {
 		this.clock.advance(minutes);
-		this.player.advanceGameTime(minutes, activity);
+		return this.player.advanceGameTime(minutes, activity);
 	},
 	jumpGameTime: function(minutes) {
 		this.clock.advance(minutes);		
 	},
 	performActivity: function(activity) {
-		this.advanceGameTime(activity.getDuration(), activity);
+		return this.advanceGameTime(activity.getDuration(), activity);
 	}
 })
