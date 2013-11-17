@@ -69,6 +69,8 @@ RoomController.extends(Object, {
 		};
 		this._updateFoodAmount();
 		this._updateAlarmTime();
+		
+		home.storeProduct(CHEAP_FOOD);
 	},
 	enter: function() {
 		var world = this._world;

@@ -131,9 +131,7 @@ GameController.extends(Object, {
 					var playerBody = self._mainScene.playerBody;
 					var playerBB = playerBody.getBoundingBox();
 					var pos = new Pos(playerBB.x + playerBB.sx * 0.5, playerBB.y);
-					self.showTempMessage('Sättigung +20', pos);
-					pos.y -= 30;
-					self.showTempMessage('-3.20 EURO', pos);
+					self.showTempMessages(['Sättigung +20', '-3.20 EURO'], pos);
 				}
 			}
 		};
@@ -212,21 +210,31 @@ GameController.extends(Object, {
 			}
 		};
 	},
-	showTempMessage: function(message, pos) {
-		var label = new Label(message, Fonts.inGameMiddle, 'white');
-		label.pos = Pos.clone(pos);
-		label.anchor = new Pos(0.5, 1);
-		label.z = 100;
-		label.addAction(new SequenceAction(
-			new EaseOutAction(2, function(progress) {
-				label.alpha = 1.0 - progress;
-			}),
-			new InstantAction(function() {
-				rootScene.removeChild(label);
-			}))
-		);
+	showTempMessages: function(messages, pos) {
+		var endPos = Pos.clone(pos);
+		endPos.y -= 100;
 		
-		var rootScene = this.rootScene;
-		rootScene.addChild(label);
+		messages.forEach(function(message, index) {
+			var rootScene = this.rootScene;
+			var label = new Label(message, Fonts.inGameMiddle, 'white');
+			label.anchor = new Pos(0.5, 1);
+			label.z = 100;
+			label.addAction(new SequenceAction(
+				new WaitAction(index * 0.5),
+				new ParallelAction(
+					new LinearAction(2, function(progress) {
+						label.pos = Pos.clone(Vec.lerp(pos, endPos, progress));
+					}),
+					new EaseOutAction(2, function(progress) {
+						label.alpha = 1.0 - progress;
+					})
+				),
+				new InstantAction(function() {
+					rootScene.removeChild(label);
+				}))
+			);
+			
+			rootScene.addChild(label);
+		}, this);
 	}
 });

@@ -123,3 +123,33 @@ SequenceAction.extends(Object, {
 		}
 	}
 });
+
+function ParallelAction(action /* any amount of actions can be passed afterwards */) {
+	if (!action) { throw new Error('A ParallelAction has to be created with at least one child action'); }
+	
+	if (Array.isArray(action)) {
+		this.actions = new Array(action.length);
+		action.forEach(function(element, index) {
+			this.actions[index] = element;
+		}, this);
+	} else {
+		this.actions = new Array(arguments.length);
+		for (var i = 0; i < arguments.length; ++i) {
+			this.actions[i] = arguments[i];
+		}
+	}
+}
+ParallelAction.extends(Object, {
+	get finished() {
+		return this.actions.some(function(action) {return action.finished;});
+	},
+	start: function() {
+		this.actions.forEach(function(action) {action.start()});
+	},
+	stop: function() {
+		this.actions.forEach(function(action) {action.stop()});		
+	},
+	update: function(deltaTime) {
+		this.actions.forEach(function(action) {action.update(deltaTime)});		
+	}
+});
