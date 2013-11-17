@@ -185,8 +185,14 @@ GameController.extends(Object, {
 		player.money = 391;
 		
 		// initial transit
-		this.transitToController(roomController, roomController.enter)();
-		this.showMessage('Viel Spaß beim spielen!');
+		this.transitToController(roomController, roomController.enter, function() {
+			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
+				'\n' +
+				'Unten siehst Du deine Lebenslust. Diese darf auf keinen Fall\n' +
+				'auf Null fallen, sonst hast Du verloren.\n' +
+				'\n' +
+				'Viel Spaß beim spielen!');
+		})();
 	},
 	update: function(delta) {
 		this.rootScene.update(delta);

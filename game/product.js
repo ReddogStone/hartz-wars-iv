@@ -45,4 +45,4 @@ var EXPENSIVE_FOOD = new FoodProduct('expensive_food', 30, 'Vornehm', 3, -20, 40
 var DOENER_MEAL = new Meal(-5, 20, 0, 15);
 var BURGER_MEAL = new Meal(-5, 30, 0, 45);
 var SAUSAGE_MEAL = new Meal(-5, 10, 0, 5);
-var BEER_MEAL = new Meal(-5, 0, 5, 30);
+var BEER_MEAL = new Meal(-10, 0, 5, 30);

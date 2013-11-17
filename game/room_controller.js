@@ -70,16 +70,19 @@ RoomController.extends(Object, {
 			dialogController.init();
 		};
 		scene.onReadBook = function() {
-			self._performActivity(READ_ACTIVITY, function(rejectionReason) {
-				self.showPlayerTempMessages([rejectionReason]);
-			});
+			ControllerUtils.performActivity(world, READ_ACTIVITY, function(messages) {
+					self.showPlayerTempMessages(messages);					
+				}, 
+				function(rejectionReason) {
+					self.showPlayerTempMessages([rejectionReason]);
+				});
 		};
 		this._updateFoodAmount();
 		this._updateAlarmTime();
 		
-		home.storeProduct(CHEAP_FOOD);
+/*		home.storeProduct(CHEAP_FOOD);
 		home.storeProduct(EXPENSIVE_FOOD);
-		home.storeProduct(HEALTHY_FOOD);
+		home.storeProduct(HEALTHY_FOOD); */
 	},
 	enter: function() {
 		var world = this._world;
