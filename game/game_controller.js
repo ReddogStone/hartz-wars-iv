@@ -17,6 +17,9 @@ GameController.extends(Object, {
 		uiScene.energyProgress.progress = player.energy * 0.01;
 		uiScene.saturationProgress.progress = player.saturation * 0.01;
 		uiScene.funProgress.progress = player.fun * 0.01;
+		uiScene.energyProgress.numberLabel.text = Math.floor(player.energy);
+		uiScene.saturationProgress.numberLabel.text = Math.floor(player.saturation);
+		uiScene.funProgress.numberLabel.text = Math.floor(player.fun);
 		if (scene.playerBody) {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}

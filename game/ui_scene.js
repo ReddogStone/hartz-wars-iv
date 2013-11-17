@@ -40,16 +40,25 @@ var uiSceneTemplate = ( function() {
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
 				z: 1,
-				progress: 0.5,
+				progress: 1,
 				children: {
 					label: {
 						z: 2,
 						type: 'Label',
 						text: 'Sättigung',
 						font: font,
-						color: Color.white,
+						color: 'white',
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
+					},
+					numberLabel: {
+						z: 2,
+						type: 'Label',
+						text: '100',
+						font: font,
+						color: 'white',
+						pos: {x: 50, y: 15},
+						anchor: {x: 0.5, y: 0.5}
 					}
 				}
 			},
@@ -61,18 +70,27 @@ var uiSceneTemplate = ( function() {
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: 200, y: 60},
 				frameColor: {green: 0.56},
-				fillColor: {red: 1, green: 1},
+				fillColor: {red: 0.6, green: 0.6},
 				z: 1,
-				progress: 0.5,
+				progress: 1,
 				children: {
 					label: {
 						z: 2,
 						type: 'Label',
 						text: 'Energie',
 						font: font,
-						color: {red: 1, green: 1, blue: 1},
+						color: 'white',
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
+					},
+					numberLabel: {
+						z: 2,
+						type: 'Label',
+						text: '100',
+						font: font,
+						color: 'white',
+						pos: {x: 50, y: 15},
+						anchor: {x: 0.5, y: 0.5}
 					}
 				}
 			},
@@ -86,16 +104,25 @@ var uiSceneTemplate = ( function() {
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.5},
 				z: 1,
-				progress: 0.5,
+				progress: 1,
 				children: {
 					label: {
 						z: 2,
 						type: 'Label',
 						text: 'Lebenslust',
 						font: font,
-						color: {red: 1, green: 1, blue: 1},
+						color: 'white',
 						pos: {x: -10, y: 17},
 						anchor: {x: 1, y: 0.5}
+					},
+					numberLabel: {
+						z: 2,
+						type: 'Label',
+						text: '100',
+						font: font,
+						color: 'white',
+						pos: {x: 75, y: 22.5},
+						anchor: {x: 0.5, y: 0.5}
 					}
 				}
 			}
