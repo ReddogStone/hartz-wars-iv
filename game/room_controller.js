@@ -42,15 +42,15 @@ RoomController.extends(Object, {
 		scene.onSleep = function() {
 			var hours = Clock.timeDiff(world.clock.time, home.alarmTime);
 			var activity = new SleepActivity(hours * 60);
-			var rejectionReason = activity.reject(world);
-			if (rejectionReason) {
-				self.showPlayerTempMessages([rejectionReason]);
-			} else {
-				var messages = world.performActivity(activity);
-				if (self.onSleep) {
-					self.onSleep(messages);
-				}
-			}
+			
+			ControllerUtils.performActivity(world, activity, function(messages) {
+					if (self.onSleep) {
+						self.onSleep(messages);
+					}
+				},
+				function(rejectionReason) {
+					self.showPlayerTempMessages([rejectionReason]);
+				});
 		};
 		scene.onCookCheap = function() {
 			self._consumeFood('cheap_food');

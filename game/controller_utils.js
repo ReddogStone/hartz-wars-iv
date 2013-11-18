@@ -8,7 +8,7 @@ var ControllerUtils = {
 				onReject(rejectionReason);
 			}
 		} else {
-			var messages = world.performActivity(activity);
+			var messages = Activity.perform(activity, world);
 			if (onSuccess) {
 				onSuccess(messages);
 			}

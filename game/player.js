@@ -23,9 +23,15 @@ Player.extends(Object, {
 		}
 	},
 	get energy() { return this._energy; },
-	set energy(value) { this.setValue('energy', value); },
+	set energy(value) { 
+		this.setValue('energy', value); 
+		this.tired = (this.energy <= 0);
+	},
 	get saturation() { return this._saturation; },
-	set saturation(value) { this.setValue('saturation', value); },
+	set saturation(value) { 
+		this.setValue('saturation', value);
+		this.hungry = (this.saturation <= 0);		
+	},
 	get fun() { return this._fun; },
 	set fun(value) { this.setValue('fun', value); },
 	get money() { return this._money; },
@@ -48,32 +54,5 @@ Player.extends(Object, {
 			res.unshift(productInventory.pop());
 		}
 		return res;
-	},
-	advanceGameTime: function(minutes, activity) {
-		var energy = this.energy;
-		var saturation = this.saturation;
-		var fun = this.fun;
-	
-		this.energy += activity.getEnergyChangeRate(this) * minutes;
-		this.saturation += activity.getSaturationChangeRate(this) * minutes;
-		this.fun += activity.getFunChangeRate(this) * minutes;
-		
-		this.tired = (this.energy <= 0);
-		this.hungry = (this.saturation <= 0);
-		
-		var messages = [];
-		var energyChange = integerDifference(this.energy, energy);
-		var saturationChange = integerDifference(this.saturation, saturation);
-		var funChange = integerDifference(this.fun, fun);
-		if (energyChange != 0) {
-			messages.push(numberToStringWithSign(energyChange) + ' Energie');
-		}
-		if (saturationChange != 0) {
-			messages.push(numberToStringWithSign(saturationChange) + ' Sättigung');
-		}
-		if (funChange != 0) {
-			messages.push(numberToStringWithSign(funChange) + ' Lebenslust');
-		}
-		return messages;
 	}
 });

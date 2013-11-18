@@ -243,7 +243,7 @@ GameController.extends(Object, {
 		var self = this;
 		this.rootScene.update(delta);
 		if (!this.updatePaused) {
-			var messages = this.world.performActivity(new RegularActivity(delta / 6));
+			var messages = Activity.perform(new RegularActivity(delta / 6), this.world);
 			this._showPlayerTempMessages(messages);
 		
 			if (this.world.player.fun <= 0) {

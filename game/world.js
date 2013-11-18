@@ -18,14 +18,4 @@ function World() {
 }
 
 World.extends(Object, {
-	advanceGameTime: function(minutes, activity) {
-		this.clock.advance(minutes);
-		return this.player.advanceGameTime(minutes, activity);
-	},
-	jumpGameTime: function(minutes) {
-		this.clock.advance(minutes);		
-	},
-	performActivity: function(activity) {
-		return this.advanceGameTime(activity.getDuration(), activity);
-	}
 })

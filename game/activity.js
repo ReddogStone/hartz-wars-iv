@@ -1,5 +1,41 @@
 'use strict';
 
+var Activity = {
+	perform: function(activity, world) {
+		var duration = activity.duration;
+		
+		var player = world.player;
+		var energy = player.energy;
+		var saturation = player.saturation;
+		var fun = player.fun;
+	
+		world.clock.advance(duration);
+		
+		player.energy += activity.getEnergyChangeRate(player) * duration;
+		player.saturation += activity.getSaturationChangeRate(player) * duration;
+		player.fun += activity.getFunChangeRate(player) * duration;
+		
+		var messages = [];
+		var energyChange = integerDifference(player.energy, energy);
+		var saturationChange = integerDifference(player.saturation, saturation);
+		var funChange = integerDifference(player.fun, fun);
+		if (energyChange != 0) {
+			messages.push(numberToStringWithSign(energyChange) + ' Energie');
+		}
+		if (saturationChange != 0) {
+			messages.push(numberToStringWithSign(saturationChange) + ' Sättigung');
+		}
+		if (funChange != 0) {
+			messages.push(numberToStringWithSign(funChange) + ' Lebenslust');
+		}
+		
+		var effectMessages = activity.applyWorldEffects(world);
+		messages = messages.concat(effectMessages);
+		
+		return messages;
+	}
+};
+
 function RegularActivity(duration) {
 	this._duration = duration;
 }
@@ -17,18 +53,16 @@ RegularActivity.extends(Object, {
 			return -100 / (4 * 24 * 60);
 		}
 	},
-	getSuccessMessages: function() {
-		var duration = this.getDuration();
-		var energyChange = duration * this.getEnergyChangeRate();
-		var saturationChange = duration * this.getSaturationChangeRate();
-		var funChange = duration * this.getFunChangeRate();
-		return [
-			numberToStringWithSign(Math.floor(energyChange)) + ' Energie',
-			numberToStringWithSign(Math.floor(saturationChange)) + ' Sättigung',
-			numberToStringWithSign(Math.floor(funChange)) + ' Lebenslust'
-		];
+	getExpectedEffectMessages: function() {
+		return [];
 	},
-	getDuration: function() {
+	applyWorldEffects: function(world) {
+		return [];
+	},
+	reject: function(world) {
+		return null;
+	},
+	get duration() {
 		return this._duration;
 	}
 });
@@ -50,20 +84,6 @@ ConsumeMealActivity.extends(RegularActivity, {
 		var meal = this.meal;
 		return meal.funChange / meal.timeToConsume;
 	},
-	getSuccessMessages: function() {
-		var meal = this.meal;
-		var result = [];
-		if (meal.energyChange != 0) {
-			result.push(numberToStringWithSign(meal.energyChange) + ' Energie');
-		}
-		if (meal.saturationChange != 0) {
-			result.push(numberToStringWithSign(meal.saturationChange) + ' Sättigung');
-		}
-		if (meal.funChange != 0) {
-			result.push(numberToStringWithSign(meal.funChange) + ' Lebenslust');
-		}
-		return result;
-	},
 	reject: function(world) {
 		if ((world.player.energy + this.meal.energyChange) < 0) {
 			return 'Nicht genug Energie';
@@ -77,10 +97,10 @@ function ReadActivity() {
 }
 ReadActivity.extends(RegularActivity, {
 	getFunChangeRate: function() {
-		return 15 / this.getDuration();
+		return 15 / this.duration;
 	},
 	reject: function(world) {
-		if ((world.player.energy + this.getDuration() * this.getEnergyChangeRate()) < 0) {
+		if ((world.player.energy + this.duration * this.getEnergyChangeRate()) < 0) {
 			return 'Nicht genug Energie';
 		}
 		return null;
