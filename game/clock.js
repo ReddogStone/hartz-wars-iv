@@ -1,7 +1,7 @@
 'use strict';
 
 var MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-var DAYS = ['Sonntag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+var DAYS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 function Clock(initialDate) {
 	this._date = initialDate;
@@ -24,7 +24,7 @@ Clock.prototype = {
 	
 	toString: function() {
 		var date = this._date;
-		return DAYS[date.getDay() - 1] + ' ' +
+		return DAYS[date.getDay()] + ' ' +
 			date.getDate() + '.' + 
 			MONTHS[date.getMonth()] + ' ' + 
 			date.getFullYear() + ', ' +

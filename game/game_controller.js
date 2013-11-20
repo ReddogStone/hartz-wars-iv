@@ -23,7 +23,9 @@ GameController.extends(Object, {
 		if (scene.playerBody) {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}
-		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';		
+		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';
+		uiScene.todayAmountLabel.text = player.hoursWorkedToday + ' Std.';
+		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek + ' Std.';
 	},
 	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
@@ -185,10 +187,16 @@ GameController.extends(Object, {
 				self._updatePlayerValues(self.world.player, self._mainScene);
 			}
 		};
+		player.onHoursWorkedChanged = function() {
+			if (self._mainScene) {
+				self._updatePlayerValues(self.world.player, self._mainScene);
+			}
+		};
 		player.energy = 100;
 		player.saturation = 100;
 		player.fun = 100;
 		player.money = 391;
+		player.addHoursWorked;
 		
 		this.updatePaused = true;
 

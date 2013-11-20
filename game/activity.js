@@ -9,7 +9,7 @@ var Activity = {
 		var saturation = player.saturation;
 		var fun = player.fun;
 	
-		world.clock.advance(duration);
+		world.advanceClock(duration);
 		
 		player.energy += activity.getEnergyChangeRate(player) * duration;
 		player.saturation += activity.getSaturationChangeRate(player) * duration;
@@ -151,7 +151,9 @@ WorkActivity.extends(RegularActivity, {
 		return null;
 	},
 	applyWorldEffects: function(world) {
-	
+		var player = world.player;
+		player.addHoursWorked(this.duration / 60 - 0.5);
+		
 		return [(this._goodDay) ? 
 			GameUtils.randomSelect('Heut war gar nicht so übel',
 				'Ich liebe meinen Job',

@@ -15,19 +15,56 @@ var uiSceneTemplate = ( function() {
 			},
 			moneyLabel: {
 				type: 'Label',
-				anchor: {x: 1, y: 0},
 				text: 'Geld: ',
 				font: font,
 				color: Color.white,
-				pos: {x: 450, y: 10},
+				pos: {x: 380, y: 10},
 				z: 1
 			},
 			moneyAmountLabel: {
 				type: 'Label',
-				text: '100€',
+				text: '',
 				font: font,
 				color: Color.white,
-				pos: {x: 450, y: 10},
+				pos: {x: 480, y: 10},
+				z: 1
+			},
+			workedLabel: {
+				type: 'Label',
+				text: 'Stunden gearbeitet',
+				font: font,
+				color: Color.white,
+				pos: {x: 380, y: 40},
+				z: 1
+			},
+			todayLabel: {
+				type: 'Label',
+				text: 'Heute:',
+				font: font,
+				color: Color.white,
+				pos: {x: 390, y: 70},
+				z: 1
+			},
+			thisWeekLabel: {
+				type: 'Label',
+				text: 'Woche:',
+				font: font,
+				color: Color.white,
+				pos: {x: 390, y: 100},
+				z: 1
+			},
+			todayAmountLabel: {
+				type: 'Label',
+				font: font,
+				color: Color.white,
+				pos: {x: 480, y: 70},
+				z: 1
+			},
+			thisWeekAmountLabel: {
+				type: 'Label',
+				font: font,
+				color: Color.white,
+				pos: {x: 480, y: 100},
 				z: 1
 			},
 			saturationProgress: {

@@ -14,9 +14,27 @@ function World() {
 	var date = new Date();
 	date.setHours(7);
 	date.setMinutes(0);
-//	date.setDate(23);
+//	date.setDate(24);
 	this.clock = new Clock(date);
 }
 
 World.extends(Object, {
+	advanceClock: function(minutes) {
+		var clock = this.clock;
+		var time = clock.time;
+		var day = clock.day;
+		this.clock.advance(minutes);
+		if (clock.time < time) {
+			this.player.newDay(clock.day);
+			if (this.onNewDay) {
+				this.onNewDay();
+			}			
+		}
+		if ((day == 0) && (clock.day == 1)) {
+			this.player.newWeek();
+			if (this.onNewWeek) {
+				this.onNewWeek();
+			}
+		}
+	}
 })

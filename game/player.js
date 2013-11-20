@@ -6,6 +6,8 @@ function Player() {
 	this._fun = 100;
 	this._money = 400;
 	this.productInventory = [];
+	this._hoursWorkedToday = 0;
+	this._hoursWorkedThisWeek = 0;
 };
 Player.extends(Object, {
 	setValue: function(valueName, value) {
@@ -41,6 +43,19 @@ Player.extends(Object, {
 			this.onValueChanged('money', value);
 		}
 	},
+	get hoursWorkedToday() {
+		return this._hoursWorkedToday;
+	},
+	get hoursWorkedThisWeek() {
+		return this._hoursWorkedThisWeek;
+	},
+	addHoursWorked: function(value) {
+		this._hoursWorkedToday += value;
+		this._hoursWorkedThisWeek += value;
+		if (this.onHoursWorkedChanged) {
+			this.onHoursWorkedChanged();
+		}
+	},
 	canTakeProduct: function(product) {
 		return (this.productInventory.length < 3);
 	},
@@ -54,5 +69,11 @@ Player.extends(Object, {
 			res.unshift(productInventory.pop());
 		}
 		return res;
+	},
+	newDay: function(day) {
+		this._hoursWorkedToday = 0;
+	},
+	newWeek: function() {
+		this._hoursWorkedThisWeek = 0;
 	}
 });
