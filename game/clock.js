@@ -1,6 +1,7 @@
 'use strict';
 
 var MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+var DAYS = ['Sonntag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 function Clock(initialDate) {
 	this._date = initialDate;
@@ -17,12 +18,18 @@ Clock.prototype = {
 		return this._date.getHours() + (this._date.getMinutes() / 60.0);
 	},
 	
+	get day() {
+		return this._date.getDay();
+	},
+	
 	toString: function() {
-		return this._date.getDate() + '.' + 
-			MONTHS[this._date.getMonth()] + ' ' + 
-			this._date.getFullYear() + ', ' +
-			padNumber(this._date.getHours(), 2) + ':' + 
-			padNumber(this._date.getMinutes(), 2);
+		var date = this._date;
+		return DAYS[date.getDay() - 1] + ' ' +
+			date.getDate() + '.' + 
+			MONTHS[date.getMonth()] + ' ' + 
+			date.getFullYear() + ', ' +
+			padNumber(date.getHours(), 2) + ':' + 
+			padNumber(date.getMinutes(), 2);
 	}
 };
 

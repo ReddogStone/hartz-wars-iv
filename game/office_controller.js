@@ -12,16 +12,7 @@ OfficeController.extends(Object, {
 		var player = world.player;
 		
 		scene.init();
-		
-		scene.onEnterOffice = function() {
-			var activity = new WorkActivity(8.5 * 60);
-			ControllerUtils.performActivity(world, activity, function(messages) {
-					self.showPlayerTempMessages(messages);					
-				},
-				function(rejectionReason) {
-					self.showPlayerTempMessages([rejectionReason]);
-				});
-		};
+		this.updateWorkCondition();
 	},
 	enterFromBus: function() {
 		this.scene.enterFromBus();
@@ -31,5 +22,30 @@ OfficeController.extends(Object, {
 	},
 	set onShowMap(value) {
 		this.scene.onShowMap = value;
+	},
+	update: function(delta) {
+		this.updateWorkCondition();
+	},
+	work: function() {
+		var self = this;
+		var activity = new WorkActivity(8.5 * 60);
+		ControllerUtils.performActivity(this._world, activity, function(messages) {
+				self.showPlayerTempMessages(messages);
+			},
+			function(rejectionReason) {
+				self.showPlayerTempMessages([rejectionReason]);
+			});
+	},
+	updateWorkCondition: function() {
+		var day = this._world.clock.day;
+		var scene = this.scene;
+		var self = this;
+		if ((day > 0) && (day < 6)) {
+			scene.onEnterOffice = function() { self.work(); };
+			scene.foreground.doorButton.label.text = 'Arbeiten gehen';
+		} else {
+			scene.onEnterOffice = function() { self.showPlayerTempMessages(['Geschlossen am Wochenende']); };
+			scene.foreground.doorButton.label.text = 'Geschlossen';
+		}
 	}
 });

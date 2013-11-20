@@ -14,6 +14,7 @@ function World() {
 	var date = new Date();
 	date.setHours(7);
 	date.setMinutes(0);
+//	date.setDate(23);
 	this.clock = new Clock(date);
 }
 

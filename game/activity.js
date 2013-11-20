@@ -128,21 +128,36 @@ SleepActivity.extends(RegularActivity, {
 
 function WorkActivity(duration) {
 	RegularActivity.call(this, duration);
+	this._goodDay = (Math.random() < 0.2);
 }
 WorkActivity.extends(RegularActivity, {
 	getEnergyChangeRate: function() {
-		return -60 / (8.5 * 60);
+		return (this._goodDay) ? 
+			-40 / (8.5 * 60) :
+			-60 / (8.5 * 60);
 	},
 	getSaturationChangeRate: function() {
 		return -60 / (8.5 * 60);
 	},
 	getFunChangeRate: function() {
-		return -25 / (8.5 * 60);
+		return (this._goodDay) ? 
+			-10 / (8.5 * 60) :
+			-30 / (8.5 * 60);
 	},
 	reject: function(world) {
 		if (world.player.energy < 40) {
 			return 'Nicht genug Energie';
 		}
 		return null;
+	},
+	applyWorldEffects: function(world) {
+	
+		return [(this._goodDay) ? 
+			GameUtils.randomSelect('Heut war gar nicht so übel',
+				'Ich liebe meinen Job',
+				'Yay, mein Chef liebt mich') :
+			GameUtils.randomSelect('War wieder ein langer Tag', 
+				'Und wieder nix geschafft', 
+				'Ich hasse diesen Job')];
 	}
 });

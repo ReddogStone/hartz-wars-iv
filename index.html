@@ -28,6 +28,8 @@
 <script src="engine/label.js" type="text/javascript"></script>
 
 <!-- game specific -->
+<script src="game/game_utils.js" type="text/javascript"></script>
+
 <script src="game/dialog.js" type="text/javascript"></script>
 <script src="game/player.js" type="text/javascript"></script>
 <script src="game/product.js" type="text/javascript"></script>
@@ -126,9 +128,9 @@
 		// draw clock
 		var clock = g_gameController.world.clock;
 		context.fillStyle = "#000000";
-		context.fillText(clock.toString(), 748, 752);
+		context.fillText(clock.toString(), 608, 752);
 		context.fillStyle = "#FFFFFF";
-		context.fillText(clock.toString(), 750, 750);
+		context.fillText(clock.toString(), 610, 750);
 		
 		// request new frame
 		requestAnimFrame(function(){

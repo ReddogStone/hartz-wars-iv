@@ -254,6 +254,10 @@ GameController.extends(Object, {
 					self._restartGame();
 				});
 			}
+			
+			if (this.controller && this.controller.update) {
+				this.controller.update(delta);
+			}
 		}
 	},
 	render: function(context) {
