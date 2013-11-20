@@ -37,14 +37,20 @@ OfficeController.extends(Object, {
 			});
 	},
 	updateWorkCondition: function() {
-		var day = this._world.clock.day;
+		var clock = this._world.clock;
+		var day = clock.day;
+		var time = clock.time;
 		var scene = this.scene;
 		var self = this;
-		if ((day > 0) && (day < 6)) {
+		if ((day > 0) && (day < 6) && (time > 6.00) && (time < 20.00)) {
 			scene.onEnterOffice = function() { self.work(); };
 			scene.foreground.doorButton.label.text = 'Arbeiten gehen';
 		} else {
-			scene.onEnterOffice = function() { self.showPlayerTempMessages(['Geschlossen am Wochenende']); };
+			var message = 'Geschlossen am Wochenende';
+			if ((day > 0) && (day < 6)) {
+				message = 'Geöffnet von 06:00 bis 20:00';
+			}
+			scene.onEnterOffice = function() { self.showPlayerTempMessages([message]); };
 			scene.foreground.doorButton.label.text = 'Geschlossen';
 		}
 	}
