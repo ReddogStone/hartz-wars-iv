@@ -8,6 +8,9 @@ function Player() {
 	this.productInventory = [];
 	this._hoursWorkedToday = 0;
 	this._hoursWorkedThisWeek = 0;
+	
+	this.workDescription = 'Mind. 40 Std./Woche, mind. 4 Std./Tag';
+	this.nextSalary = 300;
 };
 Player.extends(Object, {
 	setValue: function(valueName, value) {
@@ -75,5 +78,7 @@ Player.extends(Object, {
 	},
 	newWeek: function() {
 		this._hoursWorkedThisWeek = 0;
+		this.money += this.nextSalary;
+		this.nextSalary = 300;
 	}
 });

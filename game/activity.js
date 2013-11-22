@@ -8,6 +8,7 @@ var Activity = {
 		var energy = player.energy;
 		var saturation = player.saturation;
 		var fun = player.fun;
+		var money = player.money;
 	
 		world.advanceClock(duration);
 		
@@ -19,6 +20,7 @@ var Activity = {
 		var energyChange = integerDifference(player.energy, energy);
 		var saturationChange = integerDifference(player.saturation, saturation);
 		var funChange = integerDifference(player.fun, fun);
+		var moneyChange = player.money - money;
 		if (energyChange != 0) {
 			messages.push(numberToStringWithSign(energyChange) + ' Energie');
 		}
@@ -27,6 +29,9 @@ var Activity = {
 		}
 		if (funChange != 0) {
 			messages.push(numberToStringWithSign(funChange) + ' Lebenslust');
+		}
+		if (moneyChange != 0) {
+			messages.push(numberToStringWithSign(moneyChange.toFixed(2)) + ' EURO');
 		}
 		
 		var effectMessages = activity.applyWorldEffects(world);

@@ -24,8 +24,8 @@ GameController.extends(Object, {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}
 		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';
-		uiScene.todayAmountLabel.text = player.hoursWorkedToday.toFixed(1) + ' Std.';
-		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek.toFixed(1) + ' Std.';
+/*		uiScene.todayAmountLabel.text = player.hoursWorkedToday.toFixed(1) + ' Std.';
+		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek.toFixed(1) + ' Std.'; */
 	},
 	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
@@ -95,6 +95,7 @@ GameController.extends(Object, {
 			self._showPlayerTempMessages(messages);
 		};
 		result.restartGame = function() { self.initMainGame(self.canvas); };
+		result.showOverlay = function(overlay) { self.showOverlay(overlay); };
 		return result;
 	},
 	_buyMeal: function(meal, price) {
@@ -117,6 +118,12 @@ GameController.extends(Object, {
 	_restartGame: function() {
 		this.initMainGame(this.canvas);
 	},
+	_showWorkInfo: function() {
+		var workInfoScene = this.workInfoScene;
+		var player = this.world.player;
+		workInfoScene.setInfo(player.workDescription, player.hoursWorkedToday, player.hoursWorkedThisWeek, player.nextSalary);
+		this.showOverlay(workInfoScene);
+	},
 	initMainGame: function(canvas) {
 		var self = this;
 		this.canvas = canvas;
@@ -137,6 +144,7 @@ GameController.extends(Object, {
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
 		var uiScene = this.uiScene = new UIScene();
 		var mapScene = this.mapScene = new MapScene();
+		this.workInfoScene = new WorkInfoScene();
 		
 		// create controllers
 		var roomController = this.roomController = this._newController(RoomController, world);
@@ -182,12 +190,11 @@ GameController.extends(Object, {
 		};
 		
 		// wire-up UI scene
-		player.onValueChanged = function(valueName, oldValue, newValue) {
-			if (self._mainScene) {
-				self._updatePlayerValues(self.world.player, self._mainScene);
-			}
+		uiScene.onWorkInfo = function() {
+			self._showWorkInfo();
 		};
-		player.onHoursWorkedChanged = function() {
+		
+		player.onValueChanged = function(valueName, oldValue, newValue) {
 			if (self._mainScene) {
 				self._updatePlayerValues(self.world.player, self._mainScene);
 			}
@@ -251,8 +258,24 @@ GameController.extends(Object, {
 		var self = this;
 		this.rootScene.update(delta);
 		if (!this.updatePaused) {
-			var messages = Activity.perform(new RegularActivity(delta / 6), this.world);
+			var world = this.world;
+			var clock = world.clock;
+			var day = clock.day;
+			
+			var messages = Activity.perform(new RegularActivity(delta / 6), world);
 			this._showPlayerTempMessages(messages);
+		
+			if ((day > 0) && (day < 6) && (this.lastTime <= 20.0) && (clock.time > 20.0)) {
+				var player = world.player;
+				if (player.hoursWorkedToday < 4) {
+					player.nextSalary = Math.max(player.nextSalary - 60.0, 0.0);
+					this.showMessage('Du hast heute weniger als 4 Stunden gearbeitet.\n' +
+						'Zur Strafe bekommst Du nächstes Mal 60 EURO weniger!\n' +
+						'\n' +
+						GameUtils.randomSelect('Was hast Du dir dabei gedacht?', 'Sei nicht so faul!', 'Keine Ausreden!'));
+				}
+			}
+			this.lastTime = clock.time;
 		
 			if (this.world.player.fun <= 0) {
 				this.showMessage('Du hast verloren!\n\n' +
@@ -273,15 +296,25 @@ GameController.extends(Object, {
 		this.uiViewport.render(context, this.uiScene);
 	},
 	handleMouseEvent: function(type, mouse) {
-		var rootScene = this.rootScene;
 		var transformedEvent = {x: mouse.x, y: mouse.y, down: mouse.down};
+		var rootScene = this.rootScene;
 		Vec.set(transformedEvent, rootScene.getTransform().inverse().apply(transformedEvent));
-		rootScene[type](transformedEvent);
+		var handled = rootScene[type](transformedEvent);
+
+		if (!this.overlay) {
+			var uiScene = this.uiScene;
+			var destRect = this.uiViewport.destRect;
+			transformedEvent = {x: mouse.x, y: mouse.y, down: mouse.down};
+			Vec.set(transformedEvent, uiScene.getTransform().inverse().apply(transformedEvent));
+			transformedEvent.x -= destRect.x;
+			transformedEvent.y -= destRect.y;
+			uiScene[type](transformedEvent);
+		}
 	},
 	showMap: function() {
 		var map = this.mapScene;
 		map.visible = true;
-		map.addAction(new LinearAction(0.2, function(value) {	
+		map.addAction(new EaseOutAction(0.2, function(value) {
 			map.scale.x = value;
 			map.scale.y = value;
 			map.pos.rot = value * 2 * Math.PI;
@@ -293,19 +326,50 @@ GameController.extends(Object, {
 		this.mapScene.visible = false;
 		this.rootScene.removeChild(this.mapScene);
 	},
+	showOverlay: function(overlay, callback) {
+		var self = this;
+		var rootScene = this.rootScene;
+		rootScene.addChild(overlay);
+		overlay.handleMouseDown = overlay.handleMouseUp = overlay.handleMouseMove = function() {
+			return true;
+		}
+		this.updatePaused = true;
+		this.overlay = true;
+		
+		overlay.addAction(new EaseOutAction(0.2, function(progress) {
+			progress = 0.99 * progress + 0.01;
+			overlay.scale.x = progress;
+			overlay.scale.y = progress;
+		}));
+		overlay.onClose = function() {
+			rootScene.removeChild(overlay);
+			if (callback) {
+				callback();
+			}
+			self.updatePaused = false;
+			self.overlay = false;
+		};
+	},
 	showMessage: function(message, callback) {
 		var self = this;
 		var messageScene = new MessageScene(message);
 		var rootScene = this.rootScene;
 		rootScene.addChild(messageScene);
 		this.updatePaused = true;
+		this.overlay = true;
 		
+		messageScene.addAction(new EaseOutAction(0.2, function(progress) {
+			progress = 0.99 * progress + 0.01;
+			messageScene.scale.x = progress;
+			messageScene.scale.y = progress;
+		}));
 		messageScene.onOK = function() {
 			rootScene.removeChild(messageScene);
 			if (callback) {
 				callback();
 			}
 			self.updatePaused = false;
+			self.overlay = false;
 		};
 	},
 	showTempMessages: function(messages, pos) {

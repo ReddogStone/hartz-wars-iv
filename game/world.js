@@ -14,6 +14,11 @@ function World() {
 	var date = new Date();
 	date.setHours(7);
 	date.setMinutes(0);
+	
+	while (date.getDay() != 1) {
+		date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
+	}
+	
 //	date.setDate(24);
 	this.clock = new Clock(date);
 }

@@ -1,6 +1,11 @@
 'use strict';
 
 var uiSceneTemplate = ( function() {
+	var buttonEffects = [
+		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
+		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
+	];
+
 	var font = Fonts.inGameSmall;
 	return {
 		type: 'Scene',
@@ -29,7 +34,7 @@ var uiSceneTemplate = ( function() {
 				pos: {x: 480, y: 10},
 				z: 1
 			},
-			workedLabel: {
+/*			workedLabel: {
 				type: 'Label',
 				text: 'Stunden gearbeitet',
 				font: font,
@@ -66,7 +71,7 @@ var uiSceneTemplate = ( function() {
 				color: Color.white,
 				pos: {x: 480, y: 100},
 				z: 1
-			},
+			}, */
 			saturationProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
@@ -162,7 +167,18 @@ var uiSceneTemplate = ( function() {
 						anchor: {x: 0.5, y: 0.5}
 					}
 				}
-			}
+			},
+			workInfoButton: {
+				type: 'Button',
+				pos: {x: 380, y: 40},
+				z: 1,
+				effects: buttonEffects,
+				label: {
+					font: font,
+					color: Color.white,
+					text: '*Arbeit*'
+				}				
+			}			
 		}
 	};
 })();
@@ -172,6 +188,10 @@ function UIScene() {
 	Scene.apply(this);
 
 	this.deserialize(uiSceneTemplate);
-	var foreground = this.foreground;
+	this.workInfoButton.size = Size.clone(this.workInfoButton.label.size);
 }
-UIScene.extends(Scene);
+UIScene.extends(Scene, {
+	set onWorkInfo(value) {
+		this.workInfoButton.onClicked = value;
+	}
+});
