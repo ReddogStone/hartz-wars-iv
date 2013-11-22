@@ -152,7 +152,11 @@ WorkActivity.extends(RegularActivity, {
 	},
 	applyWorldEffects: function(world) {
 		var player = world.player;
-		player.addHoursWorked(this.duration / 60 - 0.5);
+		var hoursWorked = this.duration / 60;
+		if (hoursWorked > 6) {
+			hoursWorked = Math.max(hoursWorked - 0.5, 6);
+		}
+		player.addHoursWorked(hoursWorked);
 		
 		return [(this._goodDay) ? 
 			GameUtils.randomSelect('Heut war gar nicht so übel',

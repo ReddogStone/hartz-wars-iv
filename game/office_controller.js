@@ -28,7 +28,11 @@ OfficeController.extends(Object, {
 	},
 	work: function() {
 		var self = this;
-		var activity = new WorkActivity(8.5 * 60);
+		
+		var time = this._world.clock.time;
+		var duration = Math.min(20.0 - time, 8.5) * 60;
+		
+		var activity = new WorkActivity(duration);
 		ControllerUtils.performActivity(this._world, activity, function(messages) {
 				self.showPlayerTempMessages(messages);
 			},

@@ -24,8 +24,8 @@ GameController.extends(Object, {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}
 		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';
-		uiScene.todayAmountLabel.text = player.hoursWorkedToday + ' Std.';
-		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek + ' Std.';
+		uiScene.todayAmountLabel.text = player.hoursWorkedToday.toFixed(1) + ' Std.';
+		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek.toFixed(1) + ' Std.';
 	},
 	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
