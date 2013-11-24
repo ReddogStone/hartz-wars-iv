@@ -95,7 +95,7 @@ GameController.extends(Object, {
 			self._showPlayerTempMessages(messages);
 		};
 		result.restartGame = function() { self.initMainGame(self.canvas); };
-		result.showOverlay = function(overlay) { self.showOverlay(overlay); };
+		result.showOverlay = function(overlay, callback) { self.showOverlay(overlay, callback); };
 		return result;
 	},
 	_buyMeal: function(meal, price) {
@@ -208,8 +208,8 @@ GameController.extends(Object, {
 		this.updatePaused = true;
 
 		// initial transit
-		this.transitToController(roomController, function() {
-			roomController.enter();
+		this.transitToController(officeController, function() {
+			officeController.enterFromBus();
 			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
 				'\n' +
 				'Unten siehst Du deine Lebenslust. Diese darf auf keinen Fall\n' +

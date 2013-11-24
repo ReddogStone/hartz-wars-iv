@@ -29,16 +29,20 @@ OfficeController.extends(Object, {
 	work: function() {
 		var self = this;
 		
-		var time = this._world.clock.time;
-		var duration = Math.min(20.0 - time, 8.5) * 60;
-		
-		var activity = new WorkActivity(duration);
-		ControllerUtils.performActivity(this._world, activity, function(messages) {
-				self.showPlayerTempMessages(messages);
-			},
-			function(rejectionReason) {
-				self.showPlayerTempMessages([rejectionReason]);
-			});
+		var selectScene = new WorkSelectScene();
+		this.showOverlay(selectScene, function() {
+			var time = self._world.clock.time;
+			var duration = selectScene.workAmount;
+			duration = Math.min(20.0 - time, duration) * 60;
+			
+			var activity = new WorkActivity(duration);
+			ControllerUtils.performActivity(self._world, activity, function(messages) {
+					self.showPlayerTempMessages(messages);
+				},
+				function(rejectionReason) {
+					self.showPlayerTempMessages([rejectionReason]);
+				});
+		});
 	},
 	updateWorkCondition: function() {
 		var clock = this._world.clock;
