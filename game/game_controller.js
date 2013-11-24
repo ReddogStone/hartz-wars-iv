@@ -208,8 +208,8 @@ GameController.extends(Object, {
 		this.updatePaused = true;
 
 		// initial transit
-		this.transitToController(officeController, function() {
-			officeController.enterFromBus();
+		this.transitToController(roomController, function() {
+			roomController.enter();
 			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
 				'\n' +
 				'Unten siehst Du deine Lebenslust. Diese darf auf keinen Fall\n' +
