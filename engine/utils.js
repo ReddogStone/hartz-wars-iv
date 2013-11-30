@@ -1,6 +1,17 @@
 'use strict';
 
-Array.prototype.remove = function(element) {
+Object.defineProperty(Object, 'addProperties', {value: function(obj, properties) {
+	if (properties) {
+		var names = Object.keys(properties);
+		for (var i = 0; i < names.length; ++i) {
+			var property = names[i];
+			var descriptor = Object.getOwnPropertyDescriptor(properties, property);
+			Object.defineProperty(obj, property, descriptor);
+		}
+	}
+}});
+
+Object.defineProperty(Array.prototype, 'remove', {value: function(element) {
 	var index = this.indexOf(element);
 	if (index > -1) {
 		var result = this.splice(index, 1);
@@ -10,38 +21,34 @@ Array.prototype.remove = function(element) {
 			return null;
 		}
 	}
-}
-Array.prototype.clear = function() {
+}});
+
+Object.defineProperty(Array.prototype, 'clear', {value: function() {
 	this.splice(0, this.length);
-}
-Array.prototype.first = function() {
+}});
+
+Object.defineProperty(Array.prototype, 'first', {value: function() {
 	if (this.length > 0) {
 		return this[0];
 	}
 	return null;
-}
-Array.prototype.last = function() {
+}});
+
+Object.defineProperty(Array.prototype, 'last', {value: function() {
 	var length = this.length;
 	if (length > 0) {
 		return this[length - 1];
 	}
 	return null;
-}
+}});
 
-Function.prototype.extends = function(parent, methods) {
+Object.defineProperty(Function.prototype, 'extends', {value: function(parent, methods) {
     this.prototype = Object.create(parent.prototype);
     Object.defineProperty(this.prototype, 'parent', {value: parent.prototype});
     Object.defineProperty(this.prototype, 'constructor', {value: this});
 	
-	if (methods) {
-		var names = Object.keys(methods);
-		for (var i = 0; i < names.length; ++i) {
-			var method = names[i];
-			var descriptor = Object.getOwnPropertyDescriptor(methods, method);
-			Object.defineProperty(this.prototype, method, descriptor);
-		}
-	}
-}
+	Object.addProperties(this.prototype, methods);
+}});
 
 function padNumber(number, width) {
 	return ('00000000' + number).slice(-width);

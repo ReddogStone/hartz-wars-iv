@@ -15,6 +15,7 @@ var Activity = {
 		player.energy += activity.getEnergyChangeRate(player) * duration;
 		player.saturation += activity.getSaturationChangeRate(player) * duration;
 		player.fun += activity.getFunChangeRate(player) * duration;
+		player.money += activity.getMoneyChange(player);
 		
 		var messages = [];
 		var energyChange = integerDifference(player.energy, energy);
@@ -58,6 +59,9 @@ RegularActivity.extends(Object, {
 			return -100 / (4 * 24 * 60);
 		}
 	},
+	getMoneyChange: function(player) {
+		return 0;
+	},
 	getExpectedEffectMessages: function() {
 		return [];
 	},
@@ -94,6 +98,16 @@ ConsumeMealActivity.extends(RegularActivity, {
 			return 'Nicht genug Energie';
 		}
 		return null;
+	}
+});
+
+function BuyAndConsumeMealActivity(meal, price) {
+	ConsumeMealActivity.call(this, meal);
+	this._price = price;
+}
+BuyAndConsumeMealActivity.extends(ConsumeMealActivity, {
+	getMoneyChange: function(player) {
+		return -this._price;
 	}
 });
 
@@ -150,7 +164,7 @@ WorkActivity.extends(RegularActivity, {
 			-30 / (8.5 * 60);
 	},
 	reject: function(world) {
-		if (world.player.energy < 40) {
+		if (world.player.energy < (this.getDuration() * this.getEnergyChangeRate())) {
 			return 'Nicht genug Energie';
 		}
 		return null;
@@ -163,7 +177,7 @@ WorkActivity.extends(RegularActivity, {
 		}
 		player.addHoursWorked(hoursWorked);
 		
-		return [(this._goodDay) ? 
+		return [(this._goodDay) ?
 			GameUtils.randomSelect('Heut war gar nicht so übel',
 				'Ich liebe meinen Job',
 				'Yay, mein Chef liebt mich') :

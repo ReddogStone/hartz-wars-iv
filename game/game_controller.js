@@ -103,9 +103,7 @@ GameController.extends(Object, {
 		var world = this.world;
 		var player = world.player;
 		if (player.money >= price) {
-			ControllerUtils.performActivity(world, new ConsumeMealActivity(meal), function(messages) {
-					player.money -= price;
-					messages.push('-' + price.toFixed(2) + ' EURO');
+			ControllerUtils.performActivity(world, new BuyAndConsumeMealActivity(meal, price), function(messages) {
 					self._showPlayerTempMessages(messages);
 				},
 				function(rejectionReason) {
