@@ -44,15 +44,19 @@ Sprite.extends(Node, {
 					var data = buffer.getImageData(0, 0, width, height);
 					var pixelData = data.data;
 					var color = this.color;
+					var red = color.red;
+					var green = color.green;
+					var blue = color.blue;
+					var alpha = color.alpha;
 					for (var i = 0; i < pixelData.length; i += 4) {
 						var sr = pixelData[i];
 						var sg = pixelData[i + 1];
 						var sb = pixelData[i + 2];
 						var sa = pixelData[i + 3];
-						pixelData[i] = 255 * (sr / 255 * color.red);
-						pixelData[i + 1] = 255 * (sg / 255 * color.green);
-						pixelData[i + 2] = 255 * (sb / 255 * color.blue);
-						pixelData[i + 3] = sa * color.alpha;
+						pixelData[i] = 255 * sr / 255 * red;
+						pixelData[i + 1] = 255 * sg / 255 * green;
+						pixelData[i + 2] = 255 * sb / 255 * blue;
+						pixelData[i + 3] = sa * alpha;
 					}
 					buffer.putImageData(data, 0, 0);
 					this._buffered = true;
