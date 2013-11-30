@@ -10,7 +10,8 @@ function Scene() {
 	this.anchor = new Point(0.5, 0.5);
 	this.pos = new Pos(0.5 * w, 0.5 * h);
 	
-	this.focussed = null;
+	this.pressed = null;
+	this.hovered = null;
 }
 Scene.extends(Node, {
 	_handleMouseEvent: function(event, methodName, handleMethodName) {
@@ -19,22 +20,19 @@ Scene.extends(Node, {
 			var child = children[i];
 			if (child.visible) {
 				if ((methodName in child) || (handleMethodName in child)) {
-					var pos = child.pos;
-					var scale = child.scale;
-					var size = child.size;
-					var anchor = child.anchor;
-					
-					var inverseTransform = Transform.identity().
-						translate(pos.x, pos.y).
-						rotate(pos.rot).
-						scale(scale.x, scale.y).
-						translate(-size.x * anchor.x, - size.y * anchor.y).
-						inverse();
+					var inverseTransform = child.getTransform().inverse();
 					var childEvent = inverseTransform.apply(event);
 					childEvent.down = event.down;
 					
-					if (child == this.focussed) {
-						childEvent.focussed = true;
+					if (child.getLocalRect().containsPoint(childEvent) && (child != this.hovered)) {
+						this.hovered = child;
+						if (child.onEnter) {
+							child.onEnter();
+						}
+					}
+					
+					if (child == this.pressed) {
+						childEvent.pressed = true;
 					}
 				
 					if ((methodName in child) && child[methodName](childEvent)) {
@@ -42,7 +40,7 @@ Scene.extends(Node, {
 					}
 					if ((handleMethodName in child) && child[handleMethodName](childEvent)) {
 						if (methodName == 'mouseDown') {
-							this.focussed = child;
+							this.pressed = child;
 						}
 						return true;
 					}
@@ -63,18 +61,18 @@ Scene.extends(Node, {
 	},
 	mouseUp: function(event) {
 		var handled = false;
-		var focussed = this.focussed;
-		if (focussed) {
-			if ('handleMouseUp' in focussed) {
-				var inverseTransform = focussed.getTransform().inverse();
+		var pressed = this.pressed;
+		if (pressed) {
+			if ('handleMouseUp' in pressed) {
+				var inverseTransform = pressed.getTransform().inverse();
 				if (inverseTransform == null) {
 					throw new Error('InverseTransform is null!');
 				}
 				var childEvent = inverseTransform.apply(event);
 				childEvent.down = event.down;			
-				handled = focussed.handleMouseUp(childEvent);
+				handled = pressed.handleMouseUp(childEvent);
 				if (handled) {
-					this.focussed = null;
+					this.pressed = null;
 				}
 			}
 		}
@@ -83,6 +81,17 @@ Scene.extends(Node, {
 		}
 	},
 	mouseMove: function(event) {
+		var hovered = this.hovered;
+		if (hovered) {
+			var inverseTransform = hovered.getTransform().inverse();
+			var localPos = inverseTransform.apply(event);
+			if (!hovered.getLocalRect().containsPoint(localPos)) {
+				if (hovered.onExit) {
+					hovered.onExit();
+				}
+				this.hovered = null;
+			}
+		}
 		return this._handleMouseEvent(event, 'mouseMove', 'handleMouseMove');
 	}
 });

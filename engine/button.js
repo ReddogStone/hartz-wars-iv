@@ -145,15 +145,9 @@ Button.extends(Node, {
 					} else {
 						this._setState(ButtonState.HOVERED);
 					}
-					if (this.onEnter) {
-						this.onEnter();
-					}				
 				}
 			} else if ((this._state == ButtonState.PRESSED) || (this._state == ButtonState.HOVERED)) {
 				this._setState(ButtonState.ACTIVE);
-				if (this.onExit) {
-					this.onExit();
-				}
 			}
 		}
 	},
