@@ -11,7 +11,7 @@ function Scene() {
 	this.pos = new Pos(0.5 * w, 0.5 * h);
 	
 	this.pressed = null;
-	this.hovered = null;
+	this.hovered = [];
 }
 Scene.extends(Node, {
 	_handleMouseEvent: function(event, methodName, handleMethodName) {
@@ -23,11 +23,12 @@ Scene.extends(Node, {
 					var inverseTransform = child.getTransform().inverse();
 					var childEvent = inverseTransform.apply(event);
 					childEvent.down = event.down;
-					
-					if (child.getLocalRect().containsPoint(childEvent) && (child != this.hovered)) {
-						this.hovered = child;
+
+					if (child.hoverable && !child.hovered && child.getLocalRect().containsPoint(childEvent)) {
+						this.hovered.push(child);
+						child.hovered = true;
 						if (child.onEnter) {
-							child.onEnter();
+							child.onEnter(Pos.clone(childEvent));
 						}
 					}
 					
@@ -47,7 +48,7 @@ Scene.extends(Node, {
 				}
 			}
 		}
-		
+
 		if (handleMethodName in this) {
 			if (this[handleMethodName](event)) {
 				return true;
@@ -81,15 +82,16 @@ Scene.extends(Node, {
 		}
 	},
 	mouseMove: function(event) {
-		var hovered = this.hovered;
-		if (hovered) {
-			var inverseTransform = hovered.getTransform().inverse();
+		for (var i = this.hovered.length - 1; i >= 0; --i) {
+			var element = this.hovered[i];
+			var inverseTransform = element.getTransform().inverse();
 			var localPos = inverseTransform.apply(event);
-			if (!hovered.getLocalRect().containsPoint(localPos)) {
-				if (hovered.onExit) {
-					hovered.onExit();
+			if (!element.getLocalRect().containsPoint(localPos)) {
+				if (element.onExit) {
+					element.onExit(localPos);
 				}
-				this.hovered = null;
+				element.hovered = false;
+				this.hovered.splice(i, 1);
 			}
 		}
 		return this._handleMouseEvent(event, 'mouseMove', 'handleMouseMove');

@@ -18,6 +18,9 @@ function Node() {
 	this.actions = [];
 }
 Node.extends(Object, {
+	get hoverable() {
+		return false;
+	},
 	init: function() {
 		if ('initSelf' in this) {
 			this.initSelf();

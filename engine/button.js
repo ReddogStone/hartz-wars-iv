@@ -101,6 +101,9 @@ Button.extends(Node, {
 	set texture(value) {
 		this.sprite.texture = value;
 	},
+	get hoverable() {
+		return true;
+	},
 	addEffect: function(effect) {
 		this._effects.push(effect);
 		this._adjust();
@@ -145,6 +148,9 @@ Button.extends(Node, {
 					} else {
 						this._setState(ButtonState.HOVERED);
 					}
+				}
+				if (this.onMouseMove) {
+					this.onMouseMove(event);
 				}
 			} else if ((this._state == ButtonState.PRESSED) || (this._state == ButtonState.HOVERED)) {
 				this._setState(ButtonState.ACTIVE);
