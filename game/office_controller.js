@@ -37,10 +37,10 @@ OfficeController.extends(Object, {
 			
 			var activity = new WorkActivity(duration);
 			ControllerUtils.performActivity(self._world, activity, function(messages) {
-					self.showPlayerTempMessages(messages);
+					self.messenger.showPlayerTempMessages(messages);
 				},
 				function(rejectionReason) {
-					self.showPlayerTempMessages([rejectionReason]);
+					self.messenger.showPlayerTempMessages([rejectionReason]);
 				});
 		});
 	},

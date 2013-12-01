@@ -280,26 +280,11 @@ RoomScene.extends(Scene, {
 		this.foreground.alarmUpButton.visible = value;
 		this.foreground.alarmDownButton.visible = value;
 	},
-	set onCookCheap(value) {
-		this.foreground.fridgeCheapFoodButton.onClicked = value;
-	},
-	set onCookExpensive(value) {
-		this.foreground.fridgeExpensiveFoodButton.onClicked = value;
-	},
-	set onCookHealthy(value) {
-		this.foreground.fridgeHealthyFoodButton.onClicked = value;
-	},
 	set onExitToStreet(value) {
 		this.foreground.doorButton.onClicked = value;
 	},
-	set onSleep(value) {
-		this.foreground.chestButton.onClicked = value;
-	},
 	set onPhoneCall(value) {
 		this.foreground.phoneButton.onClicked = value;
-	},
-	set onReadBook(value) {
-		this.foreground.booksButton.onClicked = value;
 	},
 	set onAlarmUp(value) {
 		this.foreground.alarmUpButton.onClicked = value;		
@@ -309,6 +294,21 @@ RoomScene.extends(Scene, {
 	},
 	enter: function() {
 		this.playerBody.pos = new Pos(500, 600);
+	},
+	connectReadSlot: function(slot) {
+		slot.connect(this.foreground.booksButton, Vec.create(0, 30));
+	},
+	connectSleepSlot: function(slot) {
+		slot.connect(this.foreground.chestButton, Vec.create(0, 30));
+	},
+	connectCookCheapSlot: function(slot) {
+		slot.connect(this.foreground.fridgeCheapFoodButton, Vec.create(0, 30));
+	},
+	connectCookExpensiveSlot: function(slot) {
+		slot.connect(this.foreground.fridgeExpensiveFoodButton, Vec.create(0, 30));
+	},
+	connectCookHealthySlot: function(slot) {
+		slot.connect(this.foreground.fridgeHealthyFoodButton, Vec.create(0, 30));
 	}
 });
 	

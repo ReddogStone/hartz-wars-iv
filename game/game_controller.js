@@ -24,8 +24,6 @@ GameController.extends(Object, {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}
 		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';
-/*		uiScene.todayAmountLabel.text = player.hoursWorkedToday.toFixed(1) + ' Std.';
-		uiScene.thisWeekAmountLabel.text = player.hoursWorkedThisWeek.toFixed(1) + ' Std.'; */
 	},
 	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
@@ -90,28 +88,30 @@ GameController.extends(Object, {
 	_newController: function(type, world) {
 		var result = new type(world);
 		var self = this;
-		result.showMessage = function(message, callback) { self.showMessage(message, callback); };
-		result.showPlayerTempMessages = function(messages) { 
-			self._showPlayerTempMessages(messages);
+		result.messenger = {
+			showMessage: function(message, callback) { 
+				self.showMessage(message, callback); 
+			},
+			showPlayerTempMessages: function(messages) { 
+				self._showPlayerTempMessages(messages);
+			}
 		};
 		result.restartGame = function() { self.initMainGame(self.canvas); };
 		result.showOverlay = function(overlay, callback) { self.showOverlay(overlay, callback); };
 		return result;
 	},
-	_buyMeal: function(meal, price) {
-		var self = this;
-		var world = this.world;
-		var player = world.player;
-		if (player.money >= price) {
-			ControllerUtils.performActivity(world, new BuyAndConsumeMealActivity(meal, price), function(messages) {
-					self._showPlayerTempMessages(messages);
-				},
-				function(rejectionReason) {
-					self._showPlayerTempMessages([rejectionReason]);
-				});		
-		} else {
-			self._showPlayerTempMessages('Nicht genug Geld');
-		}
+	_createBuyMealSlot: function(meal, price) {
+		var messenger = {
+			showMessage: function(message, callback) { 
+				self.showMessage(message, callback); 
+			},
+			showPlayerTempMessages: function(messages) {
+				self._showPlayerTempMessages(messages);
+			}
+		};
+		return ControllerUtils.createActivitySlot(this.world, this.barScene, messenger, function() { 
+			return new BuyAndConsumeMealActivity(meal, price);
+		});
 	},
 	_restartGame: function() {
 		this.initMainGame(this.canvas);
@@ -174,18 +174,10 @@ GameController.extends(Object, {
 		mapScene.visible = false;
 		
 		// events
-		barScene.onEatDoener = function() {
-			self._buyMeal(DOENER_MEAL, 3.2);
-		};
-		barScene.onEatSausage = function() {
-			self._buyMeal(SAUSAGE_MEAL, 2);
-		};
-		barScene.onEatBurger = function() {
-			self._buyMeal(BURGER_MEAL, 5.5);
-		};
-		barScene.onDrinkBeer = function() {
-			self._buyMeal(BEER_MEAL, 1.5);
-		};
+		barScene.connectDoenerSlot(this._createBuyMealSlot(DOENER_MEAL, 3.2));
+		barScene.connectSausageSlot(this._createBuyMealSlot(SAUSAGE_MEAL, 3.2));
+		barScene.connectBurgerSlot(this._createBuyMealSlot(BURGER_MEAL, 3.2));
+		barScene.connectBeerSlot(this._createBuyMealSlot(BEER_MEAL, 3.2));
 		
 		// wire-up UI scene
 		uiScene.onWorkInfo = function() {

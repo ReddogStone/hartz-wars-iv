@@ -5,22 +5,21 @@ function RoomController(world) {
 	this.scene = new RoomScene();
 }
 RoomController.extends(Object, {
-	_consumeFood: function(type) {
+	_createCookSlot: function(type) {
 		var self = this;
 		var world = this._world;
 		var home = world.playerHome;
-		var product = home.consumeProduct(type);
-		if (product) {
-			var activity = new ConsumeMealActivity(product);
-			ControllerUtils.performActivity(this._world, activity, function(messages) {
-					self.showPlayerTempMessages(messages);					
-				},
-				function(rejectionReason) {
-					home.storeProduct(product);
-					self.showPlayerTempMessages([rejectionReason]);
-				});
-		}
-		this._updateFoodAmount();		
+		return ControllerUtils.createActivitySlot(world, this.scene, this.messenger, function() { 
+			var products = home.findProducts(type);
+			if (products.length > 0) {
+				return new ConsumeMealActivity(products[0]);
+			} else {
+				return null;
+			}
+		}, function(messages) { // onSucceed
+			home.consumeProduct(type);
+			self._updateFoodAmount();
+		});
 	},	
 	init: function() {
 		var scene = this.scene;
@@ -39,28 +38,24 @@ RoomController.extends(Object, {
 			home.alarmTime -= 0.5;
 			self._updateAlarmTime();
 		};
-		scene.onSleep = function() {
+		scene.connectSleepSlot(ControllerUtils.createActivitySlot(world, scene, null, function() { 
 			var hours = Clock.timeDiff(world.clock.time, home.alarmTime);
-			var activity = new SleepActivity(hours * 60);
-			
-			ControllerUtils.performActivity(world, activity, function(messages) {
-					if (self.onSleep) {
-						self.onSleep(messages);
-					}
-				},
-				function(rejectionReason) {
-					self.showPlayerTempMessages([rejectionReason]);
-				});
-		};
-		scene.onCookCheap = function() {
-			self._consumeFood('cheap_food');
-		};
-		scene.onCookExpensive = function() {
-			self._consumeFood('expensive_food');
-		};
-		scene.onCookHealthy = function() {
-			self._consumeFood('healthy_food');
-		};
+			return new SleepActivity(hours * 60);
+		}, function(messages) { // onSucceed
+			if (self.onSleep) {
+				self.onSleep(messages);
+			}
+		}, function(rejectionReason) { // onReject
+			self.messenger.showPlayerTempMessages([rejectionReason]);
+		}));
+		
+		scene.connectCookCheapSlot(this._createCookSlot('cheap_food'));
+		scene.connectCookExpensiveSlot(this._createCookSlot('expensive_food'));
+		scene.connectCookHealthySlot(this._createCookSlot('healthy_food'));
+		scene.connectReadSlot(ControllerUtils.createActivitySlot(world, scene, this.messenger, function() { 
+			return new ReadActivity();
+		}));
+
 		scene.onPhoneCall = function() {
 			var dialogController = new MotherDialogController(world);
 			scene.addChild(dialogController.scene);
@@ -69,14 +64,7 @@ RoomController.extends(Object, {
 			}
 			dialogController.init();
 		};
-		scene.onReadBook = function() {
-			ControllerUtils.performActivity(world, READ_ACTIVITY, function(messages) {
-					self.showPlayerTempMessages(messages);					
-				}, 
-				function(rejectionReason) {
-					self.showPlayerTempMessages([rejectionReason]);
-				});
-		};
+		
 		this._updateFoodAmount();
 		this._updateAlarmTime();
 		

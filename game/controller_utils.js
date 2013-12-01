@@ -14,4 +14,27 @@ var ControllerUtils = {
 			}
 		}
 	},
+	createActivitySlot: function(world, scene, messenger, createActivity, onSucceed, onReject) {
+		var infoMessageScene = null;
+		return new ActivitySlot(world, createActivity, onSucceed, onReject,	messenger ? messenger.showPlayerTempMessages : null,
+			function(type, consequences, where) {
+				switch (type) {
+					case 'show':
+						infoMessageScene = new InfoMessageScene(consequences);
+						infoMessageScene.pos = Pos.clone(where);
+						scene.addChild(infoMessageScene);
+						break;
+					case 'update':
+						if (infoMessageScene) {
+							infoMessageScene.pos = Pos.clone(where);
+						}
+						break;
+					case 'hide':
+						if (infoMessageScene) {
+							scene.removeChild(infoMessageScene);
+						}
+						break;
+				}
+			});
+	}
 };

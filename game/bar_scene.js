@@ -12,7 +12,6 @@ var barSceneTemplate = ( function() {
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
 		{ type: 'ChangingSpriteColor', active: {alpha: 0.5}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
 		{ type: 'ChangingLabelColor', active: {alpha: 0}, pressed: {red: 0.39, green: 1, blue: 0.39}, hovered: 'white' },
-//		{ type: 'ChangingSpriteBlendMode', active: 'destination-over', pressed: 'source-over', hovered: 'source-over' }
 	];
 	var font = Fonts.inGameBig;
 		
@@ -122,17 +121,17 @@ BarScene.extends(Scene, {
 	set onExitToStreet(value) {
 		this.foreground.doorButton.onClicked = value;
 	},
-	set onEatDoener(value) {
-		this.foreground.doenerButton.onClicked = value;
+	connectDoenerSlot: function(slot) {
+		slot.connect(this.foreground.doenerButton, Vec.create(150, -60));
 	},
-	set onEatSausage(value) {
-		this.foreground.sausageButton.onClicked = value;
+	connectSausageSlot: function(slot) {
+		slot.connect(this.foreground.sausageButton, Vec.create(150, -60));
 	},
-	set onEatBurger(value) {
-		this.foreground.burgerButton.onClicked = value;
+	connectBurgerSlot: function(slot) {
+		slot.connect(this.foreground.burgerButton, Vec.create(150, -60));
 	},
-	set onDrinkBeer(value) {
-		this.foreground.beerButton.onClicked = value;
+	connectBeerSlot: function(slot) {
+		slot.connect(this.foreground.beerButton, Vec.create(-150, -60));
 	},
 	enter: function() {
 		this.playerBody.pos = new Pos(250, 700);

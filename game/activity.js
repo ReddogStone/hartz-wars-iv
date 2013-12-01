@@ -39,6 +39,24 @@ var Activity = {
 		messages = messages.concat(effectMessages);
 		
 		return messages;
+	},
+	getConsequences: function(activity, world) {
+		var duration = activity.duration;
+		var player = world.player;
+		
+		var energyChange = activity.getEnergyChangeRate(player) * duration;
+		var saturationChange = activity.getSaturationChangeRate(player) * duration;
+		var funChange = activity.getFunChangeRate(player) * duration;
+		var moneyChange = activity.getMoneyChange(player);
+		var additionalMessages = activity.getExpectedEffectMessages(world);
+		
+		return {
+			energy: energyChange,
+			saturation: saturationChange,
+			fun: funChange,
+			money: moneyChange,
+			messages: additionalMessages
+		};
 	}
 };
 
@@ -62,7 +80,7 @@ RegularActivity.extends(Object, {
 	getMoneyChange: function(player) {
 		return 0;
 	},
-	getExpectedEffectMessages: function() {
+	getExpectedEffectMessages: function(world) {
 		return [];
 	},
 	applyWorldEffects: function(world) {
@@ -108,6 +126,12 @@ function BuyAndConsumeMealActivity(meal, price) {
 BuyAndConsumeMealActivity.extends(ConsumeMealActivity, {
 	getMoneyChange: function(player) {
 		return -this._price;
+	},
+	reject: function(world) {
+		if (world.player.money < this._price) {
+			return 'Nicht genug Geld';
+		}
+		return ConsumeMealActivity.prototype.reject.call(this, world);
 	}
 });
 
@@ -125,7 +149,6 @@ ReadActivity.extends(RegularActivity, {
 		return null;
 	}
 });
-var READ_ACTIVITY = new ReadActivity();
 
 function SleepActivity(duration) {
 	RegularActivity.call(this, duration);
@@ -164,7 +187,7 @@ WorkActivity.extends(RegularActivity, {
 			-30 / (8.5 * 60);
 	},
 	reject: function(world) {
-		if (world.player.energy < (this.getDuration() * this.getEnergyChangeRate())) {
+		if (world.player.energy < (this.duration * this.getEnergyChangeRate())) {
 			return 'Nicht genug Energie';
 		}
 		return null;
