@@ -3,6 +3,7 @@
 var globalScope = this;
 
 function Node() {
+	this.id = Node.createNewId();
 	this.pos = new Pos();
 	this.anchor = new Point();
 	this.visible = true;
@@ -84,12 +85,11 @@ Node.extends(Object, {
 		if (action.start) {
 			action.start();
 		}
-		this.actions.push(action);
-	},
-	removeAction: function(action) {
-		if (action.stop) {
-			action.stop();
+		if (!action.finished) {
+			this.actions.push(action);
 		}
+	},
+	cancelAction: function(action) {
 		this.actions.remove(action);
 	},
 	render: function(context) {
@@ -106,24 +106,23 @@ Node.extends(Object, {
 		context.globalAlpha = this.alpha;
 		RenderUtils.transform(context, pos, scale, size, anchor);
 		
-		if (('renderSelf' in this) && this.selfVisible) {
+		if (this.renderSelf && this.selfVisible) {
 			this.renderSelf(context);
 		}		
 		
-		this.children.forEach(function(element, index, array) {
+		this.children.forEach(function(element) {
 			element.render(context);
 		});
 		context.restore();
 	},
 	update: function(deltaTime) {
-		if ('updateSelf' in this) {
+		if (this.updateSelf) {
 			this.updateSelf(deltaTime);
 		}
-		
-		this.actions.forEach(function(element, index, array) {
-			element.update(deltaTime);
-			if (element.finished) {
-				element.stop();
+
+		this.actions.reverseForEach(function(action, index) {
+			action.update(deltaTime);
+			if (action.finished) {
 				this.actions.splice(index, 1);
 			}
 		}, this);
@@ -159,3 +158,8 @@ Node.extends(Object, {
 		}, this);
 	}
 });
+
+Node._currentId = 0;
+Node.createNewId = function () {
+	return Node._currentId++;
+};

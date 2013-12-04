@@ -42,6 +42,14 @@ Object.defineProperty(Array.prototype, 'last', {value: function() {
 	return null;
 }});
 
+Object.defineProperty(Array.prototype, 'reverseForEach', {value: function(callback, thisArg) {
+	var i, 
+		length = this.length;
+	for (i = length - 1; i >= 0; --i) {
+		callback.call(thisArg, this[i], i, this);
+	}
+}});
+
 Object.defineProperty(Function.prototype, 'extends', {value: function(parent, methods) {
     this.prototype = Object.create(parent.prototype);
     Object.defineProperty(this.prototype, 'parent', {value: parent.prototype});

@@ -7,8 +7,6 @@ function Scene() {
 	var w = canvas.width;
 	var h = canvas.height;
 	this.size = new Size(w, h);
-	this.anchor = new Point(0.5, 0.5);
-	this.pos = new Pos(0.5 * w, 0.5 * h);
 	
 	this.pressed = null;
 	this.hovered = [];

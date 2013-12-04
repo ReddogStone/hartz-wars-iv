@@ -2,40 +2,47 @@
 
 function InstantAction(callback) {
 	this.callback = callback;
+	this._finished = false;
 }
 InstantAction.extends(Object, {
+	get finished() {
+		return this._finished;
+	},
 	start: function() {
 		this.callback();
-		this.finished = true;
+		this._finished = true;
 	},
-	stop: function() {
+	update: function(deltaTime) {
+		return deltaTime;
 	}
 });
 
 function LinearAction(duration, callback) {
-	this.duration = duration;
-	this.callback = callback;
-	this.time = 0;
-	this.finished = false;
+	this._duration = duration;
+	this._callback = callback;
+	this._init();
 }
 LinearAction.extends(Object, {
-	start: function() {
-		this.time = 0;
-		this.finished = false;
-		this.callback(0.0);
+	_init: function() {
+		this._time = 0;
+		this._finished = false;		
 	},
-	stop: function() {
-		this.callback(1.0);
+	get finished() {
+		return this._finished;
+	},
+	start: function() {
+		this._init();
+		this._callback(0.0);
 	},
 	update: function(deltaTime) {
-		this.time += deltaTime;
+		this._time += deltaTime;
 		
-		if (this.time > this.duration) {
-			this.finished = true;
-			return (this.time - this.duration);
+		if (this._time > this._duration) {
+			this._finished = true;
+			return (this._time - this._duration);
 		}
 		
-		this.callback(this.time / this.duration);
+		this._callback(this._time / this._duration);
 		return 0;
 	}
 });
@@ -70,61 +77,70 @@ function SequenceAction(action /* any amount of actions can be passed afterwards
 	if (!action) { throw new Error('A SequenceAction has to be created with at least one child action'); }
 	
 	if (Array.isArray(action)) {
-		this.actions = new Array(action.length);
+		this._actions = new Array(action.length);
 		action.forEach(function(element, index) {
-			this.actions[index] = element;
+			this._actions[index] = element;
 		}, this);
 	} else {
-		this.actions = new Array(arguments.length);
+		this._actions = new Array(arguments.length);
 		for (var i = 0; i < arguments.length; ++i) {
-			this.actions[i] = arguments[i];
+			this._actions[i] = arguments[i];
 		}
 	}
 
-	this.currentIndex = 0;
-	this.finished = false;
+	this._init();
 }
 SequenceAction.extends(Object, {
-	_startAction: function() {
-		var actions = this.actions;
-		var currentIndex = this.currentIndex;
-		while (currentIndex < actions.length) {
+	_init: function() {
+		this._currentIndex = 0;
+		this._finished = false;
+	},
+	_startChildAction: function() {
+		var actions = this._actions,
+			currentIndex = this._currentIndex;
+		while (true) {
 			var action = actions[currentIndex];
 			action.start();
-			if (!action.finished) { break; }
-			action.stop();
+			if (!action.finished) { 
+				break;
+			}
+			
 			++currentIndex;
+			if (currentIndex >= actions.length) {
+				this._finished = true;
+				break;
+			}
 		}
-		if (currentIndex >= actions.length) {
-			this.finished = true;
-		}
-		this.currentIndex = currentIndex;
+		this._currentIndex = currentIndex;
+	},
+	get finished() {
+		return this._finished;
 	},
 	start: function() {
-		this.currentIndex = 0;
-		this.finished = false;
-		this._startAction();
-	},
-	stop: function() {
-		var actions = this.actions;
-		var currentIndex = this.currentIndex;
-		if (currentIndex < actions.length) {
-			actions[currentIndex].stop();
-		}
+		this._init();
+		this._startChildAction();
 	},
 	update: function(deltaTime) {
-		var actions = this.actions;
-		var current = actions[this.currentIndex];
-		var timeLeft = current.update(deltaTime);
-		while (current.finished) {
-			current.stop();
-			++this.currentIndex;
-			this._startAction();
-			if (this.finished) { break; }
-			
-			current = actions[this.currentIndex];
+		var current;
+		var timeLeft = deltaTime;
+		var actions = this._actions;
+		
+		do {
+			current = this._actions[this._currentIndex];
 			timeLeft = current.update(timeLeft);
-		}
+			if (!current.finished) {
+				break;
+			}
+			
+			++this._currentIndex;
+			this._startChildAction();
+			
+			// the sequence could be finished during _startChildAction
+			if (this._finished) {
+				break;
+			}
+		} while (current.finished);
+		
 		return timeLeft;
 	}
 });
@@ -143,60 +159,59 @@ function ParallelAction(action /* any amount of actions can be passed afterwards
 			this.actions[i] = arguments[i];
 		}
 	}
+	
+	this._finished = false;
 }
 ParallelAction.extends(Object, {
 	get finished() {
-		return this.actions.some(function(action) {return action.finished;});
+		return this._finished;
 	},
 	start: function() {
-		this.actions.forEach(function(action) {action.start()});
-	},
-	stop: function() {
-		this.actions.forEach(function(action) {action.stop()});		
+		var finished = true;
+		this.actions.forEach(function(action) {
+			action.start();
+			finished = finished && action.finished;
+		}, this);
+		this._finished = finished;
 	},
 	update: function(deltaTime) {
-		var minRest = Infinity;
+		var finished = true,
+			minRest = Infinity;
 		this.actions.forEach(function(action) {
 			var rest = action.update(deltaTime);
 			if (rest < minRest) {
 				minRest = rest;
 			}
+			finished = finished && action.finished;
 		});
+		this._finished = finished;
 		return minRest;
 	}
 });
 
 function RepeatAction(action) {
-	this.action = action;
+	this._action = action;
 }
 RepeatAction.extends(Object, {
 	get finished() {
 		return false;
 	},
 	start: function() {
-		var action = this.action;
+		var action = this._action;
 		action.start();
 		if (action.finished) {
-			action.stop();
-			action.start();
+			throw new Error('Don\'t repeat an instant message, lest doom rises!');
 		}
-	},
-	stop: function() {
-		this.action.stop();
 	},
 	update: function(deltaTime) {
-		var action = this.action;
-		var rest = action.update(deltaTime);
-		if (action.finished) {
-			action.stop();
-			action.start();
-		}
-		while (rest > 0) {
-			rest = this.action.update(rest);
+		var rest = deltaTime,
+			action = this._action;
+
+		do {
+			rest = action.update(rest);
 			if (action.finished) {
-				action.stop();
 				action.start();
-			}			
-		}
+			}
+		} while (rest > 0);
 	}
 });
