@@ -307,7 +307,7 @@ GameController.extends(Object, {
 		this.uiViewport.render(context, this.uiScene);
 	},
 	_handleMouseEventForScene: function(type, mouse, scene, viewport) {
-		if (!scene) {
+		if (!scene || !scene.visible) {
 			return false;
 		}
 	
