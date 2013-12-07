@@ -25,18 +25,14 @@ var roomSceneTemplate = ( function() {
 		type: 'Scene',
 		children: {
 			background: {
-				type: 'Scene',
-				children: {
-					sprite: {
-						type: 'Sprite',
-						texture: 'data/room_bg.png',
-						size: {x: 1024, y: 640},
-						z: 0
-					}
-				}
+				type: 'Sprite',
+				texture: 'data/room_bg.png',
+				size: {x: 1024, y: 640},
+				z: 0
 			},
 			foreground: {
-				type: 'Scene',
+				type: 'Node',
+				size: {x: 1024, y: 640},
 				children: {
 					doorButton: {
 						type: 'Button',

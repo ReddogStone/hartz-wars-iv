@@ -47,7 +47,7 @@ ActivitySlot.extends(Object, {
 				if (activity) {
 					var consequences = Activity.getConsequences(activity, world);
 					
-					var transform = button.getTransform();
+					var transform = button.globalTransform;
 					pos = Vec.add(transform.apply(pos), offset);
 					
 					showInfo('show', consequences, pos);
@@ -65,7 +65,7 @@ ActivitySlot.extends(Object, {
 				}
 			};
 			button.onMouseMove = function(pos) {
-				var transform = button.getTransform();
+				var transform = button.globalTransform;
 				pos = Vec.add(transform.apply(pos), offset);
 				showInfo('update', null, pos);
 

@@ -90,7 +90,7 @@ Label.extends(Node, {
 		this._text = value;
 		this._adjustSize();
 	},
-	renderSelf: function(context) {
+	render: function(context) {
 		context.font = this._font.toString();
 		context.fillStyle = this.color.toString();
 		context.textAlign = 'start';

@@ -5,6 +5,7 @@ var globalScope = this;
 function Node() {
 	this.id = Node.createNewId();
 	this.pos = new Pos();
+	this.globalTransform = Transform.identity();
 	this.anchor = new Point();
 	this.visible = true;
 	this.selfVisible = true;
@@ -30,7 +31,7 @@ Node.extends(Object, {
 			element.init();
 		});
 	},
-	getTransform: function() {
+	getLocalTransform: function() {
 		var pos = this.pos;
 		var scale = this.scale;
 		var size = this.size;
@@ -47,7 +48,7 @@ Node.extends(Object, {
 			translate(-size.x * anchor.x, - size.y * anchor.y);
 	},
 	getBoundingBox: function() {
-		var transform = this.getTransform();
+		var transform = this.globalTransform;
 		var size = this.size;
 		var points = [
 			transform.apply(Vec.create(0, 0)),
@@ -91,29 +92,6 @@ Node.extends(Object, {
 	},
 	cancelAction: function(action) {
 		this.actions.remove(action);
-	},
-	render: function(context) {
-		if (!this.visible) {
-			return;
-		}
-	
-		var pos = this.pos;
-		var scale = this.scale;
-		var size = this.size;
-		var anchor = this.anchor;
-		
-		context.save();
-		context.globalAlpha = this.alpha;
-		RenderUtils.transform(context, pos, scale, size, anchor);
-		
-		if (this.renderSelf && this.selfVisible) {
-			this.renderSelf(context);
-		}		
-		
-		this.children.forEach(function(element) {
-			element.render(context);
-		});
-		context.restore();
 	},
 	update: function(deltaTime) {
 		if (this.updateSelf) {

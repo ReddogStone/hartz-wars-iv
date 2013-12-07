@@ -22,7 +22,7 @@ Sprite.extends(Node, {
 			this._buffered = false;
 		}
 	},
-	renderSelf: function(context) {
+	render: function(context) {
 		var sRect = this.sourceRect;
 		var size = this.size;
 		var texture = this.texture;

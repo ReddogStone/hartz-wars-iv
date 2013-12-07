@@ -39,6 +39,7 @@ LinearAction.extends(Object, {
 		
 		if (this._time > this._duration) {
 			this._finished = true;
+			this._callback(1.0);
 			return (this._time - this._duration);
 		}
 		

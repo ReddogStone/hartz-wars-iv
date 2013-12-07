@@ -6,12 +6,6 @@ function GameController() {
 }
 
 GameController.extends(Object, {
-	get _mainScene() {
-		return this.rootScene.children[0];
-	},
-	set _mainScene(value) {
-		this.rootScene.children[0] = value;
-	},
 	_updatePlayerValues: function(player, scene) {
 		var uiScene = this.uiScene;
 		uiScene.energyProgress.progress = player.energy * 0.01;
@@ -31,7 +25,7 @@ GameController.extends(Object, {
 			self.hideMap();
 			var args = arguments;
 
-			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, scene, 
+			var transition = new TransitionScene(TRANSITION_TIME, self.rootScene, scene, 
 				function() {
 					self._updatePlayerValues(self.world.player, scene);
 					scene.init();
@@ -41,12 +35,12 @@ GameController.extends(Object, {
 				},
 				function() {
 					self.controller = null;
-					self._mainScene = scene;
+					self.rootScene = scene;
 					if (onFinished) {
 						onFinished.apply(scene, args);
 					}
 				});
-			self._mainScene = transition;
+			self.rootScene = transition;
 			transition.init();
 		};
 	},
@@ -56,7 +50,7 @@ GameController.extends(Object, {
 			self.hideMap();
 			var args = arguments;
 			
-			var transition = new TransitionScene(TRANSITION_TIME, self._mainScene, controller.scene, 
+			var transition = new TransitionScene(TRANSITION_TIME, self.rootScene, controller.scene, 
 				function() {
 					self._updatePlayerValues(self.world.player, controller.scene);
 					controller.init();
@@ -66,19 +60,20 @@ GameController.extends(Object, {
 				},
 				function() {
 					self.controller = controller;
-					self._mainScene = controller.scene;
+					self.rootScene = controller.scene;
 					if (onFinished) {
 						onFinished.apply(controller, args);
 					}
 				});
-			self._mainScene = transition;
+			self.rootScene = transition;
 			transition.init();
 		};
 	},
 	_showPlayerTempMessages: function(messages) {
-		if (this._mainScene) {
-			if (this._mainScene.playerBody) {
-				var playerBody = this._mainScene.playerBody;
+		var rootScene = this.rootScene;
+		if (rootScene) {
+			if (rootScene.playerBody) {
+				var playerBody = rootScene.playerBody;
 				var playerBB = playerBody.getBoundingBox();
 				var pos = new Pos(playerBB.x + playerBB.sx * 0.5, playerBB.y);
 				this.showTempMessages(messages, pos);
@@ -129,7 +124,7 @@ GameController.extends(Object, {
 		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
 		this.uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
 		
-		this.rootScene = new Scene();
+		this.rootScene = null;
 		this.controller = null;
 		
 		var world = this.world = new World();
@@ -185,8 +180,8 @@ GameController.extends(Object, {
 		};
 		
 		player.onValueChanged = function(valueName, oldValue, newValue) {
-			if (self._mainScene) {
-				self._updatePlayerValues(self.world.player, self._mainScene);
+			if (self.rootScene) {
+				self._updatePlayerValues(self.world.player, self.rootScene);
 			}
 		};
 		player.energy = 100;
@@ -196,6 +191,7 @@ GameController.extends(Object, {
 		player.addHoursWorked;
 		
 		this.updatePaused = true;
+		this.overlay = null;
 
 		// initial transit
 		this.transitToController(roomController, function() {
@@ -210,7 +206,7 @@ GameController.extends(Object, {
 		})();
 		
 		this.tempMessageQueue = [];
-		this.rootScene.addAction(new RepeatAction(new SequenceAction(
+		this.uiScene.addAction(new RepeatAction(new SequenceAction(
 			new WaitAction(0.5),
 			new InstantAction(function() {
 				if (self.tempMessageQueue.length <= 0) {
@@ -244,9 +240,20 @@ GameController.extends(Object, {
 			})
 		)));
 	},
+	_updateScene: function(delta, scene) {
+		if (!scene) {
+			return;
+		}
+		
+		scene.update(delta);
+	},	
 	update: function(delta) {
 		var self = this;
-		this.rootScene.update(delta);
+		this._updateScene(delta, this.rootScene);
+		this._updateScene(delta, this.mapScene);
+		this._updateScene(delta, this.overlay);
+		this._updateScene(delta, this.uiScene);
+		
 		if (!this.updatePaused) {
 			var world = this.world;
 			var clock = world.clock;
@@ -281,25 +288,39 @@ GameController.extends(Object, {
 			}
 		}
 	},
+	_updateRenderList: function(scene) {
+		if (!scene) {
+			return;
+		}
+		
+		scene.updateRenderList();
+	},
 	render: function(context) {
+		this._updateRenderList(this.rootScene);
+		this._updateRenderList(this.mapScene);
+		this._updateRenderList(this.overlay);
+		this._updateRenderList(this.uiScene);
+	
 		this.mainViewport.render(context, this.rootScene);
+		this.mainViewport.render(context, this.mapScene);
+		this.mainViewport.render(context, this.overlay);
 		this.uiViewport.render(context, this.uiScene);
 	},
-	handleMouseEvent: function(type, mouse) {
-		var transformedEvent = {x: mouse.x, y: mouse.y, down: mouse.down};
-		var rootScene = this.rootScene;
-		Vec.set(transformedEvent, rootScene.getTransform().inverse().apply(transformedEvent));
-		var handled = rootScene[type](transformedEvent);
-
-		if (!this.overlay) {
-			var uiScene = this.uiScene;
-			var destRect = this.uiViewport.destRect;
-			transformedEvent = {x: mouse.x, y: mouse.y, down: mouse.down};
-			Vec.set(transformedEvent, uiScene.getTransform().inverse().apply(transformedEvent));
-			transformedEvent.x -= destRect.x;
-			transformedEvent.y -= destRect.y;
-			uiScene[type](transformedEvent);
+	_handleMouseEventForScene: function(type, mouse, scene, viewport) {
+		if (!scene) {
+			return false;
 		}
+	
+		var destRect = viewport.destRect;
+		var transformedEvent = {x: mouse.x - destRect.x, y: mouse.y - destRect.y, down: mouse.down};
+		Vec.set(transformedEvent, scene.getLocalTransform().inverse().apply(transformedEvent));
+		return scene[type](transformedEvent);
+	},
+	handleMouseEvent: function(type, mouse) {
+		this._handleMouseEventForScene(type, mouse, this.overlay, this.mainViewport) ||
+		this._handleMouseEventForScene(type, mouse, this.mapScene, this.mainViewport) ||
+		this._handleMouseEventForScene(type, mouse, this.rootScene, this.mainViewport) ||
+		this._handleMouseEventForScene(type, mouse, this.uiScene, this.uiViewport);
 	},
 	showMap: function() {
 		var map = this.mapScene;
@@ -310,11 +331,9 @@ GameController.extends(Object, {
 			map.pos.rot = value * 2 * Math.PI;
 			map.sprite.alpha = value;
 		}));
-		this.rootScene.children[1] = map;
 	},
 	hideMap: function() {
 		this.mapScene.visible = false;
-		this.rootScene.removeChild(this.mapScene);
 	},
 	showOverlay: function(overlay, callback) {
 		var self = this;
@@ -324,7 +343,7 @@ GameController.extends(Object, {
 			return true;
 		}
 		this.updatePaused = true;
-		this.overlay = true;
+		this.overlay = overlay;
 		
 		overlay.addAction(new EaseOutAction(0.2, function(progress) {
 			progress = 0.99 * progress + 0.01;
@@ -337,7 +356,7 @@ GameController.extends(Object, {
 				callback();
 			}
 			self.updatePaused = false;
-			self.overlay = false;
+			self.overlay = null;
 		};
 	},
 	showMessage: function(message, callback) {
@@ -346,7 +365,7 @@ GameController.extends(Object, {
 		var rootScene = this.rootScene;
 		rootScene.addChild(messageScene);
 		this.updatePaused = true;
-		this.overlay = true;
+		this.overlay = messageScene;
 		
 		messageScene.addAction(new EaseOutAction(0.2, function(progress) {
 			progress = 0.99 * progress + 0.01;
@@ -359,7 +378,7 @@ GameController.extends(Object, {
 				callback();
 			}
 			self.updatePaused = false;
-			self.overlay = false;
+			self.overlay = null;
 		};
 	},
 	showTempMessages: function(messages, pos) {
