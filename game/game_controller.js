@@ -244,7 +244,6 @@ GameController.extends(Object, {
 		if (!scene) {
 			return;
 		}
-		
 		scene.update(delta);
 	},	
 	update: function(delta) {
@@ -292,7 +291,6 @@ GameController.extends(Object, {
 		if (!scene) {
 			return;
 		}
-		
 		scene.updateRenderList();
 	},
 	render: function(context) {
@@ -337,8 +335,6 @@ GameController.extends(Object, {
 	},
 	showOverlay: function(overlay, callback) {
 		var self = this;
-		var rootScene = this.rootScene;
-		rootScene.addChild(overlay);
 		overlay.handleMouseDown = overlay.handleMouseUp = overlay.handleMouseMove = function() {
 			return true;
 		}
@@ -351,7 +347,6 @@ GameController.extends(Object, {
 			overlay.scale.y = progress;
 		}));
 		overlay.onClose = function() {
-			rootScene.removeChild(overlay);
 			if (callback) {
 				callback();
 			}
@@ -362,8 +357,6 @@ GameController.extends(Object, {
 	showMessage: function(message, callback) {
 		var self = this;
 		var messageScene = new MessageScene(message);
-		var rootScene = this.rootScene;
-		rootScene.addChild(messageScene);
 		this.updatePaused = true;
 		this.overlay = messageScene;
 		
@@ -373,7 +366,6 @@ GameController.extends(Object, {
 			messageScene.scale.y = progress;
 		}));
 		messageScene.onOK = function() {
-			rootScene.removeChild(messageScene);
 			if (callback) {
 				callback();
 			}

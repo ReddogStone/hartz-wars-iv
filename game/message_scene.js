@@ -15,7 +15,7 @@ var messageSceneTemplate = ( function() {
 		type: 'Scene',
 		children: {
 			background: {
-				type: 'Scene',
+				type: 'Node',
 				size: {x: 824, y: 440},
 				anchor: {x: 0, y: 0},
 				pos: {x: 100, y: 100},

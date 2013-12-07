@@ -7,6 +7,8 @@ function Scene() {
 	var w = canvas.width;
 	var h = canvas.height;
 	this.size = new Size(w, h);
+	this.pos = new Pos(0.5 * w, 0.5 * h);
+	this.anchor = new Size(0.5, 0.5);
 	
 	this.pressed = null;
 	this.hovered = [];
@@ -100,20 +102,17 @@ Scene.extends(Node, {
 		return this._renderList;
 	},
 	updateRenderList: function() {
-		if (!this.visible) {
-			return;
-		}
-	
 		var renderList = this._renderList;
 		var childList = this._childList;
 		renderList.clear();
 		childList.clear();
 		
-		var stack = [];
-		this.children.forEach(function(child) {
-			child.globalTransform = child.getLocalTransform();
-			stack.push(child);
-		});
+		if (!this.visible) {
+			return;
+		}
+	
+		this.globalTransform = this.getLocalTransform();
+		var stack = [this];
 		
 		var result = [];
 		while (stack.length > 0) {
@@ -125,7 +124,9 @@ Scene.extends(Node, {
 					stack.push(child);
 				});
 				
-				childList.push(node);
+				if (node != this) {
+					childList.push(node);
+				}
 				if (node.render) {
 					renderList.push(node);
 				}
