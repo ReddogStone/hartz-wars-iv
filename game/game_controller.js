@@ -193,9 +193,9 @@ GameController.extends(Object, {
 		
 		// events
 		barScene.connectDoenerSlot(this._createBuyMealSlot(DOENER_MEAL, 3.2));
-		barScene.connectSausageSlot(this._createBuyMealSlot(SAUSAGE_MEAL, 3.2));
-		barScene.connectBurgerSlot(this._createBuyMealSlot(BURGER_MEAL, 3.2));
-		barScene.connectBeerSlot(this._createBuyMealSlot(BEER_MEAL, 3.2));
+		barScene.connectSausageSlot(this._createBuyMealSlot(SAUSAGE_MEAL, 2.0));
+		barScene.connectBurgerSlot(this._createBuyMealSlot(BURGER_MEAL, 5.5));
+		barScene.connectBeerSlot(this._createBuyMealSlot(BEER_MEAL, 1.5));
 		
 		// wire-up UI scene
 		uiScene.onWorkInfo = function() {
