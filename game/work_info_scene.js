@@ -115,7 +115,7 @@ function WorkInfoScene() {
 	};
 }
 WorkInfoScene.extends(Scene, {
-	set onClose(value) {
+	set onConfirm(value) {
 		this.background.okButton.onClicked = value;
 	},
 	setInfo: function(description, workedToday, workedThisWeek, nextSalary) {

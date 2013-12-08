@@ -5,6 +5,24 @@ function OfficeController(world) {
 	this.scene = new OfficeScene();
 }
 OfficeController.extends(Object, {
+	_setWorkAmount: function(workAmount) {
+		if (workAmount > 6) {
+			return {amount: 6, info: 'Maximal 6 Std. ohne Pause'};
+		} else if (workAmount < 1) {
+			return {amount: 1, info: 'Du musst schon mindestens eine Stunde arbeiten.'};
+		}
+			
+		return {amount: workAmount, info: ''};
+	},
+	_setConsequences: function(selectScene) {
+		var time = this._world.clock.time;
+		var duration = selectScene.workAmount;
+		duration = Math.min(20.0 - time, duration) * 60;
+		
+		var activity = new WorkActivity(duration);
+		var consequences = Activity.getConsequences(activity, this._world);
+		selectScene.setInfo(consequences);		
+	},
 	init: function() {
 		var self = this;
 		var scene = this.scene;
@@ -30,6 +48,21 @@ OfficeController.extends(Object, {
 		var self = this;
 		
 		var selectScene = new WorkSelectScene();
+		
+		selectScene.onIncreaseWorkAmount = function() {
+			var response = self._setWorkAmount(selectScene.workAmount + 0.5);
+			selectScene.workAmount = response.amount;
+			selectScene.additionalInformation = response.info;
+			self._setConsequences(selectScene);
+		};
+		selectScene.onDecreaseWorkAmount = function() {
+			var response = self._setWorkAmount(selectScene.workAmount - 0.5);
+			selectScene.workAmount = response.amount;
+			selectScene.additionalInformation = response.info;
+			self._setConsequences(selectScene);
+		};
+		this._setConsequences(selectScene);
+		
 		this.showOverlay(selectScene, function() {
 			var time = self._world.clock.time;
 			var duration = selectScene.workAmount;

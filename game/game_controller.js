@@ -218,7 +218,7 @@ GameController.extends(Object, {
 		this.overlay = null;
 		
 		// initial transit
-		this.transitToController(roomController, function() {
+/*		this.transitToController(roomController, function() {
 			roomController.enter();
 			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
 				'\n' +
@@ -227,7 +227,9 @@ GameController.extends(Object, {
 				'\n' +
 				'Viel Spaß beim spielen!');
 			this.updatePaused = false;
-		})();
+		})(); */
+		
+		this.transitToController(officeController, officeController.enterFromBus)();
 		
 		this.tempMessageQueue = [];
 		uiScene.addAction(new RepeatAction(new SequenceAction(
@@ -341,10 +343,14 @@ GameController.extends(Object, {
 			overlay.scale.x = progress;
 			overlay.scale.y = progress;
 		}));
-		overlay.onClose = function() {
+		overlay.onConfirm = function() {
 			if (callback) {
 				callback();
 			}
+			self.updatePaused = false;
+			self.overlay = null;
+		};
+		overlay.onCancel = function() {
 			self.updatePaused = false;
 			self.overlay = null;
 		};

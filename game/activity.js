@@ -12,6 +12,8 @@ var Activity = {
 	
 		world.advanceClock(duration);
 		
+		activity.prepare();
+		
 		player.energy += activity.getEnergyChangeRate(player) * duration;
 		player.saturation += activity.getSaturationChangeRate(player) * duration;
 		player.fun += activity.getFunChangeRate(player) * duration;
@@ -64,6 +66,8 @@ function RegularActivity(duration) {
 	this._duration = duration;
 }
 RegularActivity.extends(Object, {
+	prepare: function(world) {
+	},
 	getEnergyChangeRate: function(player) {
 		return -100 / (16 * 60);
 	},
@@ -170,9 +174,11 @@ SleepActivity.extends(RegularActivity, {
 
 function WorkActivity(duration) {
 	RegularActivity.call(this, duration);
-	this._goodDay = (Math.random() < 0.2);
 }
 WorkActivity.extends(RegularActivity, {
+	prepare: function(world) {
+		this._goodDay = (Math.random() < 0.2);
+	},
 	getEnergyChangeRate: function() {
 		return (this._goodDay) ? 
 			-40 / (8.5 * 60) :
@@ -207,5 +213,8 @@ WorkActivity.extends(RegularActivity, {
 			GameUtils.randomSelect('War wieder ein langer Tag', 
 				'Und wieder nix geschafft', 
 				'Ich hasse diesen Job')];
+	},
+	getExpectedEffectMessages: function() {
+		return ['An einem "Guten Tag" weniger Energie- und Lebenslustabzug'];
 	}
 });
