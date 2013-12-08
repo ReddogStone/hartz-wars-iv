@@ -214,7 +214,7 @@ GameController.extends(Object, {
 		player.addHoursWorked;
 		
 		// set internal properties
-		this.updatePaused = true;
+		this.updatePaused = false;
 		this.overlay = null;
 		
 		// initial transit
@@ -284,17 +284,22 @@ GameController.extends(Object, {
 			var messages = Activity.perform(new RegularActivity(delta / 6), world);
 			this._showPlayerTempMessages(messages);
 		
-			if ((day > 0) && (day < 6) && (this.lastTime <= 20.0) && (clock.time > 20.0)) {
+			var lastDay = this.lastDay;
+			if ( (lastDay > 0) && (lastDay < 6) && (this.lastTime <= 20.0) && ((day != lastDay) || (clock.time > 20.0)) ) {
 				var player = world.player;
 				if (player.hoursWorkedToday < 4) {
 					player.nextSalary = Math.max(player.nextSalary - 60.0, 0.0);
-					this.showMessage('Du hast heute weniger als 4 Stunden gearbeitet.\n' +
+					
+					var dayReference = (day != lastDay) ? 'gestern' : 'heute';
+					
+					this.showMessage('Du hast ' + dayReference + ' weniger als 4 Stunden gearbeitet.\n' +
 						'Zur Strafe bekommst Du nächstes Mal 60 EURO weniger!\n' +
 						'\n' +
 						GameUtils.randomSelect('Was hast Du dir dabei gedacht?', 'Sei nicht so faul!', 'Keine Ausreden!'));
 				}
 			}
 			this.lastTime = clock.time;
+			this.lastDay = day;
 		
 			if (this.world.player.fun <= 0) {
 				this.showMessage('Du hast verloren!\n\n' +
