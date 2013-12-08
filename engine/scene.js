@@ -40,7 +40,7 @@ Scene.extends(Node, {
 				}
 			
 				if (mouseHandler[handleMethodName](childEvent)) {
-					if (methodName == 'mouseDown') {
+					if (handleMethodName == 'handleMouseDown') {
 						this.pressed = mouseHandler;
 					}
 					return true;
