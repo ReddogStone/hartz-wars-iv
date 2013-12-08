@@ -115,15 +115,11 @@ GameController.extends(Object, {
 		return result;
 	},
 	_createBuyMealSlot: function(meal, price) {
-		var messenger = {
-			showMessage: function(message, callback) { 
-				self.showMessage(message, callback); 
-			},
-			showPlayerTempMessages: function(messages) {
-				self._showPlayerTempMessages(messages);
-			}
+		var self = this;
+		var showPlayerMessages = function(messages) {
+			self._showPlayerTempMessages(messages);
 		};
-		return ControllerUtils.createActivitySlot(this.world, this.barScene, messenger, function() { 
+		return new ActivitySlot(this.world, this.barScene, showPlayerMessages, function() {
 			return new BuyAndConsumeMealActivity(meal, price);
 		});
 	},

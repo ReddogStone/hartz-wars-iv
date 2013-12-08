@@ -97,16 +97,14 @@ var infoMessageTemplate = ( function() {
 	};
 })();
 
-function InfoMessageScene(consequences) {
+function InfoMessageScene() {
 	var self = this;
 	Scene.apply(this);
 	
 	this.deserialize(infoMessageTemplate);
-	
-	this._setInfo(consequences);
 }
 InfoMessageScene.extends(Scene, {
-	_setInfo: function(consequences) {
+	setInfo: function(consequences) {
 		this.funAmountLabel.text = consequences.fun ? numberToStringWithSign(consequences.fun.toFixed(0)) : '--';
 		this.energyAmountLabel.text = consequences.energy ? numberToStringWithSign(consequences.energy.toFixed(0)) : '--';
 		this.saturationAmountLabel.text = consequences.saturation ? numberToStringWithSign(consequences.saturation.toFixed(0)) : '--';

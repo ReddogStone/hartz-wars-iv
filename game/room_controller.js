@@ -9,17 +9,19 @@ RoomController.extends(Object, {
 		var self = this;
 		var world = this._world;
 		var home = world.playerHome;
-		return ControllerUtils.createActivitySlot(world, this.scene, this.messenger, function() { 
+		
+		var slot = new ActivitySlot(world, this.scene, this.messenger.showPlayerTempMessages, function() {
 			var products = home.findProducts(type);
 			if (products.length > 0) {
 				return new ConsumeMealActivity(products[0]);
-			} else {
-				return null;
 			}
-		}, function(messages) { // onSucceed
-			home.consumeProduct(type);
-			self._updateFoodAmount();
+			return null;
 		});
+		slot.onSucceed = function(messages) {
+			home.consumeProduct(type);
+			self._updateFoodAmount();			
+		};
+		return slot;
 	},	
 	init: function() {
 		var scene = this.scene;
@@ -38,21 +40,26 @@ RoomController.extends(Object, {
 			home.alarmTime -= 0.5;
 			self._updateAlarmTime();
 		};
-		scene.connectSleepSlot(ControllerUtils.createActivitySlot(world, scene, null, function() { 
+		
+		var sleepSlot = this.sleepSlot = new ActivitySlot(world, scene, null, function() { 
 			var hours = Clock.timeDiff(world.clock.time, home.alarmTime);
 			return new SleepActivity(hours * 60);
-		}, function(messages) { // onSucceed
+		});
+		sleepSlot.onSucceed = function(messages) {
 			if (self.onSleep) {
 				self.onSleep(messages);
 			}
-		}, function(rejectionReason) { // onReject
+		};
+		sleepSlot.onReject = function(rejectionReason) {
 			self.messenger.showPlayerTempMessages([rejectionReason]);
-		}));
+		};
+		scene.connectSleepSlot(sleepSlot);
 		
 		scene.connectCookCheapSlot(this._createCookSlot('cheap_food'));
 		scene.connectCookExpensiveSlot(this._createCookSlot('expensive_food'));
 		scene.connectCookHealthySlot(this._createCookSlot('healthy_food'));
-		scene.connectReadSlot(ControllerUtils.createActivitySlot(world, scene, this.messenger, function() { 
+		
+		scene.connectReadSlot(new ActivitySlot(world, scene, this.messenger.showPlayerTempMessages, function() { 
 			return new ReadActivity();
 		}));
 
@@ -98,5 +105,6 @@ RoomController.extends(Object, {
 		var alarmHours = Math.floor(alarmTime);
 		var alarmMinutes = Math.floor((alarmTime - alarmHours) * 60);
 		this.scene.foreground.alarmTimeLabel.text = padNumber(alarmHours, 2) + ':' + padNumber(alarmMinutes, 2);
+		this.sleepSlot.notifyChanges();
 	}
 });
