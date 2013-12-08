@@ -3,6 +3,7 @@
 function RoomController(world) {
 	this._world = world;
 	this.scene = new RoomScene();
+	this._cookSlots = {};
 }
 RoomController.extends(Object, {
 	_createCookSlot: function(type) {
@@ -19,7 +20,8 @@ RoomController.extends(Object, {
 		});
 		slot.onSucceed = function(messages) {
 			home.consumeProduct(type);
-			self._updateFoodAmount();			
+			self._updateFoodAmount();
+			slot.notifyChanges();
 		};
 		return slot;
 	},	
