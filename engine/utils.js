@@ -46,8 +46,22 @@ Object.defineProperty(Array.prototype, 'reverseForEach', {value: function(callba
 	var i, 
 		length = this.length;
 	for (i = length - 1; i >= 0; --i) {
-		callback.call(thisArg, this[i], i, this);
+		if (this.hasOwnProperty(i)) {
+			callback.call(thisArg, this[i], i, this);
+		}
 	}
+}});
+
+Object.defineProperty(Array.prototype, 'reverseSome', {value: function(callback, thisArg) {
+	var i,
+		length = this.length;
+	for (i = length - 1; i >= 0; --i) {
+		if (this.hasOwnProperty(i) && callback.call(thisArg, this[i], i, this)) {
+			return true;
+		}
+	}
+	
+	return false;
 }});
 
 Object.defineProperty(Function.prototype, 'extends', {value: function(parent, methods) {

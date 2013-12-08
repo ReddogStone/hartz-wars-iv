@@ -136,7 +136,6 @@ Button.extends(Node, {
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}
-			return true;
 		}
 	},
 	handleMouseMove: function(event) {

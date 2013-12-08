@@ -2,6 +2,13 @@
 
 var TRANSITION_TIME = 1;
 
+var Layers = {
+	MAIN_SCENE: 0,
+	MAP_SCENE: 1,
+	UI_SCENE: 2,
+	OVERLAY: 3
+};
+
 function GameController() {
 }
 
@@ -18,6 +25,18 @@ GameController.extends(Object, {
 			scene.playerBody.colorBody.alpha = player.fun * 0.01;
 		}
 		uiScene.moneyAmountLabel.text = player.money.toFixed(2) + ' EURO';
+	},
+	get rootScene() {
+		return this.layerDirector.getLayerScene(Layers.MAIN_SCENE);
+	},
+	set rootScene(value) {
+		this.layerDirector.setLayerScene(Layers.MAIN_SCENE, value);
+	},
+	get overlay() {
+		return this.layerDirector.getLayerScene(Layers.OVERLAY);
+	},
+	set overlay(value) {
+		this.layerDirector.setLayerScene(Layers.OVERLAY, value);
 	},
 	transitToScene: function(scene, onEnter, onFinished) {
 		var self = this;
@@ -124,7 +143,6 @@ GameController.extends(Object, {
 		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
 		this.uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
 		
-		this.rootScene = null;
 		this.controller = null;
 		
 		var world = this.world = new World();
@@ -137,12 +155,21 @@ GameController.extends(Object, {
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
 		var uiScene = this.uiScene = new UIScene();
 		var mapScene = this.mapScene = new MapScene();
-		this.workInfoScene = new WorkInfoScene();
+		this.workInfoScene = new WorkInfoScene();		
 		
 		// create controllers
 		var roomController = this.roomController = this._newController(RoomController, world);
 		var supermarketInsideController = this.supermarketInsideController = this._newController(SupermarketInsideController, world);
 		var officeController = this.officeController = this._newController(OfficeController, world);
+		
+		// setup the layers
+		var layerDirector = this.layerDirector = new LayerDirector();
+		layerDirector.createLayer(Layers.MAIN_SCENE, this.mainViewport);
+		layerDirector.createLayer(Layers.MAP_SCENE, this.mainViewport);
+		layerDirector.createLayer(Layers.UI_SCENE, this.uiViewport);
+		layerDirector.createLayer(Layers.OVERLAY, this.mainViewport, LayerType.MODAL);
+		layerDirector.setLayerScene(Layers.MAP_SCENE, mapScene);
+		layerDirector.setLayerScene(Layers.UI_SCENE, uiScene);		
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
@@ -190,9 +217,10 @@ GameController.extends(Object, {
 		player.money = 391;
 		player.addHoursWorked;
 		
+		// set internal properties
 		this.updatePaused = true;
 		this.overlay = null;
-
+		
 		// initial transit
 		this.transitToController(roomController, function() {
 			roomController.enter();
@@ -206,7 +234,7 @@ GameController.extends(Object, {
 		})();
 		
 		this.tempMessageQueue = [];
-		this.uiScene.addAction(new RepeatAction(new SequenceAction(
+		uiScene.addAction(new RepeatAction(new SequenceAction(
 			new WaitAction(0.5),
 			new InstantAction(function() {
 				if (self.tempMessageQueue.length <= 0) {
@@ -248,10 +276,7 @@ GameController.extends(Object, {
 	},	
 	update: function(delta) {
 		var self = this;
-		this._updateScene(delta, this.rootScene);
-		this._updateScene(delta, this.mapScene);
-		this._updateScene(delta, this.overlay);
-		this._updateScene(delta, this.uiScene);
+		this.layerDirector.update(delta);
 		
 		if (!this.updatePaused) {
 			var world = this.world;
@@ -287,38 +312,12 @@ GameController.extends(Object, {
 			}
 		}
 	},
-	_updateRenderList: function(scene) {
-		if (!scene) {
-			return;
-		}
-		scene.updateRenderList();
-	},
 	render: function(context) {
-		this._updateRenderList(this.rootScene);
-		this._updateRenderList(this.mapScene);
-		this._updateRenderList(this.overlay);
-		this._updateRenderList(this.uiScene);
-	
-		this.mainViewport.render(context, this.rootScene);
-		this.mainViewport.render(context, this.mapScene);
-		this.mainViewport.render(context, this.overlay);
-		this.uiViewport.render(context, this.uiScene);
-	},
-	_handleMouseEventForScene: function(type, mouse, scene, viewport) {
-		if (!scene || !scene.visible) {
-			return false;
-		}
-	
-		var destRect = viewport.destRect;
-		var transformedEvent = {x: mouse.x - destRect.x, y: mouse.y - destRect.y, down: mouse.down};
-		Vec.set(transformedEvent, scene.getLocalTransform().inverse().apply(transformedEvent));
-		return scene[type](transformedEvent);
+		this.layerDirector.updateRenderList();
+		this.layerDirector.render(context);
 	},
 	handleMouseEvent: function(type, mouse) {
-		this._handleMouseEventForScene(type, mouse, this.overlay, this.mainViewport) ||
-		this._handleMouseEventForScene(type, mouse, this.mapScene, this.mainViewport) ||
-		this._handleMouseEventForScene(type, mouse, this.rootScene, this.mainViewport) ||
-		this._handleMouseEventForScene(type, mouse, this.uiScene, this.uiViewport);
+		this.layerDirector.handleMouseEvent(type, mouse);
 	},
 	showMap: function() {
 		var map = this.mapScene;

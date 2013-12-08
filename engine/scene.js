@@ -17,12 +17,12 @@ function Scene() {
 	this._mouseHandlers = [];
 }
 Scene.extends(Node, {
-	_handleMouseEvent: function(event, methodName, handleMethodName) {
+	_handleMouseEvent: function(event, handleMethodName) {
 		var childList = this._childList;
 
 		for (var i = childList.length - 1; i >= 0; --i) {
 			var mouseHandler = childList[i];
-			if ((methodName in mouseHandler) || (handleMethodName in mouseHandler)) {
+			if (handleMethodName in mouseHandler) {
 				var inverseTransform = mouseHandler.globalTransform.inverse();
 				var childEvent = inverseTransform.apply(event);
 				childEvent.down = event.down;
@@ -39,10 +39,7 @@ Scene.extends(Node, {
 					childEvent.pressed = true;
 				}
 			
-				if ((methodName in mouseHandler) && mouseHandler[methodName](childEvent)) {
-					return true;
-				}
-				if ((handleMethodName in mouseHandler) && mouseHandler[handleMethodName](childEvent)) {
+				if (mouseHandler[handleMethodName](childEvent)) {
 					if (methodName == 'mouseDown') {
 						this.pressed = mouseHandler;
 					}
@@ -60,28 +57,23 @@ Scene.extends(Node, {
 		return false;
 	},
 	mouseDown: function(event) {
-		return this._handleMouseEvent(event, 'mouseDown', 'handleMouseDown');
+		return this._handleMouseEvent(event, 'handleMouseDown');
 	},
 	mouseUp: function(event) {
-		var handled = false;
 		var pressed = this.pressed;
-		if (pressed) {
-			if (pressed.handleMouseUp) {
-				var inverseTransform = pressed.globalTransform.inverse();
-				if (inverseTransform == null) {
-					throw new Error('InverseTransform is null!');
-				}
-				var childEvent = inverseTransform.apply(event);
-				childEvent.down = event.down;			
-				handled = pressed.handleMouseUp(childEvent);
-				if (handled) {
-					this.pressed = null;
-				}
+		if (pressed && pressed.handleMouseUp) {
+			var inverseTransform = pressed.globalTransform.inverse();
+			if (inverseTransform == null) {
+				throw new Error('InverseTransform is null!');
 			}
+			var childEvent = inverseTransform.apply(event);
+			childEvent.down = event.down;			
+			pressed.handleMouseUp(childEvent);
+			this.pressed = null;
+			return true;
 		}
-		if (!handled) {
-			return this._handleMouseEvent(event, 'mouseUp', 'handleMouseUp');
-		}
+
+		return this._handleMouseEvent(event, 'handleMouseUp');
 	},
 	mouseMove: function(event) {
 		for (var i = this.hovered.length - 1; i >= 0; --i) {
@@ -96,7 +88,7 @@ Scene.extends(Node, {
 				this.hovered.splice(i, 1);
 			}
 		}
-		return this._handleMouseEvent(event, 'mouseMove', 'handleMouseMove');
+		return this._handleMouseEvent(event, 'handleMouseMove');
 	},
 	getRenderList: function() {
 		return this._renderList;
