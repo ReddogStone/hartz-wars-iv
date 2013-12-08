@@ -19,7 +19,8 @@ function World() {
 		date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
 	}
 	
-//	date.setDate(24);
+//	date.setDate(7);
+//	this.player._hoursWorkedThisWeek = 39;
 	this.clock = new Clock(date);
 }
 
@@ -30,16 +31,16 @@ World.extends(Object, {
 		var day = clock.day;
 		this.clock.advance(minutes);
 		if (clock.time < time) {
-			this.player.newDay(clock.day);
 			if (this.onNewDay) {
 				this.onNewDay();
-			}			
+			}
+			this.player.newDay(clock.day);
 		}
 		if ((day == 0) && (clock.day == 1)) {
-			this.player.newWeek();
 			if (this.onNewWeek) {
 				this.onNewWeek();
 			}
+			this.player.newWeek();
 		}
 	}
 })

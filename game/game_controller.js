@@ -218,18 +218,20 @@ GameController.extends(Object, {
 		this.overlay = null;
 		
 		// initial transit
-/*		this.transitToController(roomController, function() {
+		this.transitToController(roomController, function() {
 			roomController.enter();
 			self.showMessage('Willkommen bei Hartz Wars IV.\n' +
 				'\n' +
 				'Unten siehst Du deine Lebenslust. Diese darf auf keinen Fall\n' +
 				'auf Null fallen, sonst hast Du verloren.\n' +
 				'\n' +
+				'Um Geld zu verdienen solltest du arbeiten gehen.\n' +
+				'Das Gehalt kommt jede Woche.\n' +
+				'Drücke unten auf *Arbeit* für mehr Info.\n' +
+				'\n' +
 				'Viel Spaß beim spielen!');
 			this.updatePaused = false;
-		})(); */
-		
-		this.transitToController(officeController, officeController.enterFromBus)();
+		})();
 		
 		this.tempMessageQueue = [];
 		uiScene.addAction(new RepeatAction(new SequenceAction(
@@ -265,6 +267,30 @@ GameController.extends(Object, {
 				rootScene.addChild(label);
 			})
 		)));
+		
+		world.onNewDay = function() {
+			var day = world.clock.day;
+			if ((day > 0) && (day < 6) && (player.hoursWorkedToday < 4)) {
+				player.nextSalary = Math.max(player.nextSalary - 60.0, 0.0);
+				self.showMessage('Du hast gestern weniger als 4 Stunden gearbeitet.\n' +
+					'Zur Strafe bekommst Du nächstes Mal 60 EURO weniger!\n' +
+					'\n' +
+					GameUtils.randomSelect('Wir werden dir außerdem immer Salz in den Kaffee beimischen.', 
+						'Und dein Chef wird dich frühs immer als erstes anschreien.', 
+						'Vorsicht, deine Probezeit läuft noch!'));
+			}
+		};
+		world.onNewWeek = function() {
+			if (player.hoursWorkedThisWeek < 40) {
+				player.nextSalary = Math.max(player.nextSalary - 60.0, 0.0);
+				self.showMessage('Du hast letzte Woche weniger als 40 Stunden gearbeitet.\n' +
+					'Zur Strafe bekommst Du 60 EURO weniger!\n' +
+					'\n' +
+					GameUtils.randomSelect('Andere rackern sich ab und du drehst Däumchen?', 
+						'Wie wär\'s mal mit Verantwortung?', 
+						'Ja, es ist uns egal, dass dein Hamster krank war.'));
+			}
+		};
 	},
 	_updateScene: function(delta, scene) {
 		if (!scene) {
@@ -283,23 +309,6 @@ GameController.extends(Object, {
 			
 			var messages = Activity.perform(new RegularActivity(delta / 6), world);
 			this._showPlayerTempMessages(messages);
-		
-			var lastDay = this.lastDay;
-			if ( (lastDay > 0) && (lastDay < 6) && (this.lastTime <= 20.0) && ((day != lastDay) || (clock.time > 20.0)) ) {
-				var player = world.player;
-				if (player.hoursWorkedToday < 4) {
-					player.nextSalary = Math.max(player.nextSalary - 60.0, 0.0);
-					
-					var dayReference = (day != lastDay) ? 'gestern' : 'heute';
-					
-					this.showMessage('Du hast ' + dayReference + ' weniger als 4 Stunden gearbeitet.\n' +
-						'Zur Strafe bekommst Du nächstes Mal 60 EURO weniger!\n' +
-						'\n' +
-						GameUtils.randomSelect('Was hast Du dir dabei gedacht?', 'Sei nicht so faul!', 'Keine Ausreden!'));
-				}
-			}
-			this.lastTime = clock.time;
-			this.lastDay = day;
 		
 			if (this.world.player.fun <= 0) {
 				this.showMessage('Du hast verloren!\n\n' +
