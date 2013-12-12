@@ -7,6 +7,11 @@ var uiSceneTemplate = ( function() {
 	];
 
 	var font = Fonts.inGameSmall;
+	
+	var left = 10;
+	var progressLeft = left + 120;
+	var secondColumn = progressLeft + 170;
+	
 	return {
 		type: 'Scene',
 		children: {
@@ -23,7 +28,7 @@ var uiSceneTemplate = ( function() {
 				text: 'Geld: ',
 				font: font,
 				color: Color.white,
-				pos: {x: 380, y: 10},
+				pos: {x: secondColumn, y: 10},
 				z: 1
 			},
 			moneyAmountLabel: {
@@ -31,7 +36,7 @@ var uiSceneTemplate = ( function() {
 				text: '',
 				font: font,
 				color: Color.white,
-				pos: {x: 480, y: 10},
+				pos: {x: secondColumn + 70, y: 10},
 				z: 1
 			},
 			saturationProgress: {
@@ -40,7 +45,7 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 95},
+				pos: {x: progressLeft, y: 95},
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
 				z: 1,
@@ -72,7 +77,7 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 60},
+				pos: {x: progressLeft, y: 60},
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.6, green: 0.6},
 				z: 1,
@@ -104,7 +109,7 @@ var uiSceneTemplate = ( function() {
 				texture: 'data/progress.png',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
-				pos: {x: 200, y: 10},
+				pos: {x: progressLeft, y: 10},
 				frameColor: {green: 0.56},
 				fillColor: {red: 0.5},
 				z: 1,
@@ -132,7 +137,7 @@ var uiSceneTemplate = ( function() {
 			},
 			workInfoButton: {
 				type: 'Button',
-				pos: {x: 380, y: 40},
+				pos: {x: secondColumn, y: 40},
 				z: 1,
 				effects: buttonEffects,
 				label: {
@@ -145,15 +150,53 @@ var uiSceneTemplate = ( function() {
 	};
 })();
 
+var PERK_SIZE = 70;
+
 function UIScene() {
 	var self = this;
 	Scene.apply(this);
-
+	
 	this.deserialize(uiSceneTemplate);
 	this.workInfoButton.size = Size.clone(this.workInfoButton.label.size);
+	
+	this.perks = {};
+	this.addPerk(HUNGRY_PERK);
+	this.addPerk(TIRED_PERK);
 }
 UIScene.extends(Scene, {
+	_adjustPerkPositions: function() {
+		var index = 0;
+		var left = 520;
+		var top = 20;
+		var border = 20;
+		
+		var perks = this.perks;
+		for (var perkId in perks) {
+			var perk = perks[perkId];
+			perk.pos = new Pos(left + (PERK_SIZE + border) * index, top);
+			++index;
+		}
+	},
 	set onWorkInfo(value) {
 		this.workInfoButton.onClicked = value;
+	},
+	addPerk: function(perk) {
+		var perkElement = new Button(new Size(PERK_SIZE, PERK_SIZE));
+		perkElement.label.text = perk.title;
+		perkElement.label.font = Fonts.inGameSmall;
+		perkElement.label.color = 'white';
+		perkElement.label.anchor = new Size(0.5, 0);
+		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE);
+		perkElement.z = 1;
+		perkElement.addEffect(createFromTemplate({ type: 'ChangingLabelColor', active: 'white', hovered: {green: 1.0} }));
+		this.perks[perk.id] = perkElement;
+		
+		this.background.addChild(perkElement);
+		
+		this._adjustPerkPositions();
+	},
+	removePerk: function(perk) {
+		this.background.removeChild(this.perks[perk.id]);
+		delete this.perks[perk.id];
 	}
 });

@@ -30,7 +30,8 @@ Sprite.extends(Node, {
 		var saveOp = context.globalCompositeOperation;
 		context.globalCompositeOperation = this.blend;
 		
-		if (texture && texture.complete) {
+		if (texture && texture.loaded) {
+			texture = texture.image;
 			var width = texture.width;
 			var height = texture.height;
 			if (this.color) {
@@ -76,7 +77,7 @@ Sprite.extends(Node, {
 	deserializeSelf: function(template) {
 		Node.prototype.deserializeSelf.call(this, template);
 		
-		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.texture) { this.texture = Texture.clone(Engine.textureManager.get(template.texture)); }
 		if (template.sourceRect) { this.sourceRect = Rect.clone(template.sourceRect); }
 		if (template.color) { this.color = Color.clone(template.color); }
 		if (template.blend)	{ this.blend = template.blend; }

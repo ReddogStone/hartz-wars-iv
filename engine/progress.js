@@ -10,7 +10,6 @@ function Progress(size, texture, fillRect, frameRect) {
 	this._frameSprite = new Sprite();
 	this._fillRect = new Rect();
 
-	if (texture) { this.texture = texture; }
 	if (size) { this.size = size; }
 	if (fillRect) { this.fillRect = fillRect; }
 	if (frameRect) { this.frameRect = frameRect; }
@@ -19,6 +18,8 @@ function Progress(size, texture, fillRect, frameRect) {
 	this.addChild(this._fillSpriteMiddle);
 	this.addChild(this._fillSpriteRight);
 	this.addChild(this._frameSprite);
+
+	this.texture = texture;
 }
 Progress.extends(Node, {
 	get z() {
@@ -96,7 +97,7 @@ Progress.extends(Node, {
 	deserializeSelf: function(template) {
 		Node.prototype.deserializeSelf.call(this, template);
 		
-		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.texture) { this.texture = Texture.clone(Engine.textureManager.get(template.texture)); }
 		if (template.frameRect) { this.frameRect = Rect.clone(template.frameRect); }
 		if (template.fillRect) { this.fillRect = Rect.clone(template.fillRect); }
 		if (template.frameColor) { this.frameColor = Color.clone(template.frameColor); }

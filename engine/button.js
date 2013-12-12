@@ -159,7 +159,7 @@ Button.extends(Node, {
 	deserializeSelf: function(template) {
 		Node.prototype.deserializeSelf.call(this, template);
 		
-		if (template.texture) { this.texture = loadImage(template.texture); }
+		if (template.texture) { this.texture = Texture.clone(Engine.textureManager.get(template.texture)); }
 		if (template.sourceRect) { this.sprite.sourceRect = Rect.clone(template.sourceRect); }
 		if (template.effects) { 
 			template.effects.forEach(function(element) {
