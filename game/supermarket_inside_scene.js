@@ -58,24 +58,21 @@ var supermarketInsideTemplate = ( function() {
 					buyCheapButton: {
 						type: 'Button',
 						size: {x: 200, y: 125},
-						texture: 'data/supermarket_food',
-						sourceRect: {x: 0, y: 0, sx: 200, sy: 125},
+						texture: 'data/supermarket_food_cheap',
 						pos: {x: 9, y: 70},
 						effects: cheapButtonEffects
 					},
 					buyExpensiveButton: {
 						type: 'Button',
 						size: {x: 193, y: 125},
-						texture: 'data/supermarket_food',
-						sourceRect: {x: 200, y: 0, sx: 200, sy: 125},
+						texture: 'data/supermarket_food_expensive',
 						pos: {x: 214, y: 70},
 						effects: cheapButtonEffects
 					},
 					buyHealthyButton: {
 						type: 'Button',
 						size: {x: 200, y: 131},
-						texture: 'data/supermarket_food',
-						sourceRect: {x: 0, y: 125, sx: 200, sy: 125},
+						texture: 'data/supermarket_food_healthy',
 						pos: {x: 9, y: 200},
 						effects: cheapButtonEffects
 					},
@@ -109,7 +106,6 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory1: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 75},
@@ -117,7 +113,6 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory2: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 150},
@@ -125,7 +120,6 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory3: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 225},
@@ -170,23 +164,23 @@ SupermarketInsideScene.extends(Scene, {
 		}, this);
 	},
 	setPlayerInventorySlot: function(index, type) {
-		var sourceRect;
+		var texture;
 		switch (type) {
 			case 'cheap':
-				sourceRect = new Rect(0, 0, 200, 125);
+				texture = Engine.textureManager.get('data/supermarket_food_cheap');
 				break;
 			case 'expensive':
-				sourceRect = new Rect(200, 0, 200, 125);
+				texture = Engine.textureManager.get('data/supermarket_food_expensive');
 				break;
 			case 'healthy':
-				sourceRect = new Rect(0, 125, 200, 125);
+				texture = Engine.textureManager.get('data/supermarket_food_healthy');
 				break;
 			default:
 				throw new Error('Slot type should be: "cheap", "expensive" or "healthy", but was "' + type + '"');
 		}
 		var slotSprite = this._playerInventorySlots[index];
 		slotSprite.visible = true;
-		slotSprite.sourceRect = sourceRect;
+		slotSprite.texture = Texture.clone(texture);
 	},
 	set onExit(value) {
 		this.buyOverlay.exitButton.onClicked = value;
