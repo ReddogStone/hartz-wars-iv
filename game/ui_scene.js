@@ -161,8 +161,6 @@ function UIScene() {
 	this.workInfoButton.size = Size.clone(this.workInfoButton.label.size);
 	
 	this.perks = {};
-	this.addPerk(HUNGRY_PERK);
-	this.addPerk(TIRED_PERK);
 }
 UIScene.extends(Scene, {
 	_adjustPerkPositions: function() {
@@ -172,8 +170,8 @@ UIScene.extends(Scene, {
 		var border = 50;
 		
 		var perks = this.perks;
-		for (var perkId in perks) {
-			var perk = perks[perkId];
+		for (var perkTypes in perks) {
+			var perk = perks[perkTypes];
 			perk.pos = new Pos(left + (PERK_SIZE + border) * index, top);
 			++index;
 		}
@@ -182,6 +180,8 @@ UIScene.extends(Scene, {
 		this.workInfoButton.onClicked = value;
 	},
 	addPerk: function(perk) {
+		this.removePerk(perk.type);
+		
 		var perkElement = new Button(new Size(PERK_SIZE, PERK_SIZE));
 		var texture = Engine.textureManager.get(perk.textureId);
 		if (texture) {
@@ -194,14 +194,14 @@ UIScene.extends(Scene, {
 		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE + PERK_TITLE_OFFSET);
 		perkElement.z = 1;
 		perkElement.addEffect(createFromTemplate({ type: 'ChangingLabelColor', active: 'white', hovered: {green: 1.0} }));
-		this.perks[perk.id] = perkElement;
+		this.perks[perk.type.name] = perkElement;
 		
 		this.background.addChild(perkElement);
 		
 		this._adjustPerkPositions();
 	},
-	removePerk: function(perk) {
-		this.background.removeChild(this.perks[perk.id]);
-		delete this.perks[perk.id];
+	removePerk: function(perkType) {
+		this.background.removeChild(this.perks[perkType.name]);
+		delete this.perks[perkType.name];
 	}
 });

@@ -75,7 +75,8 @@ RegularActivity.extends(Object, {
 		return -100 / (12 * 60);
 	},
 	getFunChangeRate: function(player) {
-		if (player.hungry || player.tired) {
+		var perks = player.perks;
+		if (perks[PerkType.HUNGRY.name] || perks[PerkType.TIRED.name]) {
 			return -0.5;
 		} else {
 			return -100 / (4 * 24 * 60);

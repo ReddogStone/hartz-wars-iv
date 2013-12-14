@@ -11,6 +11,7 @@ function Player() {
 	
 	this.workDescription = 'Mind. 40 Std./Woche, mind. 4 Std./Tag';
 	this.nextSalary = 300;
+	this.perks = {};
 };
 Player.extends(Object, {
 	setValue: function(valueName, value) {
@@ -23,27 +24,46 @@ Player.extends(Object, {
 		
 		var oldValue = this['_' + valueName];
 		this['_' + valueName] = value;
-		if (this.onValueChanged) {
-			this.onValueChanged(valueName, oldValue, value);
-		}
+		return value;
 	},
 	get energy() { return this._energy; },
 	set energy(value) { 
-		this.setValue('energy', value); 
-		this.tired = (this.energy <= 0);
+		var setValue = this.setValue('energy', value);
+		if(setValue <= 0) {
+			this.setPerk(PerkType.TIRED, PERK_TIRED);
+		} else {
+			this.removePerk(PerkType.TIRED);
+		}
+
+		if (this.onEnergyChanged) {
+			this.onEnergyChanged(this._energy);
+		}
 	},
 	get saturation() { return this._saturation; },
 	set saturation(value) { 
-		this.setValue('saturation', value);
-		this.hungry = (this.saturation <= 0);		
+		var setValue = this.setValue('saturation', value);
+		if(setValue <= 0) {
+			this.setPerk(PerkType.HUNGRY, PERK_HUNGRY);
+		} else {
+			this.removePerk(PerkType.HUNGRY);
+		}
+		
+		if (this.onSaturationChanged) {
+			this.onSaturationChanged(this._saturation);
+		}
 	},
 	get fun() { return this._fun; },
-	set fun(value) { this.setValue('fun', value); },
+	set fun(value) {
+		this.setValue('fun', value);
+		if (this.onFunChanged) {
+			this.onFunChanged(this._fun);
+		}
+	},
 	get money() { return this._money; },
 	set money(value) {
 		this._money = value;
-		if (this.onValueChanged) {
-			this.onValueChanged('money', value);
+		if (this.onMoneyChanged) {
+			this.onMoneyChanged(value);
 		}
 	},
 	get hoursWorkedToday() {
@@ -80,5 +100,22 @@ Player.extends(Object, {
 		this._hoursWorkedThisWeek = 0;
 		this.money += this.nextSalary;
 		this.nextSalary = 300;
+	},
+	setPerk: function(type, perk) {
+		if (this.perks[type.name] != perk) {
+			this.perks[type.name] = perk;
+			if (this.onPerkSet) {
+				this.onPerkSet(perk);
+			}
+		}
+	},
+	removePerk: function(type) {
+		var perk = this.perks[type.name];
+		if (perk) {
+			delete this.perks[type.name];
+			if (this.onPerkRemoved) {
+				this.onPerkRemoved(perk);
+			}
+		}
 	}
 });

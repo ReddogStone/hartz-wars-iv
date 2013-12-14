@@ -202,11 +202,20 @@ GameController.extends(Object, {
 			self._showWorkInfo();
 		};
 		
-		player.onValueChanged = function(valueName, oldValue, newValue) {
+		player.onMoneyChanged = 
+		player.onFunChanged = 
+		player.onSaturationChanged = 
+		player.onEnergyChanged = function(valueName, oldValue, newValue) {
 			if (self.rootScene) {
-				self._updatePlayerValues(self.world.player, self.rootScene);
+				self._updatePlayerValues(player, self.rootScene);
 			}
 		};
+		player.onPerkSet = function(perk) {
+			uiScene.addPerk(perk);
+		}
+		player.onPerkRemoved = function(perk) {
+			uiScene.removePerk(perk.type);
+		}
 		player.energy = 100;
 		player.saturation = 100;
 		player.fun = 100;
