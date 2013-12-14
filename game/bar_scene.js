@@ -23,7 +23,7 @@ var barSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/bar_bg.png',
+						texture: 'data/bar_bg',
 						size: {x: 1024, y: 640},
 						z: 0
 					}
@@ -35,7 +35,7 @@ var barSceneTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 80, y: 570},
-						texture: 'data/bar_door_highlight.png',
+						texture: 'data/bar_door_highlight',
 						effects: roomDoorEffects,
 						pos: {x: 0, y: 23},
 						z: 1,
@@ -49,7 +49,7 @@ var barSceneTemplate = ( function() {
 					doenerButton: {
 						type: 'Button',
 						size: {x: 160, y: 90},
-						texture: 'data/doener.png',
+						texture: 'data/doener',
 						effects: foodButtonEffects,
 						pos: {x: 205, y: 50},
 						z: 1,
@@ -63,7 +63,7 @@ var barSceneTemplate = ( function() {
 					sausageButton: {
 						type: 'Button',
 						size: {x: 160, y: 90},
-						texture: 'data/sausage.png',
+						texture: 'data/sausage',
 						effects: foodButtonEffects,
 						pos: {x: 385, y: 50},
 						z: 1,
@@ -77,7 +77,7 @@ var barSceneTemplate = ( function() {
 					burgerButton: {
 						type: 'Button',
 						size: {x: 160, y: 90},
-						texture: 'data/burger_menu.png',
+						texture: 'data/burger_menu',
 						effects: foodButtonEffects,
 						pos: {x: 565, y: 50},
 						z: 1,
@@ -91,7 +91,7 @@ var barSceneTemplate = ( function() {
 					beerButton: {
 						type: 'Button',
 						size: {x: 70, y: 90},
-						texture: 'data/beer_bottle.png',
+						texture: 'data/beer_bottle',
 						effects: foodButtonEffects,
 						pos: {x: 740, y: 55},
 						z: 1,

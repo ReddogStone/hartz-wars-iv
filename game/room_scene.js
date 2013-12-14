@@ -26,7 +26,7 @@ var roomSceneTemplate = ( function() {
 		children: {
 			background: {
 				type: 'Sprite',
-				texture: 'data/room_bg.png',
+				texture: 'data/room_bg',
 				size: {x: 1024, y: 640},
 				z: 0
 			},
@@ -37,7 +37,7 @@ var roomSceneTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 148, y: 286},
-						texture: 'data/room_door_highlight.png',
+						texture: 'data/room_door_highlight',
 						effects: highlightEffects,
 						pos: {x: 630, y: 152},
 						label: {
@@ -50,7 +50,7 @@ var roomSceneTemplate = ( function() {
 					chestButton: {
 						type: 'Button',
 						size: {x: 205, y: 164},
-						texture: 'data/room_chest_highlight.png',
+						texture: 'data/room_chest_highlight',
 						effects: highlightEffects,
 						pos: {x: 139, y: 342},
 						label: {
@@ -81,8 +81,7 @@ var roomSceneTemplate = ( function() {
 						size: {x: 16, y: 16},
 						pos: {x: 250, y: 425},
 						anchor: {x: 0, y: 1},
-						texture: 'data/arrow_buttons.png',
-						sourceRect: {x: 0, y: 0, sx: 16, sy: 16},
+						texture: 'data/arrow_up',
 						effects: alarmButtonEffects,
 						z: 6
 					},
@@ -90,15 +89,14 @@ var roomSceneTemplate = ( function() {
 						type: 'Button',
 						size: {x: 16, y: 16},
 						pos: {x: 250, y: 425},
-						texture: 'data/arrow_buttons.png',
-						sourceRect: {x: 0, y: 16, sx: 16, sy: 16},
+						texture: 'data/arrow_down',
 						effects: alarmButtonEffects,
 						z: 6
 					},
 					fridge: {
 						type: 'Sprite',
 						size: {x: 188, y: 277},
-						texture: 'data/fridge.png',
+						texture: 'data/fridge',
 						pos: {x: 360, y: 230},
 						z: 2
 					},
@@ -106,7 +104,7 @@ var roomSceneTemplate = ( function() {
 						type: 'Button',
 						size: {x: 188, y: 277},
 						effects: fridgeEffects,
-						texture: 'data/fridge_highlight.png',
+						texture: 'data/fridge_highlight',
 						pos: {x: 360, y: 230},
 						z: 3,
 						label: {
@@ -180,14 +178,14 @@ var roomSceneTemplate = ( function() {
 						type: 'Sprite',
 						size: {x: 115, y: 96},
 						pos: {x: 825, y: 305},
-						texture: 'data/phone.png',
+						texture: 'data/phone',
 						z: 2
 					},
 					phoneButton: {
 						type: 'Button',
 						size: {x: 115, y: 96},
 						effects: highlightEffects,
-						texture: 'data/phone_highlight.png',
+						texture: 'data/phone_highlight',
 						pos: {x: 825, y: 305},
 						z: 3,
 						label: {
@@ -201,14 +199,14 @@ var roomSceneTemplate = ( function() {
 						type: 'Sprite',
 						size: {x: 120, y: 119},
 						pos: {x: 827, y: 189},
-						texture: 'data/home_books.png',
+						texture: 'data/home_books',
 						z: 2
 					},
 					booksButton: {
 						type: 'Button',
 						size: {x: 120, y: 119},
 						effects: highlightEffects,
-						texture: 'data/home_books_highlight.png',
+						texture: 'data/home_books_highlight',
 						pos: {x: 827, y: 189},
 						z: 3,
 						label: {

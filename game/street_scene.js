@@ -28,7 +28,7 @@ var streetSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/street_bg.png',
+						texture: 'data/street_bg',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -39,7 +39,7 @@ var streetSceneTemplate = ( function() {
 					homeDoorButton: {
 						type: 'Button',
 						size: {x: 150, y: 265},
-						texture: 'data/street_home_door_highlight.png',
+						texture: 'data/street_home_door_highlight',
 						effects: doorButtonEffects,
 						pos: {x: 730, y: 0},
 						label: {
@@ -51,7 +51,7 @@ var streetSceneTemplate = ( function() {
 					barDoorButton: {
 						type: 'Button',
 						size: {x: 82, y: 150},
-						texture: 'data/street_bar_door_highlight.png',
+						texture: 'data/street_bar_door_highlight',
 						effects: doorButtonEffects,
 						pos: {x: 82, y: 0},
 						label: {
@@ -64,7 +64,7 @@ var streetSceneTemplate = ( function() {
 					toSupermarketButton: {
 						type: 'Button',
 						size: {x: 52, y: 640},
-						texture: 'data/street_to_supermarket_highlight.png',
+						texture: 'data/street_to_supermarket_highlight',
 						effects: doorButtonEffects,
 						pos: {x: 0, y: 0},
 						label: {

@@ -229,7 +229,7 @@ GameController.extends(Object, {
 				'Das Gehalt kommt jede Woche.\n' +
 				'Drücke unten auf *Arbeit* für mehr Info.\n' +
 				'\n' +
-				'Viel Spaß beim spielen!');
+				'Viel Spaß beim Spielen!');
 			this.updatePaused = false;
 		})();
 		

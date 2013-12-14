@@ -4,7 +4,6 @@ var callbackQueue = {
 	queue: [],
 	busy: false,
 	performCallback: function() {
-		console.log('Perform callback');
 		if (this.queue.length > 0) {
 			this.busy = true;
 			var callback = this.queue.shift();
@@ -13,7 +12,7 @@ var callbackQueue = {
 			var self = this;
 			window.setTimeout(function() {
 				self.performCallback();
-			}, 100);
+			}, 1);
 		} else {
 			this.busy = false;
 		}
@@ -27,6 +26,10 @@ var callbackQueue = {
 };
 
 function Texture(image, sourceRect) {
+	if (!image) {
+		throw new Error('A texture cannot be created without an image!');
+	}
+
 	var self = this;
 	this._image = image;
 	if (!sourceRect) {
@@ -60,6 +63,9 @@ Texture.extends(Object, {
 	}
 });
 Texture.clone = function(value) {
+	if (!value) {
+		return value;
+	}
 	return new Texture(value._image, value._sourceRect);
 }
 
@@ -86,10 +92,12 @@ TextureManager.extends(Object, {
 		var image = new Image();
 		image.onload = function() {
 			self._finishedLoading(path);
+			//callbackQueue.addCallback(callback);
 			callback();
 		};
-		image.onError = function() {
+		image.onerror = function() {
 			delete self._images[path];
+			throw new Error('Could not load: "' + path + '"');
 		};
 		image.src = path;
 		this._images[path] = image;
@@ -101,9 +109,9 @@ TextureManager.extends(Object, {
 		}
 		
 		var image = this._images[path];
-		if (!image) {
+/*		if (!image) {
 			image = this.loadImage(path);
-		}
+		} */
 		return image;
 	},
 	create: function(id, path, sourceRect) {

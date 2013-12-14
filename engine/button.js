@@ -159,8 +159,13 @@ Button.extends(Node, {
 	deserializeSelf: function(template) {
 		Node.prototype.deserializeSelf.call(this, template);
 		
-		if (template.texture) { this.texture = Texture.clone(Engine.textureManager.get(template.texture)); }
-		if (template.sourceRect) { this.sprite.sourceRect = Rect.clone(template.sourceRect); }
+		if (template.texture) {
+			var texture = Engine.textureManager.get(template.texture);
+			if (!texture || !texture.image) {
+				throw new Error('Could not get: "' + template.texture + '"');
+			}
+			this.texture = Texture.clone(texture);
+		}
 		if (template.effects) { 
 			template.effects.forEach(function(element) {
 				var effect = createFromTemplate(element);

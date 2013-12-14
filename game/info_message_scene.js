@@ -16,7 +16,7 @@ var infoMessageTemplate = ( function() {
 		children: {
 			background: {
 				type: 'Sprite',
-				texture: 'data/effect_message_bg.png',
+				texture: 'data/effect_message_bg',
 				size: {x: 231, y: 108},
 				z: bottomZ,
 				alpha: 0.8

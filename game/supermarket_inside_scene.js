@@ -28,7 +28,7 @@ var supermarketInsideTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/supermarket_inside_bg.png',
+						texture: 'data/supermarket_inside_bg',
 						size: {x: 1024, y: 640}
 					}
 				}
@@ -41,7 +41,7 @@ var supermarketInsideTemplate = ( function() {
 					background: {
 						type: 'Sprite',
 						alpha: 0.7,
-						texture: 'data/supermarket_buy_bg.png',
+						texture: 'data/supermarket_buy_bg',
 						size: {x: 592, y: 424}
 					},
 					exitButton: {
@@ -58,7 +58,7 @@ var supermarketInsideTemplate = ( function() {
 					buyCheapButton: {
 						type: 'Button',
 						size: {x: 200, y: 125},
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						sourceRect: {x: 0, y: 0, sx: 200, sy: 125},
 						pos: {x: 9, y: 70},
 						effects: cheapButtonEffects
@@ -66,7 +66,7 @@ var supermarketInsideTemplate = ( function() {
 					buyExpensiveButton: {
 						type: 'Button',
 						size: {x: 193, y: 125},
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						sourceRect: {x: 200, y: 0, sx: 200, sy: 125},
 						pos: {x: 214, y: 70},
 						effects: cheapButtonEffects
@@ -74,7 +74,7 @@ var supermarketInsideTemplate = ( function() {
 					buyHealthyButton: {
 						type: 'Button',
 						size: {x: 200, y: 131},
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						sourceRect: {x: 0, y: 125, sx: 200, sy: 125},
 						pos: {x: 9, y: 200},
 						effects: cheapButtonEffects
@@ -109,7 +109,7 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory1: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 75},
@@ -117,7 +117,7 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory2: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 150},
@@ -125,7 +125,7 @@ var supermarketInsideTemplate = ( function() {
 					},
 					playerInventory3: {
 						type: 'Sprite',
-						texture: 'data/supermarket_food.png',
+						texture: 'data/supermarket_food',
 						z: 1,
 						anchor: {x: 0.5, y: 0},
 						pos: {x: 495, y: 225},

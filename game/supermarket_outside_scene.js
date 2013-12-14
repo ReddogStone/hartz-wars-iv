@@ -17,7 +17,7 @@ var supermarketOutsideTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/supermarket_outside_bg.png',
+						texture: 'data/supermarket_outside_bg',
 						size: {x: 1024, y: 640},
 						z: 0
 					}
@@ -29,7 +29,7 @@ var supermarketOutsideTemplate = ( function() {
 					toStreetButton: {
 						type: 'Button',
 						size: {x: 119, y: 516},
-						texture: 'data/supermarket_to_street_highlight.png',
+						texture: 'data/supermarket_to_street_highlight',
 						effects: highlightEffects,
 						pos: {x: 1024, y: 640},
 						anchor: {x: 1, y: 1},
@@ -44,7 +44,7 @@ var supermarketOutsideTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 173, y: 275},
-						texture: 'data/supermarket_door_highlight.png',
+						texture: 'data/supermarket_door_highlight',
 						effects: highlightEffects,
 						pos: {x: 630, y: 285},
 						z: 1,

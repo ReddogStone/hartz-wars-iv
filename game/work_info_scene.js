@@ -22,7 +22,7 @@ var workInfoSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/dialog_bg.png',
+						texture: 'data/dialog_bg',
 						size: {x: 824, y: 440},
 						pos: {x: 0, y: 0},
 						alpha: 0.8,
@@ -30,7 +30,7 @@ var workInfoSceneTemplate = ( function() {
 					},
 					okButton: {
 						type: 'Button',
-						texture: 'data/buttons.png',
+						texture: 'data/buttons',
 						effects: buttonEffects,
 						pos: {x: 800, y: 416},
 						size: {x: 64, y: 64},

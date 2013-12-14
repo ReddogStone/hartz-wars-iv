@@ -12,7 +12,7 @@ var dialogSceneTemplate = ( function() {
 		children: {
 			background: {
 				type: 'Sprite',
-				texture: 'data/dialog_bg.png',
+				texture: 'data/dialog_bg',
 				size: {x: 824, y: 440},
 				pos: {x: 100, y: 100},
 				alpha: 0.8,

@@ -21,7 +21,7 @@ var officeTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/office_bg.png',
+						texture: 'data/office_bg',
 						size: {x: 1024, y: 640},
 						z: 0
 					}
@@ -33,7 +33,7 @@ var officeTemplate = ( function() {
 					doorButton: {
 						type: 'Button',
 						size: {x: 187, y: 72},
-						texture: 'data/office_door_highlight.png',
+						texture: 'data/office_door_highlight',
 						effects: highlightEffects,
 						pos: {x: 223, y: 511},
 						z: 1,

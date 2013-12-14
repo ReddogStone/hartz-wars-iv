@@ -1,12 +1,11 @@
 'use strict';
 
-function Sprite(texture, size, sourceRect) {
+function Sprite(texture, size) {
 	var self = this;
 	Node.apply(this);
 	
 	this.size = Size.clone(size);
 	this.texture = texture;
-	this.sourceRect = sourceRect;
 	this._bufferCanvas = document.createElement('canvas');
 	this._buffered = false;
 	this._color = null;
@@ -23,7 +22,6 @@ Sprite.extends(Node, {
 		}
 	},
 	render: function(context) {
-		var sRect = this.sourceRect;
 		var size = this.size;
 		var texture = this.texture;
 
@@ -31,9 +29,9 @@ Sprite.extends(Node, {
 		context.globalCompositeOperation = this.blend;
 		
 		if (texture && texture.loaded) {
-			texture = texture.image;
-			var width = texture.width;
-			var height = texture.height;
+			var image = texture.image;
+			var width = image.width;
+			var height = image.height;
 			if (this.color) {
 				var bufferCanvas = this._bufferCanvas;
 				if (!this._buffered) {
@@ -41,7 +39,12 @@ Sprite.extends(Node, {
 					bufferCanvas.height = height;
 					var buffer = bufferCanvas.getContext('2d');
 					
-					buffer.drawImage(texture, 0, 0);
+					try {
+						buffer.drawImage(image, 0, 0);
+					} catch(e) {
+						e.message = 'Error when rendering: "' + image.src + '"\n' + e.message;
+						throw e;
+					}
 					var data = buffer.getImageData(0, 0, width, height);
 					var pixelData = data.data;
 					var color = this.color;
@@ -62,13 +65,14 @@ Sprite.extends(Node, {
 					buffer.putImageData(data, 0, 0);
 					this._buffered = true;
 				}
-				texture = bufferCanvas;
+				image = bufferCanvas;
 			}
 			
-			sRect = sRect || new Rect(0, 0, width, height);
+			var sRect = texture.sourceRect || new Rect(0, 0, width, height);
 			try {
-				context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+				context.drawImage(image, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
 			} catch(e) {
+				e.message = 'Error when rendering: "' + image.src + '"\n' + e.message;
 				throw e;
 			}
 		} else if (this.color) {
@@ -81,8 +85,13 @@ Sprite.extends(Node, {
 	deserializeSelf: function(template) {
 		Node.prototype.deserializeSelf.call(this, template);
 		
-		if (template.texture) { this.texture = Texture.clone(Engine.textureManager.get(template.texture)); }
-		if (template.sourceRect) { this.sourceRect = Rect.clone(template.sourceRect); }
+		if (template.texture) { 
+			var texture = Engine.textureManager.get(template.texture);
+			if (!texture || !texture.image) {
+				throw new Error('Could not get: "' + template.texture + '"');
+			}
+			this.texture = Texture.clone(texture);
+		}
 		if (template.color) { this.color = Color.clone(template.color); }
 		if (template.blend)	{ this.blend = template.blend; }
 	}

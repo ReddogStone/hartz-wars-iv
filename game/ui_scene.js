@@ -42,7 +42,7 @@ var uiSceneTemplate = ( function() {
 			saturationProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
-				texture: 'data/progress.png',
+				texture: 'data/progress',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 95},
@@ -74,7 +74,7 @@ var uiSceneTemplate = ( function() {
 			energyProgress: {
 				type: 'Progress',
 				size: {x: 100, y: 30},
-				texture: 'data/progress.png',
+				texture: 'data/progress',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 60},
@@ -106,7 +106,7 @@ var uiSceneTemplate = ( function() {
 			funProgress: {
 				type: 'Progress',
 				size: {x: 150, y: 45},
-				texture: 'data/progress.png',
+				texture: 'data/progress',
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 10},
@@ -151,6 +151,7 @@ var uiSceneTemplate = ( function() {
 })();
 
 var PERK_SIZE = 50;
+var PERK_TITLE_OFFSET = -10;
 
 function UIScene() {
 	var self = this;
@@ -167,7 +168,7 @@ UIScene.extends(Scene, {
 	_adjustPerkPositions: function() {
 		var index = 0;
 		var left = 520;
-		var top = 20;
+		var top = 30;
 		var border = 50;
 		
 		var perks = this.perks;
@@ -190,7 +191,7 @@ UIScene.extends(Scene, {
 		perkElement.label.font = Fonts.inGameSmall;
 		perkElement.label.color = 'white';
 		perkElement.label.anchor = new Size(0.5, 1);
-		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE);
+		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE + PERK_TITLE_OFFSET);
 		perkElement.z = 1;
 		perkElement.addEffect(createFromTemplate({ type: 'ChangingLabelColor', active: 'white', hovered: {green: 1.0} }));
 		this.perks[perk.id] = perkElement;

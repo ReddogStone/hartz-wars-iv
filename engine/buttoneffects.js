@@ -87,7 +87,7 @@ makeChangingValueEffect(ChangingLabelColor, function(button, value) { button.lab
 function ChangingFrames(active, pressed, hovered, inactive) {
 	initChangingValueEffect(this, active, pressed, hovered, inactive, Rect);
 }
-makeChangingValueEffect(ChangingFrames, function(button, value) { button.sprite.sourceRect = value; }, Rect);
+makeChangingValueEffect(ChangingFrames, function(button, value) { button.sprite.texture.sourceRect = value; }, Rect);
 
 function ChangingSpriteBlendMode(active, pressed, hovered, inactive) {
 	initChangingValueEffect(this, active, pressed, hovered, inactive);

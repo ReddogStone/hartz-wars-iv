@@ -53,10 +53,10 @@ Progress.extends(Node, {
 		return this._frameSprite.texture;
 	},
 	set texture(value) {
-		this._frameSprite.texture = value;
-		this._fillSpriteLeft.texture = value;
-		this._fillSpriteMiddle.texture = value;
-		this._fillSpriteRight.texture = value;
+		this._frameSprite.texture = Texture.clone(value);
+		this._fillSpriteLeft.texture = Texture.clone(value);
+		this._fillSpriteMiddle.texture = Texture.clone(value);
+		this._fillSpriteRight.texture = Texture.clone(value);
 	},
 	get size() {
 		return this._frameSprite.size;
@@ -65,10 +65,10 @@ Progress.extends(Node, {
 		this._frameSprite.size = value;
 	},
 	get frameRect() {
-		return this._frameSprite.sourceRect;
+		return this._frameSprite.texture.sourceRect;
 	},
 	set frameRect(value) {
-		this._frameSprite.sourceRect = value;
+		this._frameSprite.texture.sourceRect = value;
 	},
 	get fillRect() {
 		return this._fillRect;
@@ -84,9 +84,9 @@ Progress.extends(Node, {
 		fillSpriteMiddle.size = new Size(Math.floor(size.x - value.sx / value.sy * size.y - 0.5) + 1, size.y);
 		fillSpriteRight.size = new Size(Math.floor(value.sx / value.sy * 0.5 * size.y - 0.5) + 1, size.y);
 
-		fillSpriteLeft.sourceRect = new Rect(value.x, value.y, value.sx * 0.5, value.sy);
-		fillSpriteMiddle.sourceRect = new Rect(value.x + value.sx * 0.5 - 1, value.y, 1, value.sy);
-		fillSpriteRight.sourceRect = new Rect(value.x + value.sx * 0.5, value.y, value.sx * 0.5, value.sy);
+		fillSpriteLeft.texture.sourceRect = new Rect(value.x, value.y, value.sx * 0.5, value.sy);
+		fillSpriteMiddle.texture.sourceRect = new Rect(value.x + value.sx * 0.5 - 1, value.y, 1, value.sy);
+		fillSpriteRight.texture.sourceRect = new Rect(value.x + value.sx * 0.5, value.y, value.sx * 0.5, value.sy);
 	},
 	set progress(value) {
 		this._progress = value;

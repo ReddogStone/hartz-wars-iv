@@ -20,7 +20,7 @@ var mapSceneTemplate = ( function() {
 		children: {
 			sprite: {
 				type: 'Sprite',
-				texture: 'data/map_bg.png',
+				texture: 'data/map_bg',
 				size: {x: 800, y: 598},
 				anchor: {x: 0.5, y: 0.5},
 				pos: {x: 512, y: 320},
@@ -36,7 +36,7 @@ var mapSceneTemplate = ( function() {
 			homeButton: {
 				type: 'Button',
 				size: {x: 70, y: 120},
-				texture: 'data/map_selection.png',
+				texture: 'data/map_selection',
 				effects: mapHomeButtonEffects,
 				pos: {x: 735, y: 277},
 				z: 52,
@@ -56,7 +56,7 @@ var mapSceneTemplate = ( function() {
 			workButton: {
 				type: 'Button',
 				size: {x: 70, y: 114},
-				texture: 'data/map_selection.png',
+				texture: 'data/map_selection',
 				effects: mapHomeButtonEffects,
 				pos: {x: 216, y: 345},
 				z: 52,

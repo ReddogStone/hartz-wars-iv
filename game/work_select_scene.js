@@ -34,7 +34,7 @@ var workSelectSceneTemplate = ( function() {
 				children: {
 					sprite: {
 						type: 'Sprite',
-						texture: 'data/dialog_bg.png',
+						texture: 'data/dialog_bg',
 						size: {x: 824, y: 440},
 						pos: {x: 0, y: 0},
 						alpha: 0.8,
@@ -42,7 +42,7 @@ var workSelectSceneTemplate = ( function() {
 					},
 					okButton: {
 						type: 'Button',
-						texture: 'data/buttons.png',
+						texture: 'data/buttons',
 						effects: okButtonEffects,
 						pos: {x: 800, y: 416},
 						size: {x: 64, y: 64},
@@ -51,7 +51,7 @@ var workSelectSceneTemplate = ( function() {
 					},
 					cancelButton: {
 						type: 'Button',
-						texture: 'data/buttons.png',
+						texture: 'data/buttons',
 						effects: cancelButtonEffects,
 						pos: {x: 720, y: 416},
 						size: {x: 64, y: 64},
@@ -88,7 +88,7 @@ var workSelectSceneTemplate = ( function() {
 						size: {x: 16, y: 16},
 						pos: {x: 200, y: 100},
 						anchor: {x: 0, y: 1},
-						texture: 'data/arrow_buttons.png',
+						texture: 'data/arrow_up',
 						sourceRect: {x: 0, y: 0, sx: 16, sy: 16},
 						effects: selectionButtonEffects,
 						z: 101
@@ -97,7 +97,7 @@ var workSelectSceneTemplate = ( function() {
 						type: 'Button',
 						size: {x: 16, y: 16},
 						pos: {x: 200, y: 100},
-						texture: 'data/arrow_buttons.png',
+						texture: 'data/arrow_down',
 						sourceRect: {x: 0, y: 16, sx: 16, sy: 16},
 						effects: selectionButtonEffects,
 						z: 101
