@@ -27,10 +27,12 @@
 <script src="engine/label.js" type="text/javascript"></script>
 <script src="engine/layerdirector.js" type="text/javascript"></script>
 <script src="engine/texturemanager.js" type="text/javascript"></script>
+<script src="engine/assetmanager.js" type="text/javascript"></script>
 <script src="engine/engine.js" type="text/javascript"></script>
 
 <!-- game specific -->
 <script src="game/game_utils.js" type="text/javascript"></script>
+<script src="game/assets.js" type="text/javascript"></script>
 
 <script src="game/dialog.js" type="text/javascript"></script>
 <script src="game/player.js" type="text/javascript"></script>
@@ -94,8 +96,21 @@
 	var g_gameController;
 	var g_waitForLoad = true;
 	
+	var g_loadingProgress = 0;
+	
 	function animate(lastTime, canvas, context){
-		if (!g_waitForLoad) {
+		if (g_waitForLoad) {
+			// draw loading progress
+			context.fillStyle = "white";
+			context.fillRect(0, 0, canvas.width, canvas.height);
+			
+			context.font = "20pt ComicFont";
+			context.fillStyle = "black";
+			context.strokeStyle = "black";
+			context.lineWidth = 1;
+			var progressText = "Hübsche Zahlen -> " + (100 * g_loadingProgress).toFixed(0) + '%';
+			context.fillText(progressText, 390, 360);
+		} else {
 			// update
 			var time = window.performance.now();
 			var timeDiff = (time - lastTime) * 0.001;
@@ -194,51 +209,19 @@
 		var context = g_canvas.getContext("2d");
 
 		Engine.init();
-		var textureManager = Engine.textureManager;
-		textureManager.loadImage('data/arrow_buttons.png');
-		textureManager.loadImage('data/bar_bg.png');
-		textureManager.loadImage('data/bar_door_highlight.png');
-		textureManager.loadImage('data/beer_bottle.png');
-		textureManager.loadImage('data/burger_menu.png');
-		textureManager.loadImage('data/buttons.png');
-		textureManager.loadImage('data/dialog_bg.png');
-		textureManager.loadImage('data/doener.png');
-		textureManager.loadImage('data/effect_message_bg.png');
-		textureManager.loadImage('data/fridge.png');
-		textureManager.loadImage('data/fridge_highlight.png');
-		textureManager.loadImage('data/home_books.png');
-		textureManager.loadImage('data/home_books_highlight.png');
-		textureManager.loadImage('data/map.png');
-		textureManager.loadImage('data/map_bg.png');
-		textureManager.loadImage('data/map_selection.png');
-		textureManager.loadImage('data/office_bg.png');
-		textureManager.loadImage('data/office_door_highlight.png');
-		textureManager.loadImage('data/phone.png');
-		textureManager.loadImage('data/phone_highlight.png');
-		textureManager.loadImage('data/progress.png');
-		textureManager.loadImage('data/room_bg.png');
-		textureManager.loadImage('data/room_chest_highlight.png');
-		textureManager.loadImage('data/room_door_highlight.png');
-		textureManager.loadImage('data/sausage.png');
-		textureManager.loadImage('data/street_bar_door_highlight.png');
-		textureManager.loadImage('data/street_bg.png');
-		textureManager.loadImage('data/street_home_door_highlight.png');
-		textureManager.loadImage('data/street_to_supermarket_highlight.png');
-		textureManager.loadImage('data/supermarket_buy_bg.png');
-		textureManager.loadImage('data/supermarket_door_highlight.png');
-		textureManager.loadImage('data/supermarket_food.png');
-		textureManager.loadImage('data/supermarket_inside_bg.png');
-		textureManager.loadImage('data/supermarket_outside_bg.png');
-		textureManager.loadImage('data/supermarket_to_street_highlight.png');
-		textureManager.loadImage('data/walk_anim.png');
-		textureManager.loadImage('data/walk_anim_gray.png');
-		textureManager.onAllLoaded = function() {
-			g_waitForLoad = false;
-		}
-
+		var assetManager = Engine.assetManager;
+		
+		var total = ASSETS.images.length;
+		assetManager.load(ASSETS, function(progress) {
+			g_loadingProgress = (progress + 1) / total;
+			if (progress >= total) {
+				g_waitForLoad = false;
+			}
+		});
+		
 		g_gameController = new GameController();
 		g_gameController.initMainGame(g_canvas);
-		
+
 		g_canvas.addEventListener('mousedown', handleMouseDown, false);
 		g_canvas.addEventListener('mousemove', handleMouseMove, false);
 		g_canvas.addEventListener('mouseup', handleMouseUp, false);		

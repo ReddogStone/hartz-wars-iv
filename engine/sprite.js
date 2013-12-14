@@ -66,7 +66,11 @@ Sprite.extends(Node, {
 			}
 			
 			sRect = sRect || new Rect(0, 0, width, height);
-			context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+			try {
+				context.drawImage(texture, sRect.x, sRect.y, sRect.sx, sRect.sy, 0, 0, size.x, size.y);
+			} catch(e) {
+				throw e;
+			}
 		} else if (this.color) {
 			context.fillStyle = this.color.toString();
 			context.fillRect(0, 0, size.x, size.y);

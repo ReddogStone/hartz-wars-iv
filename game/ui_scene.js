@@ -150,7 +150,7 @@ var uiSceneTemplate = ( function() {
 	};
 })();
 
-var PERK_SIZE = 70;
+var PERK_SIZE = 50;
 
 function UIScene() {
 	var self = this;
@@ -168,7 +168,7 @@ UIScene.extends(Scene, {
 		var index = 0;
 		var left = 520;
 		var top = 20;
-		var border = 20;
+		var border = 50;
 		
 		var perks = this.perks;
 		for (var perkId in perks) {
@@ -182,10 +182,14 @@ UIScene.extends(Scene, {
 	},
 	addPerk: function(perk) {
 		var perkElement = new Button(new Size(PERK_SIZE, PERK_SIZE));
+		var texture = Engine.textureManager.get(perk.textureId);
+		if (texture) {
+			perkElement.texture = Texture.clone(texture);
+		}
 		perkElement.label.text = perk.title;
 		perkElement.label.font = Fonts.inGameSmall;
 		perkElement.label.color = 'white';
-		perkElement.label.anchor = new Size(0.5, 0);
+		perkElement.label.anchor = new Size(0.5, 1);
 		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE);
 		perkElement.z = 1;
 		perkElement.addEffect(createFromTemplate({ type: 'ChangingLabelColor', active: 'white', hovered: {green: 1.0} }));

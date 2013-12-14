@@ -1,5 +1,31 @@
 'use strict';
 
+var callbackQueue = {
+	queue: [],
+	busy: false,
+	performCallback: function() {
+		console.log('Perform callback');
+		if (this.queue.length > 0) {
+			this.busy = true;
+			var callback = this.queue.shift();
+			callback();
+			
+			var self = this;
+			window.setTimeout(function() {
+				self.performCallback();
+			}, 100);
+		} else {
+			this.busy = false;
+		}
+	},
+	addCallback: function(callback) {
+		this.queue.push(callback);
+		if (!this.busy) {
+			this.performCallback();
+		}
+	}
+};
+
 function Texture(image, sourceRect) {
 	var self = this;
 	this._image = image;
@@ -55,32 +81,45 @@ TextureManager.extends(Object, {
 			this.onAllLoaded();
 		}
 	},
-	loadImage: function(path) {
+	loadImage: function(path, callback) {
 		var self = this;
 		var image = new Image();
 		image.onload = function() {
 			self._finishedLoading(path);
+			callback();
+		};
+		image.onError = function() {
+			delete self._images[path];
 		};
 		image.src = path;
 		this._images[path] = image;
 		return image;
 	},
 	getImage: function(path) {
+		if (!path) {
+			return null;
+		}
+		
 		var image = this._images[path];
 		if (!image) {
 			image = this.loadImage(path);
 		}
 		return image;
 	},
-	createTexture: function(id, path, sourceRect) {
-		var texture = new Texture(this.getImage(path), sourceRect);
+	create: function(id, path, sourceRect) {
+		var image = this.getImage(path);
+		if (!image) {
+			return null;
+		}
+		
+		var texture = new Texture(image, sourceRect);
 		this._textures[id] = texture;
 		return texture;
 	},
 	get: function(id) {
 		var texture = this._textures[id];
 		if (!texture) {
-			texture = this.createTexture(id, id);
+			texture = this.create(id, id);
 		}
 		return texture;
 	}

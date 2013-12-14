@@ -1,17 +1,17 @@
 'use strict';
 
-function Perk(title, image, description) {
+function Perk(title, textureId, description) {
 	this._id = Perk.newId();
 	this._title = title;
-	this._image = image;
+	this._textureId = textureId;
 	this._description = description;
 }
 Perk.extends(Object, {
 	get title() {
 		return this._title;
 	},
-	get image() {
-		return this._image;
+	get textureId() {
+		return this._textureId;
 	},
 	get description() {
 		return this._description;
@@ -25,5 +25,5 @@ Perk.newId = function() {
 	return Perk._currentId++;
 };
 
-var HUNGRY_PERK = new Perk('Hungrig', '', 'Deine Lebenslust sinkt rapide');
-var TIRED_PERK = new Perk('Müde', '', 'Deine Lebenslust sinkt rapide');
+var HUNGRY_PERK = new Perk('Hungrig', 'data/hungry', 'Deine Lebenslust sinkt rapide');
+var TIRED_PERK = new Perk('Müde', 'data/tired', 'Deine Lebenslust sinkt rapide');
