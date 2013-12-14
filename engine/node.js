@@ -93,6 +93,9 @@ Node.extends(Object, {
 	cancelAction: function(action) {
 		this.actions.remove(action);
 	},
+	cancelAllActions: function() {
+		this.actions.clear();
+	},
 	update: function(deltaTime) {
 		if (this.updateSelf) {
 			this.updateSelf(deltaTime);

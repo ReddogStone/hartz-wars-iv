@@ -1,5 +1,20 @@
 'use strict';
 
+function ContinuousAction(callback) {
+	this._callback = callback;
+}
+ContinuousAction.extends(Object, {
+	get finished() {
+		return false;
+	},
+	start: function() {
+	},
+	update: function(delta) {
+		this._callback(delta);
+		return 0;
+	}
+});
+
 function InstantAction(callback) {
 	this.callback = callback;
 	this._finished = false;
@@ -134,6 +149,11 @@ SequenceAction.extends(Object, {
 			}
 			
 			++this._currentIndex;
+			if (this._currentIndex >= actions.length) {
+				this._finished = true;
+				break;
+			}
+			
 			this._startChildAction();
 			
 			// the sequence could be finished during _startChildAction

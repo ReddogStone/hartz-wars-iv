@@ -119,7 +119,7 @@ GameController.extends(Object, {
 		var showPlayerMessages = function(messages) {
 			self._showPlayerTempMessages(messages);
 		};
-		return new ActivitySlot(this.world, this.barScene, showPlayerMessages, function() {
+		return new ActivitySlot(this.world, this.barScene, this._infoMessageScene, showPlayerMessages, function() {
 			return new BuyAndConsumeMealActivity(meal, price);
 		});
 	},
@@ -151,7 +151,8 @@ GameController.extends(Object, {
 		var supermarketOutsideScene = this.supermarketOutsideScene = new SupermarketOutsideScene();
 		var uiScene = this.uiScene = new UIScene();
 		var mapScene = this.mapScene = new MapScene();
-		this.workInfoScene = new WorkInfoScene();		
+		this.workInfoScene = new WorkInfoScene();
+		this._infoMessageScene = new InfoMessageScene();
 		
 		// create controllers
 		var roomController = this.roomController = this._newController(RoomController, world);

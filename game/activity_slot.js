@@ -1,11 +1,16 @@
 'use strict';
 
-function ActivitySlot(world, parentScene, tempMessageFunc, createActivity) {
+function ActivitySlot(world, parentScene, scene, tempMessageFunc, createActivity) {
 	this._world = world;
 	this._parentScene = parentScene;
 	this._createActivity = createActivity;
 	this._showTempMessages = tempMessageFunc;
-	this._infoMessageScene = new InfoMessageScene();
+	this._infoMessageScene = scene;
+	
+	if (parentScene.children.indexOf(scene) == -1) {
+		parentScene.addChild(scene);
+		scene.visible = false;
+	}
 }
 ActivitySlot.extends(Object, {
 	connect: function(button, offset) {
@@ -38,17 +43,52 @@ ActivitySlot.extends(Object, {
 		var oldOnExit = button.onExit;
 		var oldOnMouseMove = button.onMouseMove;
 		
+		var targetPos = new Pos();
+		var targetAlpha = 0;
+		
 		button.onEnter = function(pos) {
 			var activity = self._createActivity();
 			if (activity) {
 				var consequences = Activity.getConsequences(activity, world);
 				
 				var transform = button.globalTransform;
-				pos = Vec.add(transform.apply(pos), offset);
+				targetPos = Vec.add(transform.apply(pos), offset);
+				targetAlpha = 0.8;
 				
-				self._infoMessageScene.setInfo(consequences);
-				self._infoMessageScene.pos = Pos.clone(pos);
-				self._parentScene.addChild(self._infoMessageScene);
+				var infoMessageScene = self._infoMessageScene;
+				infoMessageScene.setInfo(consequences);
+				
+				infoMessageScene.cancelAllActions();
+				infoMessageScene.visible = true;
+				var currentAlpha = infoMessageScene.background.alpha;
+				var currentPos = infoMessageScene.pos;
+				infoMessageScene.addAction(new ContinuousAction(function(delta) {
+					if (!infoMessageScene.visible) {
+						return;
+					}
+				
+					var amount = 0.2;
+					
+					var alpha = infoMessageScene.background.alpha;
+					if (Math.abs(alpha - targetAlpha) < 0.001) {
+						alpha = targetAlpha;
+					} else {
+						alpha = alpha + amount * (targetAlpha - alpha);
+					}
+					infoMessageScene.background.alpha = alpha;
+					if (alpha == 0) {
+						infoMessageScene.visible = false;
+					} else {
+						infoMessageScene.visible = true;
+					}
+					
+					var pos = infoMessageScene.pos;
+					if (Vec.squareDist(targetPos, pos) < 1) {
+						infoMessageScene.pos = Pos.clone(targetPos);
+					} else {
+						infoMessageScene.pos = Pos.clone(Vec.add(pos, Vec.mul(Vec.sub(targetPos, pos), amount)));
+					}
+				}));
 			}
 			
 			if (oldOnEnter) {
@@ -56,21 +96,22 @@ ActivitySlot.extends(Object, {
 			}
 		};
 		button.onExit = function(pos) {
-			self._parentScene.removeChild(self._infoMessageScene);
+			var infoMessageScene = self._infoMessageScene;
+			
+			targetAlpha = 0;
 			
 			if (oldOnExit) {
 				oldOnExit(pos);
 			}
 		};
-		button.onMouseMove = function(pos) {
-			var transform = button.globalTransform;
-			pos = Vec.add(transform.apply(pos), offset);
-			self._infoMessageScene.pos = Pos.clone(pos);
-
-			if (oldOnMouseMove) {
-				oldOnMouseMove(pos);
+		
+		var oldMouseMove = this._parentScene.onMouseMove;
+		this._parentScene.onMouseMove = function(event) {
+			targetPos = Vec.add(event, offset);
+			if (oldMouseMove) {
+				oldMouseMove(event);
 			}
-		};
+		};		
 	},
 	notifyChanges: function() {
 		var activity = this._createActivity();
@@ -78,7 +119,7 @@ ActivitySlot.extends(Object, {
 			var consequences = Activity.getConsequences(activity, this._world);
 			this._infoMessageScene.setInfo(consequences);
 		} else {
-			this._parentScene.removeChild(this._infoMessageScene);
+			this._infoMessageScene.visible = false;
 		}
 	}
 });

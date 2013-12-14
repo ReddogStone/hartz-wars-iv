@@ -76,6 +76,10 @@ Scene.extends(Node, {
 		return this._handleMouseEvent(event, 'handleMouseUp');
 	},
 	mouseMove: function(event) {
+		if (this.onMouseMove) {
+			this.onMouseMove(event);
+		}
+		
 		for (var i = this.hovered.length - 1; i >= 0; --i) {
 			var element = this.hovered[i];
 			var inverseTransform = element.globalTransform.inverse();

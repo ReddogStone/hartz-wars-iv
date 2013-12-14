@@ -4,6 +4,7 @@ function RoomController(world) {
 	this._world = world;
 	this.scene = new RoomScene();
 	this._cookSlots = {};
+	this._infoMessageScene = new InfoMessageScene();
 }
 RoomController.extends(Object, {
 	_createCookSlot: function(type) {
@@ -11,7 +12,7 @@ RoomController.extends(Object, {
 		var world = this._world;
 		var home = world.playerHome;
 		
-		var slot = new ActivitySlot(world, this.scene, this.messenger.showPlayerTempMessages, function() {
+		var slot = new ActivitySlot(world, this.scene, this._infoMessageScene, this.messenger.showPlayerTempMessages, function() {
 			var products = home.findProducts(type);
 			if (products.length > 0) {
 				return new ConsumeMealActivity(products[0]);
@@ -43,7 +44,7 @@ RoomController.extends(Object, {
 			self._updateAlarmTime();
 		};
 		
-		var sleepSlot = this.sleepSlot = new ActivitySlot(world, scene, null, function() { 
+		var sleepSlot = this.sleepSlot = new ActivitySlot(world, scene, this._infoMessageScene, null, function() { 
 			var hours = Clock.timeDiff(world.clock.time, home.alarmTime);
 			return new SleepActivity(hours * 60);
 		});
@@ -61,7 +62,7 @@ RoomController.extends(Object, {
 		scene.connectCookExpensiveSlot(this._createCookSlot('expensive_food'));
 		scene.connectCookHealthySlot(this._createCookSlot('healthy_food'));
 		
-		scene.connectReadSlot(new ActivitySlot(world, scene, this.messenger.showPlayerTempMessages, function() { 
+		scene.connectReadSlot(new ActivitySlot(world, scene, this._infoMessageScene, this.messenger.showPlayerTempMessages, function() { 
 			return new ReadActivity();
 		}));
 
