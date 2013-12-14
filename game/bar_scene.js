@@ -131,7 +131,7 @@ BarScene.extends(Scene, {
 		slot.connect(this.foreground.burgerButton, Vec.create(150, -60));
 	},
 	connectBeerSlot: function(slot) {
-		slot.connect(this.foreground.beerButton, Vec.create(-150, -60));
+		slot.connect(this.foreground.beerButton, Vec.create(100, 60));
 	},
 	enter: function() {
 		this.playerBody.pos = new Pos(250, 700);
