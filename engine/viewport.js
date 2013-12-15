@@ -23,7 +23,7 @@ Viewport.extends(Object, {
 		for (var i = 0; i < flatList.length; ++i) {
 			var node = flatList[i];
 			node.globalTransform.setToContext(bufferContext);
-			bufferContext.globalAlpha = node.alpha;
+			bufferContext.globalAlpha = node.globalAlpha;
 			node.render(bufferContext);
 		}
 		var destRect = this.destRect;

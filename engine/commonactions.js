@@ -9,11 +9,27 @@ ContinuousAction.extends(Object, {
 	},
 	start: function() {
 	},
-	update: function(delta) {
-		this._callback(delta);
+	update: function(deltaTime) {
+		this._callback(deltaTime);
 		return 0;
 	}
 });
+
+function TargetFollowingAction(halfTime, getValueTargetsFunc, setValuesFunc) {
+	var self = this;
+	this.halfTime = halfTime;
+	ContinuousAction.call(this, function(deltaTime) {
+		var amount = Math.pow(0.5, deltaTime / self.halfTime);
+		var valuesAndTargets = getValueTargetsFunc();
+		var newValues = valuesAndTargets.map(function(valueTargetPair) {
+			var value = valueTargetPair.value;
+			var target = valueTargetPair.target;
+			return target + amount * (value - target);
+		});
+		setValuesFunc(newValues);
+	});
+}
+TargetFollowingAction.extends(ContinuousAction);
 
 function InstantAction(callback) {
 	this.callback = callback;

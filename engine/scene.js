@@ -114,9 +114,9 @@ Scene.extends(Node, {
 		while (stack.length > 0) {
 			var node = stack.shift();
 			if (node.visible) {
-				var transform = node.globalTransform;
 				node.children.forEach(function(child) {
-					child.globalTransform = transform.combine(child.getLocalTransform());
+					child.globalTransform = node.globalTransform.combine(child.getLocalTransform());
+					child.globalAlpha = node.globalAlpha * child.alpha;
 					stack.push(child);
 				});
 				

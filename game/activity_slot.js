@@ -39,13 +39,10 @@ ActivitySlot.extends(Object, {
 			}
 		};
 		
-		var oldOnEnter = button.onEnter;
-		var oldOnExit = button.onExit;
-		var oldOnMouseMove = button.onMouseMove;
-		
 		var targetPos = new Pos();
 		var targetAlpha = 0;
 		
+		var oldOnEnter = button.onEnter;
 		button.onEnter = function(pos) {
 			var activity = self._createActivity();
 			if (activity) {
@@ -53,41 +50,32 @@ ActivitySlot.extends(Object, {
 				
 				var transform = button.globalTransform;
 				targetPos = Vec.add(transform.apply(pos), offset);
-				targetAlpha = 0.8;
+				targetAlpha = 1;
 				
 				var infoMessageScene = self._infoMessageScene;
 				infoMessageScene.setInfo(consequences);
 				
 				infoMessageScene.cancelAllActions();
+				
+				if (!infoMessageScene.visible) {
+					infoMessageScene.pos = Pos.clone(targetPos);
+				}
+								
 				infoMessageScene.visible = true;
 				var currentAlpha = infoMessageScene.background.alpha;
 				var currentPos = infoMessageScene.pos;
-				infoMessageScene.addAction(new ContinuousAction(function(delta) {
-					if (!infoMessageScene.visible) {
-						return;
-					}
-				
-					var amount = 0.2;
-					
-					var alpha = infoMessageScene.background.alpha;
-					if (Math.abs(alpha - targetAlpha) < 0.001) {
-						alpha = targetAlpha;
-					} else {
-						alpha = alpha + amount * (targetAlpha - alpha);
-					}
-					infoMessageScene.background.alpha = alpha;
-					if (alpha == 0) {
-						infoMessageScene.visible = false;
-					} else {
-						infoMessageScene.visible = true;
-					}
-					
-					var pos = infoMessageScene.pos;
-					if (Vec.squareDist(targetPos, pos) < 1) {
-						infoMessageScene.pos = Pos.clone(targetPos);
-					} else {
-						infoMessageScene.pos = Pos.clone(Vec.add(pos, Vec.mul(Vec.sub(targetPos, pos), amount)));
-					}
+				infoMessageScene.addAction(new TargetFollowingAction(0.1, function() {
+					return [
+						{value: infoMessageScene.alpha, target: targetAlpha},
+						{value: infoMessageScene.pos.x, target: targetPos.x},
+						{value: infoMessageScene.pos.y, target: targetPos.y}
+					];
+				}, function(values) {
+					var alpha = values[0];
+					infoMessageScene.visible = (alpha > 0.001);
+					infoMessageScene.alpha = alpha;
+					infoMessageScene.pos.x = values[1];
+					infoMessageScene.pos.y = values[2];
 				}));
 			}
 			
@@ -95,6 +83,8 @@ ActivitySlot.extends(Object, {
 				oldOnEnter(pos);
 			}
 		};
+
+		var oldOnExit = button.onExit;
 		button.onExit = function(pos) {
 			var infoMessageScene = self._infoMessageScene;
 			

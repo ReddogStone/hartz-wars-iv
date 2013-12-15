@@ -11,6 +11,7 @@ function Node() {
 	this.selfVisible = true;
 	this.scale = new Size(1, 1);
 	this.alpha = 1.0;
+	this.globalAlpha = 1.0;
 	this.z = Number.NEGATIVE_INFINITY;
 	if (!('size' in this)) {
 		this.size = new Size(0, 0);
