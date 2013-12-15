@@ -34,5 +34,5 @@ Perk.newId = function() {
 	return Perk._currentId++;
 };
 
-var PERK_HUNGRY = new Perk(PerkType.HUNGRY, 'Hungrig', 'data/hungry', 'Deine Lebenslust sinkt rapide');
-var PERK_TIRED = new Perk(PerkType.TIRED, 'Müde', 'data/tired', 'Deine Lebenslust sinkt rapide');
+var PERK_HUNGRY = new Perk(PerkType.HUNGRY, 'Hungrig', 'data/hungry', 'Deine Lebenslust sinkt\nrapide');
+var PERK_TIRED = new Perk(PerkType.TIRED, 'Müde', 'data/tired', 'Deine Lebenslust sinkt\nrapide');

@@ -13,7 +13,6 @@ var uiSceneTemplate = ( function() {
 	var secondColumn = progressLeft + 170;
 	
 	return {
-		type: 'Scene',
 		anchor: {x: 0, y: 0},
 		pos: {x: 0, y: 640},
 		children: {
@@ -153,33 +152,42 @@ var uiSceneTemplate = ( function() {
 })();
 
 var perkDescriptionTemplate = ( function() {
+	var font = Fonts.inGameSmall;
+
 	var bottomZ = 10;
+	var sx = 231;
+	var sy = 108;
+	var border = 10;
 
 	return {
-		type: 'Node',
+		anchor: {x: 0.5, y: 1},
+		size: {x: sx, y: sy},
 		children: {
 			background: {
 				type: 'Sprite',
 				texture: 'data/effect_message_bg',
-				size: {x: 231, y: 108},
+				size: {x: sx, y: sy},
 				z: bottomZ,
 				alpha: 0.8
 			},
 			titleLabel: {
 				type: 'Label',
-				pos: {x: middle, y: top},
+				pos: {x: 0.5 * sx, y: border},
 				z: bottomZ + 1,
-				anchor: {x: 1, y: 0},
+				anchor: {x: 0.5, y: 0},
 				text: 'Title',
 				color: 'black',
 				font: font
 			},
+			descriptionBase: {
+				type: 'Node',
+				pos: {x: border, y: border + 25}
+			}
 		}
 	};
-});
+})();
 
 var PERK_SIZE = 50;
-var PERK_TITLE_OFFSET = -10;
 
 function UIScene() {
 	var self = this;
@@ -188,14 +196,38 @@ function UIScene() {
 	this.deserialize(uiSceneTemplate);
 	this.workInfoButton.size = Size.clone(this.workInfoButton.label.size);
 	
+	this._perkInfoTargetAlpha = 0;
+	this._perkInfoTargetPos = new Pos();
+	var perkInfo = new Node();
+	perkInfo.deserialize(perkDescriptionTemplate);
+	perkInfo.visible = false;
+	perkInfo.addAction(new TargetFollowingAction(0.1, function() {
+		return [
+			{value: perkInfo.alpha, target: self._perkInfoTargetAlpha},
+			{value: perkInfo.pos.x, target: self._perkInfoTargetPos.x},
+			{value: perkInfo.pos.y, target: self._perkInfoTargetPos.y}
+		];
+	}, function(values) {
+		var alpha = values[0];
+		perkInfo.visible = (alpha > 0.001);
+		perkInfo.alpha = alpha;
+		perkInfo.pos.x = values[1];
+		perkInfo.pos.y = values[2];
+	}));
+	this._perkInfo = perkInfo;
+	this.addChild(perkInfo);	
+	
 	this.perks = {};
+	
+	this.addPerk(PERK_HUNGRY);
+	this.addPerk(PERK_TIRED);
 }
 UIScene.extends(Scene, {
 	_adjustPerkPositions: function() {
 		var index = 0;
 		var left = 520;
-		var top = 30;
-		var border = 50;
+		var top = 10;
+		var border = 10;
 		
 		var perks = this.perks;
 		for (var perkTypes in perks) {
@@ -203,6 +235,27 @@ UIScene.extends(Scene, {
 			perk.pos = new Pos(left + (PERK_SIZE + border) * index, top);
 			++index;
 		}
+	},
+	_showPerkInfo: function(perkButton, perk) {
+		var perkInfo = this._perkInfo;
+		perkInfo.titleLabel.text = perk.title;
+		this._perkInfoTargetPos = new Pos(perkButton.pos.x + 0.5 * perkButton.size.x, perkButton.pos.y - 20);
+		if (!perkInfo.visible) {
+			perkInfo.pos = this._perkInfoTargetPos;
+		}
+		this._perkInfoTargetAlpha = 1;
+
+		perk.description.split('\n').forEach(function(line, index) {
+			var label = new Label(line, perkInfo.titleLabel.font, Color.black);
+			label.pos = new Pos(0, index * 20);
+			label.z = 11;
+			perkInfo.descriptionBase.addChild(label);
+		});
+		perkInfo.visible = true;
+	},
+	_hidePerkInfo: function() {
+		this._perkInfoTargetAlpha = 0;
+		this._perkInfo.descriptionBase.clearChildren();
 	},
 	set onWorkInfo(value) {
 		this.workInfoButton.onClicked = value;
@@ -215,14 +268,17 @@ UIScene.extends(Scene, {
 		if (texture) {
 			perkElement.texture = Texture.clone(texture);
 		}
-		perkElement.label.text = perk.title;
-		perkElement.label.font = Fonts.inGameSmall;
-		perkElement.label.color = 'white';
-		perkElement.label.anchor = new Size(0.5, 1);
-		perkElement.labelOffset = new Pos(0, -0.5 * PERK_SIZE + PERK_TITLE_OFFSET);
 		perkElement.z = 1;
 		perkElement.addEffect(createFromTemplate({ type: 'ChangingLabelColor', active: 'white', hovered: {green: 1.0} }));
 		this.perks[perk.type.name] = perkElement;
+		
+		var self = this;
+		perkElement.onEnter = function() {
+			self._showPerkInfo(perkElement, perk);
+		}
+		perkElement.onExit = function() {
+			self._hidePerkInfo();
+		}
 		
 		this.background.addChild(perkElement);
 		

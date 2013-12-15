@@ -124,6 +124,8 @@ Node.extends(Object, {
 		if (template.z !== undefined) { this.z = template.z; }		
 	},
 	deserialize: function(template) {
+		this.deserializeSelf(template);
+		
 		var children = [];
 		var templChildren = template.children || {};
 		for (var childName in templChildren) {
@@ -132,8 +134,6 @@ Node.extends(Object, {
 			children.push({name: childName, node: child});
 		}
 		
-		this.deserializeSelf(template);
-				
 		children.forEach( function(element, index, array) {
 			this.addChild(element.node);
 			this[element.name] = element.node;
