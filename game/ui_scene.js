@@ -14,6 +14,8 @@ var uiSceneTemplate = ( function() {
 	
 	return {
 		type: 'Scene',
+		anchor: {x: 0, y: 0},
+		pos: {x: 0, y: 640},
 		children: {
 			background: {
 				type: 'Sprite',
@@ -149,6 +151,32 @@ var uiSceneTemplate = ( function() {
 		}
 	};
 })();
+
+var perkDescriptionTemplate = ( function() {
+	var bottomZ = 10;
+
+	return {
+		type: 'Node',
+		children: {
+			background: {
+				type: 'Sprite',
+				texture: 'data/effect_message_bg',
+				size: {x: 231, y: 108},
+				z: bottomZ,
+				alpha: 0.8
+			},
+			titleLabel: {
+				type: 'Label',
+				pos: {x: middle, y: top},
+				z: bottomZ + 1,
+				anchor: {x: 1, y: 0},
+				text: 'Title',
+				color: 'black',
+				font: font
+			},
+		}
+	};
+});
 
 var PERK_SIZE = 50;
 var PERK_TITLE_OFFSET = -10;

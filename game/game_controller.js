@@ -136,8 +136,8 @@ GameController.extends(Object, {
 		var self = this;
 		this.canvas = canvas;
 		this.camera = new Camera(-canvas.width * 0.5, -canvas.height * 0.5, 0, 1, 1);
-		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640), new Size(1024, 640));
-		this.uiViewport = new Viewport(new Rect(0, 640, 1024, 128), new Size(1024, 128));
+		this.mainViewport = new Viewport(new Rect(0, 0, 1024, 640));
+		this.uiViewport = new Viewport(new Rect(0, 0, 1024, 768));
 		
 		this.controller = null;
 		
@@ -166,7 +166,7 @@ GameController.extends(Object, {
 		layerDirector.createLayer(Layers.UI_SCENE, this.uiViewport);
 		layerDirector.createLayer(Layers.OVERLAY, this.mainViewport, LayerType.MODAL);
 		layerDirector.setLayerScene(Layers.MAP_SCENE, mapScene);
-		layerDirector.setLayerScene(Layers.UI_SCENE, uiScene);		
+		layerDirector.setLayerScene(Layers.UI_SCENE, uiScene);
 		
 		// connect scenes
 		roomController.onExitToStreet = this.transitToScene(streetScene, streetScene.enterFromRoom);
