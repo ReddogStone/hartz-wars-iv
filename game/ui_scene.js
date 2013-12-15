@@ -16,7 +16,7 @@ var uiSceneTemplate = ( function() {
 	
 	return {
 		anchor: {x: 0, y: 0},
-		pos: {x: 0, y: 640.5},
+		pos: {x: 0, y: 640},
 		children: {
 			background: {
 				type: 'Sprite',
