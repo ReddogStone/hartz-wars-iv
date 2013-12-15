@@ -33,4 +33,5 @@ Object.defineProperty(Color, 'black', {get: function() { return new Color(0, 0, 
 Object.defineProperty(Color, 'red', {get: function() { return new Color(1, 0, 0, 1); } })
 Object.defineProperty(Color, 'green', {get: function() { return new Color(0, 1, 0, 1); } })
 Object.defineProperty(Color, 'blue', {get: function() { return new Color(0, 0, 1, 1); } })
+Object.defineProperty(Color, 'gray', {get: function() { return new Color(0.25, 0.25, 0.25, 1); } })
 Object.defineProperty(Color, 'transparentBlack', {get: function() { return new Color(0, 0, 0, 0); } })

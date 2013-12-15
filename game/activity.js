@@ -13,10 +13,16 @@ var Activity = {
 		world.advanceClock(duration);
 		
 		activity.prepare();
+
+		var perks = player.perks;
+		var funConsequence = activity.getFunChangeRate(player) * duration;
+/*		if (perks[PerkType.HUNGRY.name] || perks[PerkType.TIRED.name]) {
+			funConsequence = Math.min(funConsequence, 0);
+	 	}*/
 		
 		player.energy += activity.getEnergyChangeRate(player) * duration;
 		player.saturation += activity.getSaturationChangeRate(player) * duration;
-		player.fun += activity.getFunChangeRate(player) * duration;
+		player.fun += funConsequence;
 		player.money += activity.getMoneyChange(player);
 		
 		var messages = [];
@@ -77,7 +83,7 @@ RegularActivity.extends(Object, {
 	getFunChangeRate: function(player) {
 		var perks = player.perks;
 		if (perks[PerkType.HUNGRY.name] || perks[PerkType.TIRED.name]) {
-			return -0.5;
+			return -2;
 		} else {
 			return -100 / (4 * 24 * 60);
 		}

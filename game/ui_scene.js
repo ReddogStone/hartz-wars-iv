@@ -3,32 +3,34 @@
 var uiSceneTemplate = ( function() {
 	var buttonEffects = [
 		{ type: 'JumpingLabel', offsetX: 2, offsetY: 2 },
-		{ type: 'ChangingLabelColor', active: 'white', pressed: 'red', hovered: {green: 0.47} },
+		{ type: 'ChangingLabelColor', active: 'black', pressed: 'red', hovered: {green: 0.47} },
 	];
 
 	var font = Fonts.inGameSmall;
+	var textColor = 'black';
+	var progressNumberColor = 'black';
 	
-	var left = 10;
+	var left = 60;
 	var progressLeft = left + 120;
 	var secondColumn = progressLeft + 170;
 	
 	return {
 		anchor: {x: 0, y: 0},
-		pos: {x: 0, y: 640},
+		pos: {x: 0, y: 640.5},
 		children: {
 			background: {
 				type: 'Sprite',
+				texture: 'data/ui_bg',
 				size: {x: 1024, y: 128},
 				pos: {x: 0, y: 0},
 				scale: {x: 1, y: 1},
-				color: {green: 0.25},
 				z: 0
 			},
 			moneyLabel: {
 				type: 'Label',
 				text: 'Geld: ',
 				font: font,
-				color: Color.white,
+				color: textColor,
 				pos: {x: secondColumn, y: 10},
 				z: 1
 			},
@@ -36,7 +38,7 @@ var uiSceneTemplate = ( function() {
 				type: 'Label',
 				text: '',
 				font: font,
-				color: Color.white,
+				color: textColor,
 				pos: {x: secondColumn + 70, y: 10},
 				z: 1
 			},
@@ -47,8 +49,8 @@ var uiSceneTemplate = ( function() {
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 95},
-				frameColor: {green: 0.56},
-				fillColor: {red: 0.44, green: 0.44, blue: 0.5},
+				frameColor: 'gray',
+				fillColor: {red: 0.5, blue: 0.8, green: 0.5},
 				z: 1,
 				progress: 1,
 				children: {
@@ -57,7 +59,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: 'Sättigung',
 						font: font,
-						color: 'white',
+						color: textColor,
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
 					},
@@ -66,7 +68,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: '100',
 						font: font,
-						color: 'white',
+						color: progressNumberColor,
 						pos: {x: 50, y: 15},
 						anchor: {x: 0.5, y: 0.5}
 					}
@@ -79,7 +81,7 @@ var uiSceneTemplate = ( function() {
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 60},
-				frameColor: {green: 0.56},
+				frameColor: 'gray',
 				fillColor: {red: 0.6, green: 0.6},
 				z: 1,
 				progress: 1,
@@ -89,7 +91,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: 'Energie',
 						font: font,
-						color: 'white',
+						color: textColor,
 						pos: {x: -10, y: 12},
 						anchor: {x: 1, y: 0.5}
 					},
@@ -98,7 +100,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: '100',
 						font: font,
-						color: 'white',
+						color: progressNumberColor,
 						pos: {x: 50, y: 15},
 						anchor: {x: 0.5, y: 0.5}
 					}
@@ -111,8 +113,8 @@ var uiSceneTemplate = ( function() {
 				fillRect: {x: 0, y: 72, sx: 30, sy: 72},
 				frameRect: {x: 0, y: 0, sx: 215, sy: 72},
 				pos: {x: progressLeft, y: 10},
-				frameColor: {green: 0.56},
-				fillColor: {red: 0.5},
+				frameColor: 'gray',
+				fillColor: {red: 0.8, green: 0.4, blue: 0.4},
 				z: 1,
 				progress: 1,
 				children: {
@@ -121,7 +123,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: 'Lebenslust',
 						font: font,
-						color: 'white',
+						color: textColor,
 						pos: {x: -10, y: 17},
 						anchor: {x: 1, y: 0.5}
 					},
@@ -130,7 +132,7 @@ var uiSceneTemplate = ( function() {
 						type: 'Label',
 						text: '100',
 						font: font,
-						color: 'white',
+						color: progressNumberColor,
 						pos: {x: 75, y: 22.5},
 						anchor: {x: 0.5, y: 0.5}
 					}
@@ -143,7 +145,7 @@ var uiSceneTemplate = ( function() {
 				effects: buttonEffects,
 				label: {
 					font: font,
-					color: Color.white,
+					color: textColor,
 					text: '*Arbeit*'
 				}				
 			}			
@@ -222,7 +224,7 @@ function UIScene() {
 UIScene.extends(Scene, {
 	_adjustPerkPositions: function() {
 		var index = 0;
-		var left = 520;
+		var left = 550;
 		var top = 10;
 		var border = 10;
 		
