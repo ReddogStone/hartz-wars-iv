@@ -39,8 +39,7 @@ var ASSETS = {
 		'data/supermarket_to_street_highlight.png',
 		'data/walk_anim.png',
 		'data/walk_anim_gray.png',
-		'http://icons.iconarchive.com/icons/iconka/meow-2/256/cat-hungry-icon.png',
-		'http://icons.iconarchive.com/icons/flameia/aqua-smiles/128/I-am-tired-icon.png'
+		'data/perks.png'
 	],
 	textures: {
 		'data/arrow_up': { image: 'data/arrow_buttons.png', sourceRect: {x: 0, y: 0, sx: 16, sy: 16} },
@@ -83,7 +82,7 @@ var ASSETS = {
 		'data/supermarket_to_street_highlight': { image: 'data/supermarket_to_street_highlight.png' },
 		'data/walk_anim': { image: 'data/walk_anim.png' },
 		'data/walk_anim_gray': { image: 'data/walk_anim_gray.png' },
-		'data/hungry': { image: 'http://icons.iconarchive.com/icons/iconka/meow-2/256/cat-hungry-icon.png' },
-		'data/tired': { image: 'http://icons.iconarchive.com/icons/flameia/aqua-smiles/128/I-am-tired-icon.png' }
+		'data/hungry': { image: 'data/perks.png', sourceRect: {x: 0, y: 0, sx: 64, sy: 64} },
+		'data/tired': { image: 'data/perks.png', sourceRect: {x: 64, y: 0, sx: 64, sy: 64}  }
 	}
 }

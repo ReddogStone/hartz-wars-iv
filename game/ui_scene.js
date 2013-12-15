@@ -218,9 +218,6 @@ function UIScene() {
 	this.addChild(perkInfo);	
 	
 	this.perks = {};
-	
-	this.addPerk(PERK_HUNGRY);
-	this.addPerk(PERK_TIRED);
 }
 UIScene.extends(Scene, {
 	_adjustPerkPositions: function() {
@@ -238,6 +235,7 @@ UIScene.extends(Scene, {
 	},
 	_showPerkInfo: function(perkButton, perk) {
 		var perkInfo = this._perkInfo;
+		perkInfo.descriptionBase.clearChildren();
 		perkInfo.titleLabel.text = perk.title;
 		this._perkInfoTargetPos = new Pos(perkButton.pos.x + 0.5 * perkButton.size.x, perkButton.pos.y - 20);
 		if (!perkInfo.visible) {
@@ -255,7 +253,6 @@ UIScene.extends(Scene, {
 	},
 	_hidePerkInfo: function() {
 		this._perkInfoTargetAlpha = 0;
-		this._perkInfo.descriptionBase.clearChildren();
 	},
 	set onWorkInfo(value) {
 		this.workInfoButton.onClicked = value;
