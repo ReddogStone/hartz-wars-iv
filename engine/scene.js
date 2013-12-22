@@ -33,6 +33,9 @@ Scene.extends(Node, {
 					if (mouseHandler.onEnter) {
 						mouseHandler.onEnter(Pos.clone(childEvent));
 					}
+					if (mouseHandler.enter) {
+						mouseHandler.enter.raise(Pos.clone(childEvent));
+					}
 				}
 				
 				if (mouseHandler == this.pressed) {
@@ -88,6 +91,9 @@ Scene.extends(Node, {
 				if (element.onExit) {
 					element.onExit(localPos);
 				}
+				if (element.exit) {
+					element.exit.raise(localPos);
+				}				
 				element.hovered = false;
 				this.hovered.splice(i, 1);
 			}

@@ -275,16 +275,16 @@ RoomScene.extends(Scene, {
 		this.foreground.alarmDownButton.visible = value;
 	},
 	set onExitToStreet(value) {
-		this.foreground.doorButton.onClicked = value;
+		Event.observe(this.foreground.doorButton.click, value);
 	},
 	set onPhoneCall(value) {
-		this.foreground.phoneButton.onClicked = value;
+		Event.observe(this.foreground.phoneButton.click, value);
 	},
 	set onAlarmUp(value) {
-		this.foreground.alarmUpButton.onClicked = value;		
+		Event.observe(this.foreground.alarmUpButton.click, value);
 	},
 	set onAlarmDown(value) {
-		this.foreground.alarmDownButton.onClicked = value;		
+		Event.observe(this.foreground.alarmDownButton.click, value);
 	},
 	enter: function() {
 		this.playerBody.pos = new Pos(500, 600);

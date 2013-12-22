@@ -43,6 +43,12 @@ function Button(size, texture, effects) {
 	
 	this.onPressed = null;
 	this.onClicked = null;
+	
+	this.click = new Event();
+	this.press = new Event();
+	this.enter = new Event();
+	this.exit = new Event();
+	this.mouseMove = new Event();
 }
 Button.extends(Node, {
 	_adjust: function() {
@@ -123,6 +129,7 @@ Button.extends(Node, {
 			if (this.onPressed) {
 				this.onPressed();
 			}
+			this.press.raise();
 			return true;
 		}
 	},
@@ -133,6 +140,7 @@ Button.extends(Node, {
 				if (this.onClicked) {
 					this.onClicked();
 				}
+				this.click.raise();
 			} else {
 				this._setState(ButtonState.ACTIVE);
 			}
@@ -151,6 +159,7 @@ Button.extends(Node, {
 				if (this.onMouseMove) {
 					this.onMouseMove(event);
 				}
+				this.mouseMove.raise(event);
 			} else if ((this._state == ButtonState.PRESSED) || (this._state == ButtonState.HOVERED)) {
 				this._setState(ButtonState.ACTIVE);
 			}
