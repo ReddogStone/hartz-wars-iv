@@ -1,5 +1,15 @@
 'use strict';
 
+function Observer(id, event) {
+	this._id = id;
+	this._event = event;
+}
+Observer.extends(Object, {
+	stop: function() {
+		this._event.removeObserverById(this._id);
+	}
+});
+
 function Event() {
 	this._observers = {};
 }
@@ -13,6 +23,7 @@ Event.extends(Object, {
 	addObserver: function(observer) {
 		var id = Event.nextObserverId();
 		this._observers[id] = observer;
+		return id;
 	},
 	removeObserver: function(observer) {
 		var observers = this._observers;
@@ -34,7 +45,7 @@ Object.addProperties(Event, {
 	nextObserverId: function() {
 		return this._observerId++;
 	},
-	observe: function(event, observer) {
-		event.addObserver(observer);
+	observe: function(event, callback) {
+		return new Observer(event.addObserver(callback), event);
 	}
 });

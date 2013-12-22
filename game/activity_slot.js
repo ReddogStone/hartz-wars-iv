@@ -38,8 +38,12 @@ ActivitySlot.extends(Object, {
 				}
 			}
 		};
-		
+
+		var moveObserver;
+		var parentScene = this._parentScene;
 		Event.observe(button.enter, function(pos) {
+			moveObserver = null;
+		
 			var activity = self._createActivity();
 			if (activity) {
 				var consequences = Activity.getConsequences(activity, world);
@@ -52,15 +56,21 @@ ActivitySlot.extends(Object, {
 				infoMessageScene.targetAlpha = 1;
 				
 				if (!infoMessageScene.visible) {
-					infoMessageScene.pos = Pos.clone(targetPos);
+					infoMessageScene.pos = Pos.clone(infoMessageScene.targetPos);
+					infoMessageScene.visible = true;
 				}
-
-				infoMessageScene.visible = true;
+				
+				moveObserver = Event.observe(parentScene.eventMouseMove, function(event) {
+					infoMessageScene.targetPos = Vec.add(event, offset);
+				});
 			}
 		});
 
 		Event.observe(button.exit, function(pos) {
 			self._infoMessageScene.targetAlpha = 0;
+			if (moveObserver) {
+				moveObserver.stop();
+			}
 		});
 		
 		Event.observe(this._parentScene.eventMouseMove, function(event) {
