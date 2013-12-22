@@ -9,7 +9,7 @@ var infoMessageTemplate = ( function() {
 	var bottomZ = 200;
 	
 	return {
-		type: 'Scene',
+		type: 'Node',
 		pos: {x: 0, y: 0},
 		anchor: {x: 0.5, y: 0},
 		size: {x: 231, y: 108},
