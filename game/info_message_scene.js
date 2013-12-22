@@ -13,6 +13,7 @@ var infoMessageTemplate = ( function() {
 		pos: {x: 0, y: 0},
 		anchor: {x: 0.5, y: 0},
 		size: {x: 231, y: 108},
+		alpha: 0,
 		children: {
 			background: {
 				type: 'Sprite',
@@ -102,6 +103,25 @@ function InfoMessageScene() {
 	Scene.apply(this);
 	
 	this.deserialize(infoMessageTemplate);
+	
+	this.targetAlpha = this.alpha;
+	this.targetPos = Pos.clone(this.pos);
+	
+	this.addAction(new TargetFollowingAction(0.1, function() {
+		var targetAlpha = self.targetAlpha;
+		var targetPos = self.targetPos;
+		return [
+			{value: self.alpha, target: targetAlpha},
+			{value: self.pos.x, target: targetPos.x},
+			{value: self.pos.y, target: targetPos.y}
+		];
+	}, function(values) {
+		var alpha = values[0];
+		self.visible = (alpha > 0.001);
+		self.alpha = alpha;
+		self.pos.x = values[1];
+		self.pos.y = values[2];
+	}));
 }
 InfoMessageScene.extends(Scene, {
 	setInfo: function(consequences) {

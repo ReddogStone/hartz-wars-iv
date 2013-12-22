@@ -15,6 +15,8 @@ function Scene() {
 	this._renderList = [];
 	this._childList = [];
 	this._mouseHandlers = [];
+	
+	this.eventMouseMove = new Event();
 }
 Scene.extends(Node, {
 	_handleMouseEvent: function(event, handleMethodName) {
@@ -82,6 +84,7 @@ Scene.extends(Node, {
 		if (this.onMouseMove) {
 			this.onMouseMove(event);
 		}
+		this.eventMouseMove.raise(event);
 		
 		for (var i = this.hovered.length - 1; i >= 0; --i) {
 			var element = this.hovered[i];

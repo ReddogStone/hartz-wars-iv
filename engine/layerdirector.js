@@ -61,8 +61,10 @@ var LayerDirector = ( function() {
 			
 				var destRect = layer.viewport.destRect;
 				var transformedEvent = {x: mouse.x - destRect.x, y: mouse.y - destRect.y, down: mouse.down};
-//				Vec.set(transformedEvent, scene.getLocalTransform().inverse().apply(transformedEvent));
 
+				if (typeof scene[type] != 'function') {
+					throw new Error('Scene ' + scene.constructor.name + ' doesn\'t define "' + type + '"');
+				}
 				var handled = scene[type](transformedEvent);
 				if (layer.type == LayerType.MODAL) {
 					return true;

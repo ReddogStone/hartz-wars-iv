@@ -39,69 +39,33 @@ ActivitySlot.extends(Object, {
 			}
 		};
 		
-		var targetPos = new Pos();
-		var targetAlpha = 0;
-		
-		var oldOnEnter = button.onEnter;
-		button.onEnter = function(pos) {
+		Event.observe(button.enter, function(pos) {
 			var activity = self._createActivity();
 			if (activity) {
 				var consequences = Activity.getConsequences(activity, world);
 				
 				var transform = button.globalTransform;
-				targetPos = Vec.add(transform.apply(pos), offset);
-				targetAlpha = 1;
 				
 				var infoMessageScene = self._infoMessageScene;
 				infoMessageScene.setInfo(consequences);
-				
-				infoMessageScene.cancelAllActions();
+				infoMessageScene.targetPos = Vec.add(transform.apply(pos), offset);
+				infoMessageScene.targetAlpha = 1;
 				
 				if (!infoMessageScene.visible) {
 					infoMessageScene.pos = Pos.clone(targetPos);
 				}
-								
-				infoMessageScene.visible = true;
-				var currentAlpha = infoMessageScene.background.alpha;
-				var currentPos = infoMessageScene.pos;
-				infoMessageScene.addAction(new TargetFollowingAction(0.1, function() {
-					return [
-						{value: infoMessageScene.alpha, target: targetAlpha},
-						{value: infoMessageScene.pos.x, target: targetPos.x},
-						{value: infoMessageScene.pos.y, target: targetPos.y}
-					];
-				}, function(values) {
-					var alpha = values[0];
-					infoMessageScene.visible = (alpha > 0.001);
-					infoMessageScene.alpha = alpha;
-					infoMessageScene.pos.x = values[1];
-					infoMessageScene.pos.y = values[2];
-				}));
-			}
-			
-			if (oldOnEnter) {
-				oldOnEnter(pos);
-			}
-		};
 
-		var oldOnExit = button.onExit;
-		button.onExit = function(pos) {
-			var infoMessageScene = self._infoMessageScene;
-			
-			targetAlpha = 0;
-			
-			if (oldOnExit) {
-				oldOnExit(pos);
+				infoMessageScene.visible = true;
 			}
-		};
+		});
+
+		Event.observe(button.exit, function(pos) {
+			self._infoMessageScene.targetAlpha = 0;
+		});
 		
-		var oldMouseMove = this._parentScene.onMouseMove;
-		this._parentScene.onMouseMove = function(event) {
-			targetPos = Vec.add(event, offset);
-			if (oldMouseMove) {
-				oldMouseMove(event);
-			}
-		};		
+		Event.observe(this._parentScene.eventMouseMove, function(event) {
+			self._infoMessageScene.targetPos = Vec.add(event, offset);
+		});
 	},
 	notifyChanges: function() {
 		var activity = this._createActivity();

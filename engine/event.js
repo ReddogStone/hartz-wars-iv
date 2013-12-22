@@ -7,7 +7,7 @@ Event.extends(Object, {
 	raise: function(value) {
 		var observers = this._observers;
 		for (var id in observers) {
-			observers[id]();
+			observers[id](value);
 		}
 	},
 	addObserver: function(observer) {
