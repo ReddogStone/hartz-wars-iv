@@ -14,17 +14,21 @@ var Engine3D = (function() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	function renderFrame(viewport) {
+	function renderFrame(scene) {
+		var viewport = scene.viewport;
 		gl.viewport(viewport.x, viewport.y, viewport.sx, viewport.sy);
 		
 		clear();
 		
-		viewport.nodes.forEach(function(node) {
-			var pos = node.position;
+		var params = {
+			uView: scene.view.val,
+			uProjection: scene.projection.val,
+		};
+		
+		scene.nodes.forEach(function(node) {
+			params.uWorld = node.position.globalTransform.val;
 			
-			node.renderable.render(this, {
-				uPos: [pos.x, pos.y, pos.z]
-			});
+			node.renderable.render(this, params);
 		}, this);
 	}
 	

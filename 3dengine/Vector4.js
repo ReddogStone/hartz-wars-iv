@@ -16,10 +16,102 @@ var Vecmath = (function(module) {
 	//shorthand it for better minification
 	var vec4 = Vector4.prototype;
 
-	//mixin common functions
-	for (var k in common) {
-		vec4[k] = common[k];
-	}
+    vec4.copy = function(otherVec) {
+        this.x = otherVec.x||0;
+        this.y = otherVec.y||0;
+        this.z = otherVec.z||0;
+        this.w = otherVec.w||0;
+        return this;
+    };
+
+    vec4.set = function(x, y, z, w) {
+        if (typeof x === "object") {
+            this.x = x.x||0;
+            this.y = x.y||0;
+            this.z = x.z||0;
+            this.w = x.w||0;
+        } else {
+            this.x = x||0;
+            this.y = y||0;
+            this.z = z||0;
+            this.w = w||0;
+
+        }
+        return this;
+    };
+
+    vec4.add = function(v) {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+        this.w += v.w;
+        return this;
+    };
+
+    vec4.subtract = function(v) {
+        this.x -= v.x;
+        this.y -= v.y;
+        this.z -= v.z;
+        this.w -= v.w;
+        return this;
+    };
+
+    vec4.scale = function(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+        this.w *= s;
+        return this;
+    };
+
+	vec4.length = function() {
+        var x = this.x,
+            y = this.y,
+            z = this.z,
+            w = this.w;
+        return Math.sqrt(x*x + y*y + z*z + w*w);
+    };
+
+    vec4.lengthSq = function() {
+        var x = this.x,
+            y = this.y,
+            z = this.z,
+            w = this.w;
+        return x*x + y*y + z*z + w*w;
+    };
+
+    vec4.normalize = function() {
+        var x = this.x,
+            y = this.y,
+            z = this.z,
+            w = this.w;
+        var len = x*x + y*y + z*z + w*w;
+        if (len > 0) {
+            len = 1 / Math.sqrt(len);
+            this.x = x*len;
+            this.y = y*len;
+            this.z = z*len;
+            this.w = w*len;
+        }
+        return this;
+    };
+
+    vec4.dot = function(v) {
+        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+    };
+
+    vec4.lerp = function(v, t) {
+        var ax = this.x,
+            ay = this.y,
+            az = this.z,
+            aw = this.w;
+        t = t||0;
+        this.x = ax + t * (v.x - ax);
+        this.y = ay + t * (v.y - ay);
+        this.z = az + t * (v.z - az);
+        this.w = aw + t * (v.w - aw);
+        return this;
+    };
 
 	vec4.clone = function() {
 		return new Vector4(this.x, this.y, this.z, this.w);
@@ -135,4 +227,5 @@ var Vecmath = (function(module) {
 	vec4.str = vec4.toString;
 
 	module.Vector4 = Vector4;
+	return module;	
 }) (Vecmath || {});

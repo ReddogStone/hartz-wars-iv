@@ -683,4 +683,5 @@ var Vecmath = (function(module) {
 	mat4.str = mat4.toString;
 
 	module.Matrix4 = Matrix4;
+	return module;
 }) (Vecmath || {});
