@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>My first Three.js app</title>
+	<style>canvas { width: 100%; height: 100% }</style>
+	
+	<script src="utils.js" type="text/javascript"></script>
+	<script src="fileutils.js" type="text/javascript"></script>
+	<script src="webgl_utils.js" type="text/javascript"></script>
+	<script src="engine3d.js" type="text/javascript"></script>
+	<script src="mesh.js" type="text/javascript"></script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+	var canvas = document.getElementById('canvas');
+	Engine3D.init(canvas);
+	
+	var mesh = Mesh.loadFromFile(Engine3D, 'data/meshes/simple.json');
+	var viewport = {
+		x: 0, y: 0, sx: canvas.width, sy: canvas.height,
+		renderables: [
+			mesh
+		]
+	};
+	Engine3D.renderFrame(viewport);
+	alert('OK');	
+</script>
+</body>
+</html>

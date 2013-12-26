@@ -1,0 +1,9 @@
+{
+	"name": "Hartz Wars IV: Editor",
+	"main": "index.html",
+	"window": {
+		"toolbar": true,
+		"width": 1100,
+		"height": 850
+	}
+}
