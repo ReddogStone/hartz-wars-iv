@@ -74,7 +74,7 @@ var WebGL = (function() {
 		var uniforms = {};
 		for (var i = 0; i < uniformCount; ++i) {
 			var info = gl.getActiveUniform(program, i);
-			uniforms[info.name] = {location: gl.getUniformLocation(program, info.name)};
+			uniforms[info.name] = {type: info.type, location: gl.getUniformLocation(program, info.name)};
 		}
 		program.activeUniforms = uniforms;
 		
@@ -89,19 +89,14 @@ var WebGL = (function() {
 	};
 
 	/**
-	 * Loads a shader from a file.
+	 * Loads a shader from a string.
 	 */
-	function createShaderFromFile(gl, path, type) {
-		var source = FileUtils.loadFile(path);
-		if (!source) {
-			throw new Error('File not found: "' + path + '"');
-		}
-
+	function createShader(gl, source, type) {
 		var shader = null;
 		try {
 			shader = loadShader(gl, source, type);
 		} catch (e) {
-			e.message = 'Error compiling "' + path + '": ' + e.message;
+			e.message = 'Error compiling\n\n' + source + '\n\n: ' + e.message;
 			throw e;
 		}
 		
@@ -109,21 +104,20 @@ var WebGL = (function() {
 	};
 
 	/**
-	 * Creates a program from 2 script tags.
+	 * Creates a program from 2 files
 	 */
-	function createProgramFromFiles(gl, vertexShaderPath, fragmentShaderPath) {
+	function createProgram(gl, vertexShader, fragmentShader) {
 		var shaders = [
-			createShaderFromFile(gl, vertexShaderPath, gl.VERTEX_SHADER),
-			createShaderFromFile(gl, fragmentShaderPath, gl.FRAGMENT_SHADER)
+			createShader(gl, vertexShader, gl.VERTEX_SHADER),
+			createShader(gl, fragmentShader, gl.FRAGMENT_SHADER)
 		];
 		return loadProgram(gl, shaders);
 	};
 
 
 	return {
-		createShaderFromFile: createShaderFromFile,
-		createProgram: loadProgram,
-		createProgramFromFiles: createProgramFromFiles,
+		createShader: createShader,
+		createProgram: createProgram,
 		setupWebGL: setupWebGL
 	}
 }());

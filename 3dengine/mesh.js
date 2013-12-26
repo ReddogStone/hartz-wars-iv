@@ -32,8 +32,7 @@ Mesh.extends(Object, {
 	}
 });
 
-Mesh.loadFromFile = function(engine, path) {
-	var data = JSON.parse(FileUtils.loadFile(path));
+Mesh.loadFromJson = function(engine, data) {
 	var mesh = new Mesh();
 	data.forEach(function(part) {
 		var meshPart = new MeshPart();
@@ -46,4 +45,8 @@ Mesh.loadFromFile = function(engine, path) {
 	mesh.createBuffers(engine);
 	
 	return mesh;
-}
+};
+Mesh.loadFromFile = function(engine, path) {
+	var data = JSON.parse(FileUtils.loadFile(path));
+	return Mesh.loadFromJson(engine, data);
+};

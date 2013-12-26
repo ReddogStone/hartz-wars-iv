@@ -8,6 +8,11 @@ var FileUtils = (function() {
 		var request = new XMLHttpRequest();
 		request.open('GET', path, false);
 		request.send();
+		
+		if (!request.responseText) {
+			throw new Error('Could not load file "' + path + '"!');
+		}
+		
 		return request.responseText;
 	};
 	return {

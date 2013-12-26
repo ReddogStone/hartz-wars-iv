@@ -19,12 +19,12 @@ var Engine3D = (function() {
 		
 		clear();
 		
-		// setup shader
-		var program = WebGL.createProgramFromFiles(gl, 'data/shaders/simple_vs.shader', 'data/shaders/simple_fs.shader');
-		this.setMaterial(program);
-
-		viewport.renderables.forEach(function(renderable) {
-			renderable.render(this);
+		viewport.nodes.forEach(function(node) {
+			var pos = node.position;
+			
+			node.renderable.render(this, {
+				uPos: [pos.x, pos.y, pos.z]
+			});
 		}, this);
 	}
 	
@@ -40,10 +40,93 @@ var Engine3D = (function() {
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
 		return buffer;
 	}
+	function createProgram(vertexShader, fragmentShader) {
+		return WebGL.createProgram(gl, vertexShader, fragmentShader);
+	}
 	
-	function setMaterial(program) {
+	function setMaterialParameter(location, type, value) {
+		switch (type) {
+			case 0x8B50: // FLOAT_VEC2
+				gl.uniform2fv(location, value);
+				break;
+			case 0x8B51: // FLOAT_VEC3
+				gl.uniform3fv(location, value);
+				break;
+			case 0x8B52: // FLOAT_VEC4
+				gl.uniform4fv(location, value);
+				break;
+			case 0x8B53: // INT_VEC2
+				gl.uniform2iv(location, value);
+				break;
+			case 0x8B54: // INT_VEC3
+				gl.uniform3iv(location, value);
+				break;
+			case 0x8B55: // INT_VEC4
+				gl.uniform4iv(location, value);
+				break;
+			case 0x8B56: // BOOL
+				gl.uniform1iv(location, value);
+				break;
+			case 0x8B57: // BOOL_VEC2
+				gl.uniform2iv(location, value);
+				break;
+			case 0x8B58: // BOOL_VEC3
+				gl.uniform3iv(location, value);
+				break;
+			case 0x8B59: // BOOL_VEC4
+				gl.uniform4iv(location, value);
+				break;
+			case 0x8B5A: // FLOAT_MAT2
+				gl.uniformMatrix2fv(location, false, value);
+				break;
+			case 0x8B5B: // FLOAT_MAT3
+				gl.uniformMatrix3fv(location, false, value);
+				break;
+			case 0x8B5C: // FLOAT_MAT4
+				gl.uniformMatrix4fv(location, false, value);
+				break;
+			case 0x8B5E: // SAMPLER_2D
+//				gl.uniform2fv(location, value);
+				break;
+			case 0x8B60: // SAMPLER_CUBE
+//				gl.uniform2fv(location, value);
+				break;
+			case 0x1400: // BYTE
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1401: // UNSIGNED_BYTE
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1402: // SHORT
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1403: // UNSIGNED_SHORT
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1404: // INT
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1405: // UNSIGNED_INT
+				gl.uniform1iv(location, value);
+				break;
+			case 0x1406: // FLOAT
+				gl.uniform1fv(location, value);
+				break;
+		}
+	}
+	
+	function setMaterial(program, parameters) {
 		gl.useProgram(program);
 		currentProgram = program;
+		
+		var uniforms = currentProgram.activeUniforms;
+		for (var paramName in parameters) {
+			var param = parameters[paramName];
+			if (paramName in uniforms) {
+				var info = uniforms[paramName];
+				setMaterialParameter(info.location, info.type, param);
+			}
+		}
 	}
 	function setBuffers(vb, ib, description) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, vb);
@@ -67,6 +150,7 @@ var Engine3D = (function() {
 		renderFrame: renderFrame,
 		createVertexBuffer: createVertexBuffer,
 		createIndexBuffer: createIndexBuffer,
+		createProgram: createProgram,
 		setMaterial: setMaterial,
 		setBuffers: setBuffers,
 		renderTriangles: renderTriangles
