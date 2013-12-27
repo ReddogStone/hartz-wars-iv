@@ -1,5 +1,11 @@
 'use strict';
 
+var BlendMode = {
+	SOLID: {name: 'SOLID'},
+	ALPHA: {name: 'ALPHA'},
+	PREMUL_ALPHA: {name: 'PREMUL_ALPHA'},
+};
+
 var Engine3D = (function() {
 	var gl = null;
 	var currentProgram = null;
@@ -8,6 +14,7 @@ var Engine3D = (function() {
 		gl = WebGL.setupWebGL(canvas);
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LESS);
 	}
 
 	function clear() {
@@ -53,7 +60,6 @@ var Engine3D = (function() {
 		texture.image = new Image();
 		texture.image.onload = function() {
 			gl.bindTexture(gl.TEXTURE_2D, texture);
-//			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -154,6 +160,25 @@ var Engine3D = (function() {
 		}
 	}
 	
+	function setBlendMode(blendmode) {
+		switch (blendmode) {
+			case BlendMode.SOLID:
+				gl.disable(gl.BLEND);
+				gl.enable(gl.DEPTH_TEST);
+				break;
+			case BlendMode.ALPHA:
+				gl.enable(gl.BLEND);
+				gl.disable(gl.DEPTH_TEST);
+				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+				break;
+			case BlendMode.PREMUL_ALPHA:
+				gl.enable(gl.BLEND);
+				gl.disable(gl.DEPTH_TEST);
+				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				break;
+		}
+	}
+	
 	function setBuffers(vb, ib, description) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, vb);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
@@ -179,6 +204,7 @@ var Engine3D = (function() {
 		createProgram: createProgram,
 		createTexture: createTexture,
 		setProgram: setProgram,
+		setBlendMode: setBlendMode,
 		setBuffers: setBuffers,
 		renderTriangles: renderTriangles
 	};
