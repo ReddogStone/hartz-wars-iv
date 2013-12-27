@@ -5,13 +5,21 @@ varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 
 uniform sampler2D uTexture;
-uniform vec3 uDirLight1;
+uniform vec3 uPosLight1;
+uniform vec3 uColorLight1;
+uniform vec3 uPosLight2;
+uniform vec3 uColorLight2;
+uniform vec3 uColor;
 
 void main() {
 	vec4 textureColor = texture2D(uTexture, vTexCoord);
 	
-	vec3 toLight = normalize(uDirLight1 - vWorldPos);
-	float light = clamp(dot(toLight, vNormal), 0.0, 1.0);
+	vec3 toLight1 = normalize(uPosLight1 - vWorldPos);
+	vec3 toLight2 = normalize(uPosLight2 - vWorldPos);
+	vec3 light1 = uColorLight1 * clamp(dot(toLight1, vNormal), 0.0, 1.0);
+	vec3 light2 = uColorLight2 * clamp(dot(toLight2, vNormal), 0.0, 1.0);
 	
-	gl_FragColor = light * textureColor;
+	textureColor.rgb *= (light1 + light2) * uColor;
+	
+	gl_FragColor = textureColor;
 }

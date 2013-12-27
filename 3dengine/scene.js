@@ -29,14 +29,24 @@ function Scene(viewport, view, projection) {
 	}
 	
 	this._entities = [];
-	this._dirLight1 = null;
+	this._pointLight1 = null;
+	this._pointLight2 = null;
 }
 Scene.extends(Object, {
+	get pointLight1() {
+		return this._pointLight1;
+	},
+	set pointLight1(value) {
+		this._pointLight1 = PointLight.clone(value);
+	},
+	get pointLight2() {
+		return this._pointLight2;
+	},
+	set pointLight2(value) {
+		this._pointLight2 = PointLight.clone(value);
+	},
 	addEntity: function(entity) {
 		this._entities.push(entity);
-	},
-	setDirLight1: function(value) {
-		this._dirLight1 = value.clone();
 	},
 	render: function(engine) {
 		engine.setViewport(this._viewport);
@@ -45,12 +55,17 @@ Scene.extends(Object, {
 			uView: this._view.val,
 			uProjection: this._projection.val
 		};
-		if (this._dirLight1) {
-			params.uDirLight1 = this._dirLight1.toArray();
+		if (this._pointLight1) {
+			params.uPosLight1 = this._pointLight1.pos.toArray();
+			params.uColorLight1 = this._pointLight1.color.toArray3();
+		}
+		if (this._pointLight2) {
+			params.uPosLight2 = this._pointLight2.pos.toArray();
+			params.uColorLight2 = this._pointLight2.color.toArray3();
 		}
 		
 		scene._entities.forEach(function(entity) {
-			params.uWorld = entity.position.globalTransform.val;
+			params.uWorld = entity.transformable.globalTransform.val;
 			
 			entity.renderable.render(engine, params);
 		});

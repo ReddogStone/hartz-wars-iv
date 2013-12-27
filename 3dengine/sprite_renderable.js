@@ -1,6 +1,6 @@
 'use strict';
 
-function SpriteRenderable(engine) {
+function SpriteRenderable(engine, texturePath) {
 	var meshData = [
 		{
 			"vertices": [
@@ -19,7 +19,7 @@ function SpriteRenderable(engine) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this.material = new SimpleMaterial(engine, 'data/textures/smiley.png');
+	this.material = new SimpleMaterial(engine, texturePath);
 }
 SpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {

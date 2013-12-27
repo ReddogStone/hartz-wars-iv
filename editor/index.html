@@ -8,9 +8,14 @@
 	<script src="engine3d.js" type="text/javascript"></script>
 	<script src="mesh.js" type="text/javascript"></script>
 	<script src="material.js" type="text/javascript"></script>
-	<script src="sprite_renderable.js" type="text/javascript"></script>
 	<script src="scene.js" type="text/javascript"></script>
+	<script src="color.js" type="text/javascript"></script>
+	<script src="point_light.js" type="text/javascript"></script>
 
+	<script src="sprite_renderable.js" type="text/javascript"></script>
+	<script src="transformable.js" type="text/javascript"></script>
+	
+	<script src="Matrix3.js" type="text/javascript"></script>
 	<script src="Matrix4.js" type="text/javascript"></script>
 	<script src="Vector3.js" type="text/javascript"></script>
 	<script src="Vector4.js" type="text/javascript"></script>
@@ -32,7 +37,17 @@
 	}) ();
 	
 	function render() {
-		sprite1.position.globalTransform.translate(new Vecmath.Vector3(0.001, 0, 0));
+		var now = window.performance.now();
+	
+/*		var spr1Transform = sprite1.transformable;
+		spr1Transform.translate(new Vecmath.Vector3(0.001, 0, 0));
+		spr1Transform.rotateY(0.05);
+		spr1Transform.scale.x += 0.001; */
+		
+		var spr1Transform = sprite1.transformable;		
+		spr1Transform.pos = new Vecmath.Vector3(0, 2 * Math.sin(0.001 * now), 2 * Math.cos(0.001 * now));
+		
+//		scene.pointLight1.pos = spr1Transform.pos;
 		
 		Engine3D.clear();
 		scene.render(Engine3D);
@@ -43,25 +58,31 @@
 	var canvas = document.getElementById('canvas');
 	Engine3D.init(canvas);
 	
-	var view = new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(-5, 5, 10),
+	var view = new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 0, 10),
 			new Vecmath.Vector3(0, 0, 0),
 			new Vecmath.Vector3(0, 1, 0));
 	var projection = new Vecmath.Matrix4().perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.01, 1000);
 	var scene = new Scene(new Viewport(), view, projection);
-	scene.setDirLight1(new Vecmath.Vector3(1, 0, 0.1));
+//	scene.pointLight1 = new PointLight(new Vecmath.Vector3(1, 0, 0.1), Color.white);
+	scene.pointLight2 = new PointLight(new Vecmath.Vector3(0, 0, 10), new Color(0.5, 0.5, 0.5));
 	
 	var sprite1 = {
-		renderable: new SpriteRenderable(Engine3D),
-		position: {
-			globalTransform: new Vecmath.Matrix4().translate(new Vecmath.Vector3(0.6, 0, 0))
-		}
+		renderable: new SpriteRenderable(Engine3D, 'data/textures/node2.png'),
+		transformable: new Transformable()
 	};
 	var sprite2 = {
-		renderable: new SpriteRenderable(Engine3D),
-		position: {
-			globalTransform: new Vecmath.Matrix4().translate(new Vecmath.Vector3(-0.6, 0, 0))
-		}
+		renderable: new SpriteRenderable(Engine3D, 'data/textures/node2.png'),
+		transformable: new Transformable(new Vecmath.Vector3(0, 0, 0), null, new Vecmath.Vector3(1, 1, 1))
 	};
+	
+	var mat = sprite1.renderable.material;
+	mat.blendMode = BlendMode.PREMUL_ALPHA;
+	mat.color = Color.blue;
+	
+	var mat = sprite2.renderable.material;
+	mat.blendMode = BlendMode.PREMUL_ALPHA;
+	mat.color = Color.blue;
+	
 	scene.addEntity(sprite1);
 	scene.addEntity(sprite2);
 	
