@@ -1,4 +1,6 @@
 var Vecmath = (function(module) {
+	'use strict';
+
 	function Vector4(x, y, z, w) {
 		if (typeof x === "object") {
 			this.x = x.x||0;
@@ -15,6 +17,10 @@ var Vecmath = (function(module) {
 
 	//shorthand it for better minification
 	var vec4 = Vector4.prototype;
+
+	vec4.clone = function() {
+		return new Vector4(this.x, this.y, this.z, this.w);
+	};
 
     vec4.copy = function(otherVec) {
         this.x = otherVec.x||0;
@@ -112,10 +118,6 @@ var Vecmath = (function(module) {
         this.w = aw + t * (v.w - aw);
         return this;
     };
-
-	vec4.clone = function() {
-		return new Vector4(this.x, this.y, this.z, this.w);
-	};
 
 	vec4.multiply = function(v) {
 		this.x *= v.x;

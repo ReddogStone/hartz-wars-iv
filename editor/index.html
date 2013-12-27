@@ -9,10 +9,12 @@
 	<script src="mesh.js" type="text/javascript"></script>
 	<script src="material.js" type="text/javascript"></script>
 	<script src="sprite_renderable.js" type="text/javascript"></script>
+	<script src="scene.js" type="text/javascript"></script>
 
 	<script src="Matrix4.js" type="text/javascript"></script>
 	<script src="Vector3.js" type="text/javascript"></script>
 	<script src="Vector4.js" type="text/javascript"></script>
+	<script src="Quaternion.js" type="text/javascript"></script>
 </head>
 <body>
 <canvas id="canvas" width="1024" height="768"></canvas>
@@ -30,15 +32,23 @@
 	}) ();
 	
 	function render() {
-		Engine3D.renderFrame(scene);
+		sprite1.position.globalTransform.translate(new Vecmath.Vector3(0.001, 0, 0));
 		
-		scene.nodes[0].position.globalTransform.translate(new Vecmath.Vector3(0.001, 0, 0));
-
+		Engine3D.clear();
+		scene.render(Engine3D);
+		
 		requestAnimFrame( function() { render(); } );
 	}
 
 	var canvas = document.getElementById('canvas');
 	Engine3D.init(canvas);
+	
+	var view = new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(-5, 5, 10),
+			new Vecmath.Vector3(0, 0, 0),
+			new Vecmath.Vector3(0, 1, 0));
+	var projection = new Vecmath.Matrix4().perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.01, 1000);
+	var scene = new Scene(new Viewport(), view, projection);
+	scene.setDirLight1(new Vecmath.Vector3(1, 0, 0.1));
 	
 	var sprite1 = {
 		renderable: new SpriteRenderable(Engine3D),
@@ -52,15 +62,8 @@
 			globalTransform: new Vecmath.Matrix4().translate(new Vecmath.Vector3(-0.6, 0, 0))
 		}
 	};
-	var scene = {
-		viewport: { x: 0, y: 0, sx: canvas.width, sy: canvas.height },
-		view: new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 5, 10),
-			new Vecmath.Vector3(0, 0, 0),
-			new Vecmath.Vector3(0, 1, 0)),
-		projection: new Vecmath.Matrix4().perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.01, 1000),
-		dirLight1: new Vecmath.Vector3(1, 0, 0.1),
-		nodes: [sprite1, sprite2]
-	};
+	scene.addEntity(sprite1);
+	scene.addEntity(sprite2);
 	
 	requestAnimFrame(function() { render(); });
 	alert('OK')

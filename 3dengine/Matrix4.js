@@ -1,4 +1,6 @@
 var Vecmath = (function(module) {
+	'use strict';
+
 	var ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 	var EPSILON = 0.000001;
 

@@ -17,29 +17,6 @@ var Engine3D = (function() {
 		gl.depthFunc(gl.LESS);
 	}
 
-	function clear() {
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	}
-
-	function renderFrame(scene) {
-		var viewport = scene.viewport;
-		gl.viewport(viewport.x, viewport.y, viewport.sx, viewport.sy);
-		
-		clear();
-		
-		var params = {
-			uView: scene.view.val,
-			uProjection: scene.projection.val,
-			uDirLight1: scene.dirLight1.toArray()
-		};
-		
-		scene.nodes.forEach(function(node) {
-			params.uWorld = node.position.globalTransform.val;
-			
-			node.renderable.render(this, params);
-		}, this);
-	}
-	
 	function createVertexBuffer(data) {
 		var buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -68,6 +45,10 @@ var Engine3D = (function() {
 		};
 		texture.image.src = path;
 		return texture;
+	}
+	
+	function setViewport(value) {
+		gl.viewport(value.x, value.y, value.sx, value.sy);		
 	}
 	
 	function setMaterialParameter(location, type, value) {
@@ -193,20 +174,25 @@ var Engine3D = (function() {
 		}		
 	}
 	
+	function clear() {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+	
 	function renderTriangles(count, offset) {
 		gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
 	}
 	
 	return {
 		init: init,
-		renderFrame: renderFrame,
 		createVertexBuffer: createVertexBuffer,
 		createIndexBuffer: createIndexBuffer,
 		createProgram: createProgram,
 		createTexture: createTexture,
+		setViewport: setViewport,
 		setProgram: setProgram,
 		setBlendMode: setBlendMode,
 		setBuffers: setBuffers,
+		clear: clear,
 		renderTriangles: renderTriangles
 	};
 })();

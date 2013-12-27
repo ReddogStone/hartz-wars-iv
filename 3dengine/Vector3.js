@@ -1,4 +1,6 @@
 var Vecmath = (function(module) {
+	'use strict';
+
 	function Vector3(x, y, z) {
 		if (typeof x === "object") {
 			this.x = x.x||0;
