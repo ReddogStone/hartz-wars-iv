@@ -36,21 +36,37 @@ var Engine3D = (function() {
 		return WebGL.createProgram(gl, vertexShader, fragmentShader);
 	}
 	
-	function createTexture(path) {
+	function handleLoadedTexture(texture) {
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+		
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.generateMipmap(gl.TEXTURE_2D);
+		
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		
+		texture.complete = true;
+	}
+	
+	function createTexture(image) {
 		var texture = gl.createTexture();
-		texture.image = new Image();
-		texture.image.onload = function() {
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-			
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			
-			gl.bindTexture(gl.TEXTURE_2D, null);
-		};
-		texture.image.src = path;
+		texture.image = image;
+		handleLoadedTexture(texture);
+		return texture;
+	}
+	
+	function createTextureFromFile(path) {
+		var image = new Image();
+		
+		var texture = gl.createTexture();
+		texture.image = image;
+		
+		image.onload = function() { handleLoadedTexture(texture); };
+		image.src = path;
+		
 		return texture;
 	}
 	
@@ -101,7 +117,7 @@ var Engine3D = (function() {
 				break;
 			case 0x8B5E: // SAMPLER_2D
 				var texture = value.texture;
-				if (texture.image.complete) {
+				if (texture.complete) {
 					var sampler = value.sampler;
 					gl.activeTexture(gl['TEXTURE' + sampler]);
 					gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -181,6 +197,13 @@ var Engine3D = (function() {
 		}		
 	}
 	
+	function reloadTextureImage(texture) {
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+		gl.generateMipmap(gl.TEXTURE_2D);
+		gl.bindTexture(gl.TEXTURE_2D, null);			
+	}	
+	
 	function clear() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
@@ -195,10 +218,12 @@ var Engine3D = (function() {
 		createIndexBuffer: createIndexBuffer,
 		createProgram: createProgram,
 		createTexture: createTexture,
+		createTextureFromFile: createTextureFromFile,
 		setViewport: setViewport,
 		setProgram: setProgram,
 		setBlendMode: setBlendMode,
 		setBuffers: setBuffers,
+		reloadTextureImage: reloadTextureImage,
 		clear: clear,
 		renderTriangles: renderTriangles
 	};

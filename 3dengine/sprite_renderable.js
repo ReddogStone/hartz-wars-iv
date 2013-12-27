@@ -19,7 +19,7 @@ function SpriteRenderable(engine, texturePath) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this.material = new SimpleMaterial(engine, texturePath);
+	this.material = new SimpleMaterial(engine, engine.createTextureFromFile(texturePath));
 }
 SpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {

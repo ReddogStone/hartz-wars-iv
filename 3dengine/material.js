@@ -1,10 +1,7 @@
 'use strict';
 
-function SimpleMaterial(engine, texturePath, color, luminosity) {
-	if (texturePath) {
-		this._texture = engine.createTexture(texturePath);
-	}
-	
+function SimpleMaterial(engine, texture, color, luminosity) {
+	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
 	this._color.alpha = luminosity || 0;
 	
@@ -26,6 +23,9 @@ SimpleMaterial.extends(Object, {
 	},
 	set luminosity(value) {
 		this._color.alpha = value;
+	},
+	get texture() {
+		return this._texture;
 	},
 	set: function(engine, globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
