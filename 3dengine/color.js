@@ -16,6 +16,9 @@ Color.extends(Object, {
 	},
 	toArray3: function() {
 		return [this.red, this.green, this.blue];
+	},
+	toArray4: function() {
+		return [this.red, this.green, this.blue, this.alpha];
 	}
 });
 

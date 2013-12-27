@@ -64,7 +64,7 @@
 	var projection = new Vecmath.Matrix4().perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.01, 1000);
 	var scene = new Scene(new Viewport(), view, projection);
 //	scene.pointLight1 = new PointLight(new Vecmath.Vector3(1, 0, 0.1), Color.white);
-	scene.pointLight2 = new PointLight(new Vecmath.Vector3(0, 0, 10), new Color(0.5, 0.5, 0.5));
+//	scene.pointLight2 = new PointLight(new Vecmath.Vector3(0, 0, 10), new Color(1, 1, 1));
 	
 	var sprite1 = {
 		renderable: new SpriteRenderable(Engine3D, 'data/textures/node2.png'),
@@ -77,11 +77,13 @@
 	
 	var mat = sprite1.renderable.material;
 	mat.blendMode = BlendMode.PREMUL_ALPHA;
-	mat.color = Color.blue;
+	mat.color = new Color(0.5, 0.5, 1);
+	mat.luminosity = 0.5;
 	
 	var mat = sprite2.renderable.material;
 	mat.blendMode = BlendMode.PREMUL_ALPHA;
 	mat.color = Color.blue;
+	mat.luminosity = 1;
 	
 	scene.addEntity(sprite1);
 	scene.addEntity(sprite2);

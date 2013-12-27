@@ -64,6 +64,15 @@ Scene.extends(Object, {
 			params.uColorLight2 = this._pointLight2.color.toArray3();
 		}
 		
+		var view = this._view;
+		scene._entities.forEach(function(entity) {
+			entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
+		});
+		
+		scene._entities.sort(function(e1, e2) {
+			return e1.viewZ - e2.viewZ;
+		});
+		
 		scene._entities.forEach(function(entity) {
 			params.uWorld = entity.transformable.globalTransform.val;
 			
