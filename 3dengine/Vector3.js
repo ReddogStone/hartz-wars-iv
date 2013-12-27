@@ -262,7 +262,10 @@ var Vecmath = (function(module) {
 		this.z = 0;
 		return this;
 	};
-
+	
+	vec3.toArray = function() {
+		return [this.x, this.y, this.z];
+	};
 
 	vec3.sub = vec3.subtract;
 

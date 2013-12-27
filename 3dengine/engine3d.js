@@ -30,6 +30,7 @@ var Engine3D = (function() {
 		var params = {
 			uView: scene.view.val,
 			uProjection: scene.projection.val,
+			uDirLight1: scene.dirLight1.toArray()
 		};
 		
 		scene.nodes.forEach(function(node) {

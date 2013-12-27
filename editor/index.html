@@ -54,10 +54,11 @@
 	};
 	var scene = {
 		viewport: { x: 0, y: 0, sx: canvas.width, sy: canvas.height },
-		view: new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 0, 1),
+		view: new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 5, 10),
 			new Vecmath.Vector3(0, 0, 0),
 			new Vecmath.Vector3(0, 1, 0)),
-		projection: new Vecmath.Matrix4().perspective(0.5 * Math.PI, canvas.width / canvas.height, 0.01, 1000),
+		projection: new Vecmath.Matrix4().perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.01, 1000),
+		dirLight1: new Vecmath.Vector3(1, 0, 0.1),
 		nodes: [sprite1, sprite2]
 	};
 	
