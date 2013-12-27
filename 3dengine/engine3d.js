@@ -48,6 +48,21 @@ var Engine3D = (function() {
 		return WebGL.createProgram(gl, vertexShader, fragmentShader);
 	}
 	
+	function createTexture(path) {
+		var texture = gl.createTexture();
+		texture.image = new Image();
+		texture.image.onload = function() {
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+//			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		};
+		texture.image.src = path;
+		return texture;
+	}
+	
 	function setMaterialParameter(location, type, value) {
 		switch (type) {
 			case 0x8B50: // FLOAT_VEC2
@@ -90,7 +105,13 @@ var Engine3D = (function() {
 				gl.uniformMatrix4fv(location, false, value);
 				break;
 			case 0x8B5E: // SAMPLER_2D
-//				gl.uniform2fv(location, value);
+				var texture = value.texture;
+				if (texture.image.complete) {
+					var sampler = value.sampler;
+					gl.activeTexture(gl['TEXTURE' + sampler]);
+					gl.bindTexture(gl.TEXTURE_2D, texture);
+					gl.uniform1i(location, sampler);
+				}
 				break;
 			case 0x8B60: // SAMPLER_CUBE
 //				gl.uniform2fv(location, value);
@@ -119,7 +140,7 @@ var Engine3D = (function() {
 		}
 	}
 	
-	function setMaterial(program, parameters) {
+	function setProgram(program, parameters) {
 		gl.useProgram(program);
 		currentProgram = program;
 		
@@ -132,6 +153,7 @@ var Engine3D = (function() {
 			}
 		}
 	}
+	
 	function setBuffers(vb, ib, description) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, vb);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
@@ -155,7 +177,8 @@ var Engine3D = (function() {
 		createVertexBuffer: createVertexBuffer,
 		createIndexBuffer: createIndexBuffer,
 		createProgram: createProgram,
-		setMaterial: setMaterial,
+		createTexture: createTexture,
+		setProgram: setProgram,
 		setBuffers: setBuffers,
 		renderTriangles: renderTriangles
 	};

@@ -18,13 +18,11 @@ function SpriteRenderable(engine) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/simple_vs.shader'), 
-		FileUtils.loadFile('data/shaders/simple_fs.shader'));
+	this.material = new SimpleMaterial(engine, 'data/textures/smiley.png');
 }
 SpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {
-		engine.setMaterial(this._program, globalParams);
+		this.material.set(engine, globalParams);
 		this._mesh.render(engine);
 	}
 });
