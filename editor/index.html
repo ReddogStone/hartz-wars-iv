@@ -18,6 +18,7 @@
 	
 	<script src="Matrix3.js" type="text/javascript"></script>
 	<script src="Matrix4.js" type="text/javascript"></script>
+	<script src="Vector2.js" type="text/javascript"></script>
 	<script src="Vector3.js" type="text/javascript"></script>
 	<script src="Vector4.js" type="text/javascript"></script>
 	<script src="Quaternion.js" type="text/javascript"></script>
@@ -57,11 +58,6 @@
 		}
 		fpsLabel.renderable.text = 'FPS: ' + g_fps;
 	
-		var spr1Transform = sprite1.transformable;		
-		spr1Transform.pos = new Vecmath.Vector3(0, 2 * Math.sin(0.001 * time), 2 * Math.cos(0.001 * time));
-		
-		label.renderable.text = '' + time;
-		
 		Engine3D.clear();
 		scene.render(Engine3D);
 		
@@ -70,26 +66,21 @@
 
 	var canvas = document.getElementById('canvas');
 	Engine3D.init(canvas);
+	Engine3D.setClearColor(new Color(0.3, 0.3, 0.3));
 	
-	var view = new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 0, 2),
+	var view = new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 0, 10),
 			new Vecmath.Vector3(0, 0, 0),
 			new Vecmath.Vector3(0, 1, 0));
 	var projection = new Vecmath.Matrix4().perspective(0.5 * Math.PI, canvas.width / canvas.height, 0.01, 1000);
 	var scene = new Scene(new Viewport(), view, projection);
-//	scene.pointLight1 = new PointLight(new Vecmath.Vector3(1, 0, 0.1), Color.white);
-//	scene.pointLight2 = new PointLight(new Vecmath.Vector3(0, 0, 10), new Color(1, 1, 1));
 	
 	var sprite1 = {
-		renderable: new SpriteRenderable(Engine3D, 'data/textures/node2.png'),
-		transformable: new Transformable()
+		renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
+		transformable: new Transformable(new Vecmath.Vector3(0, 0, 0))
 	};
 	var sprite2 = {
-		renderable: new SpriteRenderable(Engine3D, 'data/textures/node2.png'),
-		transformable: new Transformable(new Vecmath.Vector3(0, 0, 0), null, new Vecmath.Vector3(1, 1, 1))
-	};
-	var label = {
-		renderable: new TextRenderable(Engine3D, 'TengaliumMMM', new Font('Georgia', 32), Color.green),
-		transformable: new Transformable(new Vecmath.Vector3(0, 0, 1))
+		renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
+		transformable: new Transformable(new Vecmath.Vector3(1, 1, 2))
 	};
 	var fpsLabel = {
 		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 20), Color.white),
@@ -97,26 +88,21 @@
 	};
 	
 	var mat = sprite1.renderable.material;
-	mat.color = new Color(0.5, 0.5, 1);
+	mat.color = Color.blue;
 	mat.luminosity = 1;
-	
 	var mat = sprite2.renderable.material;
 	mat.color = Color.blue;
 	mat.luminosity = 1;
-
-	var mat = label.renderable.material;
-	mat.luminosity = 1;
-
+	
 	var mat = fpsLabel.renderable.material;
 	mat.luminosity = 1;
 	
+	scene.addEntity(fpsLabel);
 	scene.addEntity(sprite1);
 	scene.addEntity(sprite2);
-	scene.addEntity(label);
-	scene.addEntity(fpsLabel);
 	
 	requestAnimFrame(function() { render(); });
-	alert('OK')
+	alert('OK');
 </script>
 </body>
 </html>

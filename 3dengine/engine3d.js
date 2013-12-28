@@ -70,6 +70,10 @@ var Engine3D = (function() {
 		return texture;
 	}
 	
+	function setClearColor(color) {
+		gl.clearColor(color.red, color.green, color.blue, 1.0);		
+	}
+	
 	function setViewport(value) {
 		gl.viewport(value.x, value.y, value.sx, value.sy);		
 	}
@@ -223,6 +227,7 @@ var Engine3D = (function() {
 		createProgram: createProgram,
 		createTexture: createTexture,
 		createTextureFromFile: createTextureFromFile,
+		setClearColor: setClearColor,
 		setViewport: setViewport,
 		setProgram: setProgram,
 		setBlendMode: setBlendMode,

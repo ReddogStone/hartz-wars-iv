@@ -63,3 +63,39 @@ ScreenSpaceMaterial.extends(Object, {
 	}
 });
 
+function PointSpriteMaterial(engine, texture, size, color) {
+	this._size = size || new Vecmath.Vector2(64, 64);
+	this._texture = texture;
+	this._color = Color.clone(color) || Color.white;
+	
+	this._program = engine.createProgram(
+		FileUtils.loadFile('data/shaders/pointsprite_vs.shader'), 
+		FileUtils.loadFile('data/shaders/pointsprite_fs.shader'));
+	
+	this.blendMode = BlendMode.PREMUL_ALPHA;
+}
+PointSpriteMaterial.extends(Object, {
+	get size() {
+		return this._size;
+	},
+	set size(value) {
+		this._size = value.clone();
+	},
+	get color() {
+		return this._color;
+	},
+	set color(value) {
+		this._color = Color.clone(value);
+	},
+	get texture() {
+		return this._texture;
+	},
+	set: function(engine, globalParams) {
+		globalParams.uTexture = {texture: this._texture, sampler: 0};
+		globalParams.uColor = this._color.toArray4();
+		globalParams.uSize = this._size.toArray();
+		engine.setProgram(this._program, globalParams);
+		engine.setBlendMode(this.blendMode);
+	}
+});
+
