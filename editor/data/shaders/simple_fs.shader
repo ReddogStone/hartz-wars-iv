@@ -22,5 +22,5 @@ void main() {
 	textureColor.rgb *= (light1 + light2) * uColor.rgb;
 	textureColor.rgb += uColor.rgb * uColor.a * textureColor.a;
 	
-	gl_FragColor = textureColor;
+	gl_FragColor = textureColor + vec4(0.1, 0, 0, 0);
 }

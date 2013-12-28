@@ -212,6 +212,10 @@ var Engine3D = (function() {
 		gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
 	}
 	
+	function getDrawingBufferSize() {
+		return {x: gl.drawingBufferWidth, y: gl.drawingBufferHeight};
+	}
+	
 	return {
 		init: init,
 		createVertexBuffer: createVertexBuffer,
@@ -225,6 +229,7 @@ var Engine3D = (function() {
 		setBuffers: setBuffers,
 		reloadTextureImage: reloadTextureImage,
 		clear: clear,
-		renderTriangles: renderTriangles
+		renderTriangles: renderTriangles,
+		getDrawingBufferSize: getDrawingBufferSize
 	};
 })();

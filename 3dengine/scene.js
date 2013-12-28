@@ -51,9 +51,12 @@ Scene.extends(Object, {
 	render: function(engine) {
 		engine.setViewport(this._viewport);
 		
+		var bufferSize = engine.getDrawingBufferSize();
+		
 		var params = {
 			uView: this._view.val,
-			uProjection: this._projection.val
+			uProjection: this._projection.val,
+			uScreenSize: [bufferSize.x, bufferSize.y]
 		};
 		if (this._pointLight1) {
 			params.uPosLight1 = this._pointLight1.pos.toArray();

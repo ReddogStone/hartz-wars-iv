@@ -26,6 +26,11 @@
 <canvas id="canvas" width="1024" height="768"></canvas>
 
 <script>
+	var lastTime = window.performance.now();
+	var g_fps = 0;
+	var g_frames = 0;
+	var g_framesTime = 0;
+	
 	window.requestAnimFrame = (function () {
 		return window.requestAnimationFrame ||
 			window.webkitRequestAnimationFrame ||
@@ -38,17 +43,24 @@
 	}) ();
 	
 	function render() {
-		var now = window.performance.now();
+		var time = window.performance.now();
+		var delta = (time - lastTime) * 0.001;
+		lastTime = time;
+		
+		// update fps
+		g_framesTime += delta;
+		g_frames++;
+		if (g_framesTime > 1.0) {
+			g_framesTime -= 1.0;
+			g_fps = g_frames;
+			g_frames = 0;
+		}
+		fpsLabel.renderable.text = 'FPS: ' + g_fps;
 	
-/*		var spr1Transform = sprite1.transformable;
-		spr1Transform.translate(new Vecmath.Vector3(0.001, 0, 0));
-		spr1Transform.rotateY(0.05);
-		spr1Transform.scale.x += 0.001; */
-		
 		var spr1Transform = sprite1.transformable;		
-		spr1Transform.pos = new Vecmath.Vector3(0, 2 * Math.sin(0.001 * now), 2 * Math.cos(0.001 * now));
+		spr1Transform.pos = new Vecmath.Vector3(0, 2 * Math.sin(0.001 * time), 2 * Math.cos(0.001 * time));
 		
-//		scene.pointLight1.pos = spr1Transform.pos;
+		label.renderable.text = '' + time;
 		
 		Engine3D.clear();
 		scene.render(Engine3D);
@@ -76,28 +88,32 @@
 		transformable: new Transformable(new Vecmath.Vector3(0, 0, 0), null, new Vecmath.Vector3(1, 1, 1))
 	};
 	var label = {
-		renderable: new TextRenderable(Engine3D, 'Test', new Font('Georgia', 50), Color.white),
+		renderable: new TextRenderable(Engine3D, 'TengaliumMMM', new Font('Georgia', 32), Color.green),
 		transformable: new Transformable(new Vecmath.Vector3(0, 0, 1))
+	};
+	var fpsLabel = {
+		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 20), Color.white),
+		transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
 	};
 	
 	var mat = sprite1.renderable.material;
-	mat.blendMode = BlendMode.PREMUL_ALPHA;
 	mat.color = new Color(0.5, 0.5, 1);
 	mat.luminosity = 1;
 	
 	var mat = sprite2.renderable.material;
-	mat.blendMode = BlendMode.PREMUL_ALPHA;
 	mat.color = Color.blue;
 	mat.luminosity = 1;
 
 	var mat = label.renderable.material;
-	mat.blendMode = BlendMode.PREMUL_ALPHA;
-	mat.color = Color.white;
+	mat.luminosity = 1;
+
+	var mat = fpsLabel.renderable.material;
 	mat.luminosity = 1;
 	
 	scene.addEntity(sprite1);
 	scene.addEntity(sprite2);
 	scene.addEntity(label);
+	scene.addEntity(fpsLabel);
 	
 	requestAnimFrame(function() { render(); });
 	alert('OK')
