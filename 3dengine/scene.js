@@ -17,16 +17,9 @@ Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
 
-function Scene(viewport, view, projection) {
+function Scene(viewport, camera) {
 	this._viewport = Viewport.clone(viewport);
-	this._view = view ? view.clone() : new Vecmath.Matrix4().lookAt(new Vecmath.Vector3(0, 0, 10), 
-		new Vecmath.Vector3(0, 0, 0), new Vecmath.Vector3(0, 1, 0));
-	if (projection) {
-		this._projection = projection.clone();
-	} else {
-		var canvas = document.getElementById('canvas');
-		this._projection = new Vecmath.Matrix4().perspective(0.5 * Math.PI, canvas.width / canvas.height, 0.1, 1000);
-	}
+	this._camera = camera || new Camera();
 	
 	this._entities = [];
 	this._pointLight1 = null;
@@ -52,10 +45,13 @@ Scene.extends(Object, {
 		engine.setViewport(this._viewport);
 		
 		var bufferSize = engine.getDrawingBufferSize();
+		var camera = this._camera;
+		var view = camera.getView();
+		var projection = camera.getProjection();
 		
 		var params = {
-			uView: this._view.val,
-			uProjection: this._projection.val,
+			uView: view.val,
+			uProjection: projection.val,
 			uScreenSize: [bufferSize.x, bufferSize.y]
 		};
 		if (this._pointLight1) {
@@ -67,7 +63,6 @@ Scene.extends(Object, {
 			params.uColorLight2 = this._pointLight2.color.toArray3();
 		}
 		
-		var view = this._view;
 		scene._entities.forEach(function(entity) {
 			entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
 		});
@@ -77,7 +72,7 @@ Scene.extends(Object, {
 		});
 		
 		scene._entities.forEach(function(entity) {
-			params.uWorld = entity.transformable.globalTransform.val;
+			params.uWorld = entity.transformable.transform.val;
 			
 			entity.renderable.render(engine, params);
 		});

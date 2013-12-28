@@ -18,7 +18,13 @@ Transformable.extends(Object, {
 	set pos(value) {
 		this._pos = value.clone();
 	},
-	get globalTransform() {
+	get direction() {
+		return new Vecmath.Vector3(0, 0, -1).transformQuat(this._rot);
+	},
+	get up() {
+		return new Vecmath.Vector3(0, 1, 0).transformQuat(this._rot);
+	},
+	get transform() {
 		return new Vecmath.Matrix4().fromRotationTranslation(this._rot, this._pos).scale(this._scale);
 	},
 	translate: function(vec) {
