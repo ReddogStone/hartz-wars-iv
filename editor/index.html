@@ -95,6 +95,8 @@
         };
     }
 
+	var g_drag = {x: 0, y: 0};
+	
 	function handleMouseEvent(event, isDown, type) {
 		var coords = extractMouseCoords(canvas, event);
 		g_mouse.x = coords.x;
@@ -104,6 +106,8 @@
 
 	function handleMouseDown(event) {
 		handleMouseEvent(event, true, 'mouseDown');
+		
+		g_drag = {x: g_mouse.x, y: g_mouse.y};
 	}
 
 	function handleMouseUp(event) {
@@ -112,6 +116,14 @@
 
 	function handleMouseMove(event) {
 		handleMouseEvent(event, g_mouse.down, 'mouseMove');
+		
+		if (g_mouse.down) {
+			var dx = g_mouse.x - g_drag.x;
+			var dy = g_mouse.y - g_drag.y;
+			g_camEntity.camera.rotateAroundTargetHoriz(g_camEntity.transformable, -0.005 * dx);
+			g_camEntity.camera.rotateAroundTargetVert(g_camEntity.transformable, -0.01 * dy);
+			g_drag = {x: g_mouse.x, y: g_mouse.y};
+		}
 	}
 
 	g_canvas = document.getElementById('canvas');
@@ -143,7 +155,7 @@
 	for (var i = 0; i < SPRITE_COUNT; ++i) {
 		var angle = (i / (SPRITE_COUNT - 1) - 0.5) * Math.PI;
 		var sprite = {
-			renderable: new SpriteRenderable(Engine3D, 'data/textures/node.png'),
+			renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
 			transformable: new Transformable(new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle)))
 		};
 		var mat = sprite.renderable.material;
