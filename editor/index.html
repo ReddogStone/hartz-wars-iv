@@ -59,7 +59,7 @@
 		}
 		fpsLabel.renderable.text = 'FPS: ' + g_fps;
 		
-		camera.transformable.pos = new Vecmath.Vector3(10 * Math.sin(0.001 * time), 3, 10);
+		camera.transformable.pos = new Vecmath.Vector3(10 * Math.sin(0.001 * time), 5, 10);
 	
 		Engine3D.clear();
 		scene.render(Engine3D);
@@ -71,19 +71,13 @@
 	Engine3D.init(canvas);
 	Engine3D.setClearColor(new Color(0.3, 0.3, 0.3));
 	
-	var camera = new Camera(0.5 * Math.PI, canvas.width / canvas.height, 0.01, 1000);
-	camera.transformable.pos = new Vecmath.Vector3(0, 0, 10);
-	camera.target = new Vecmath.Vector3(0, 0, 0);
+	var camera = {
+		camera: new Camera(0.5 * Math.PI, canvas.width / canvas.height, 0.01, 1000),
+		transformable: new Transformable(new Vecmath.Vector3(0, 0, 10))
+	};
+	camera.camera.target = new Vecmath.Vector3(0, 0, 0);
 	var scene = new Scene(new Viewport(), camera);
 	
-	var sprite1 = {
-		renderable: new SpriteRenderable(Engine3D, 'data/textures/node.png'),
-		transformable: new Transformable(new Vecmath.Vector3(0, 0, 0))
-	};
-	var sprite2 = {
-		renderable: new SpriteRenderable(Engine3D, 'data/textures/node.png'),
-		transformable: new Transformable(new Vecmath.Vector3(1, 1, 2))
-	};
 	var fpsLabel = {
 		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 20), Color.white),
 		transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
@@ -94,11 +88,12 @@
 		var angle = (i / (count - 1) - 0.5) * Math.PI;
 		var sprite = {
 			renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
-			transformable: new Transformable(new Vecmath.Vector3(10 * Math.sin(angle), 0, 10 * Math.cos(angle)))
+			transformable: new Transformable(new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle)))
 		};
 		var mat = sprite.renderable.material;
 		mat.color = Color.blue;
 		mat.luminosity = 1;
+		mat.size = new Vecmath.Vector2(24, 24);
 		scene.addEntity(sprite);
 	}
 	

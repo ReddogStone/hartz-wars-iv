@@ -1,7 +1,6 @@
 'use strict';
 
 function Camera(fov, aspect, nearPlane, farPlane) {
-	this.transformable = new Transformable();
 	this._fov = fov || 0.5 * Math.PI;
 	if (aspect) {
 		this._aspect = aspect;
@@ -21,8 +20,7 @@ Camera.extends(Object, {
 	_createProjection: function() {
 		this._projection = new Vecmath.Matrix4().perspective(this._fov, this._aspect, this._near, this._far);
 	},
-	getView: function() {
-		var transformable = this.transformable;
+	getView: function(transformable) {
 		if (this.target) {
 			var target = this.target;
 			var targetPos = target;
