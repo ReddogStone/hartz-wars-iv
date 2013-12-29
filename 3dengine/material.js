@@ -70,7 +70,7 @@ function PointSpriteMaterial(engine, texture, size, color) {
 	
 	this._program = engine.createProgram(
 		FileUtils.loadFile('data/shaders/pointsprite_vs.shader'), 
-		FileUtils.loadFile('data/shaders/pointsprite_fs.shader'));
+		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
 	
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
@@ -94,6 +94,42 @@ PointSpriteMaterial.extends(Object, {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
 		globalParams.uSize = this._size.toArray();
+		engine.setProgram(this._program, globalParams);
+		engine.setBlendMode(this.blendMode);
+	}
+});
+
+function LineMaterial(engine, patternTexture, width, color) {
+	this._width = width ? width : 1.0;
+	this._texture = patternTexture;
+	this._color = Color.clone(color) || Color.white;
+	
+	this._program = engine.createProgram(
+		FileUtils.loadFile('data/shaders/line_vs.shader'), 
+		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
+	
+	this.blendMode = BlendMode.PREMUL_ALPHA;
+}
+LineMaterial.extends(Object, {
+	get width() {
+		return this._width;
+	},
+	set width(value) {
+		this._width = value;
+	},
+	get color() {
+		return this._color;
+	},
+	set color(value) {
+		this._color = Color.clone(value);
+	},
+	get texture() {
+		return this._texture;
+	},
+	set: function(engine, globalParams) {
+		globalParams.uTexture = {texture: this._texture, sampler: 0};
+		globalParams.uColor = this._color.toArray4();
+		globalParams.uWidth = [this._width];
 		engine.setProgram(this._program, globalParams);
 		engine.setBlendMode(this.blendMode);
 	}

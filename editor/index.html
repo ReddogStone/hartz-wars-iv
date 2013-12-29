@@ -126,51 +126,87 @@
 		}
 	}
 
-	g_canvas = document.getElementById('canvas');
-	Engine3D.init(g_canvas);
-	Engine3D.setClearColor(new Color(0.3, 0.3, 0.3));
-	
-	g_camEntity = {
-		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
-		transformable: new Transformable(new Vecmath.Vector3(0, 5, 10))
-	};
-	g_camEntity.camera.target = new Vecmath.Vector3(0, 0, 0);
-	g_scene = new Scene(new Viewport(), g_camEntity);
-	
-	g_fpsLabel = {
-		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
-		transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
-	};
-	g_fpsLabel.renderable.material.luminosity = 1;
-	g_scene.addEntity(g_fpsLabel);
-	
-	g_mousePosLabel = {
-		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
-		transformable: new Transformable(new Vecmath.Vector3(800, 727, 0))
-	};
-	g_mousePosLabel.renderable.material.luminosity = 1;
-	g_scene.addEntity(g_mousePosLabel);
-	
-	const SPRITE_COUNT = 10;
-	for (var i = 0; i < SPRITE_COUNT; ++i) {
-		var angle = (i / (SPRITE_COUNT - 1) - 0.5) * Math.PI;
+	function start() {
+		g_canvas = document.getElementById('canvas');
+		
+		Engine3D.init(g_canvas);
+		Engine3D.setClearColor(new Color(0.1, 0.1, 0.1));
+		
+		g_camEntity = {
+			camera: new Camera(0.25 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
+			transformable: new Transformable(new Vecmath.Vector3(0, 5, 15))
+		};
+		g_camEntity.camera.target = new Vecmath.Vector3(0, 0, 0);
+		g_scene = new Scene(new Viewport(), g_camEntity);
+		
+		g_fpsLabel = {
+			renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
+			transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
+		};
+		g_fpsLabel.renderable.material.luminosity = 1;
+		g_scene.addEntity(g_fpsLabel);
+		
+		g_mousePosLabel = {
+			renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
+			transformable: new Transformable(new Vecmath.Vector3(800, 727, 0))
+		};
+		g_mousePosLabel.renderable.material.luminosity = 1;
+		g_scene.addEntity(g_mousePosLabel);
+		
+		const blue = new Color(0.4, 0.6, 1.0);
+		
+		const SPRITE_COUNT = 10;
+		var transforms = [];
+		
 		var sprite = {
 			renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
-			transformable: new Transformable(new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle)))
+			transformable: new Transformable(new Vecmath.Vector3(0, 2, 0))
 		};
 		var mat = sprite.renderable.material;
-		mat.color = Color.blue;
+		mat.color = blue;
 		mat.luminosity = 1;
-		mat.size = new Vecmath.Vector2(24, 24);
+		mat.size = new Vecmath.Vector2(50, 50);
+		
 		g_scene.addEntity(sprite);
+		transforms.push(sprite.transformable);
+		
+		for (var i = 0; i < SPRITE_COUNT; ++i) {
+			var angle = (i / (SPRITE_COUNT - 1) - 0.5) * Math.PI;
+			var sprite = {
+				renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
+				transformable: new Transformable(new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle)))
+			};
+			var mat = sprite.renderable.material;
+			mat.color = blue;
+			mat.luminosity = 1;
+			mat.size = new Vecmath.Vector2(40, 40);
+			
+			g_scene.addEntity(sprite);
+			transforms.push(sprite.transformable);
+		}
+		
+		for (var i = 0; i < transforms.length - 1; ++i) {
+			var endPoint1 = transforms[i];
+			var endPoint2 = transforms[i + 1];
+			var line = {
+				renderable: new LineRenderable(Engine3D, 'data/textures/line_pattern.png', endPoint1, endPoint2)
+			};
+			var mat = line.renderable.material;
+			mat.color = blue;
+			mat.luminosity = 1;
+			mat.width = 10;
+			g_scene.addEntity(line);
+		}
+		
+		g_canvas.addEventListener('mousedown', handleMouseDown, false);
+		g_canvas.addEventListener('mousemove', handleMouseMove, false);
+		g_canvas.addEventListener('mouseup', handleMouseUp, false);
+		
+		requestAnimFrame(function() { render(); });
+		alert('OK');
 	}
 	
-	g_canvas.addEventListener('mousedown', handleMouseDown, false);
-	g_canvas.addEventListener('mousemove', handleMouseMove, false);
-	g_canvas.addEventListener('mouseup', handleMouseUp, false);
-	
-	requestAnimFrame(function() { render(); });
-	alert('OK');
+	start();
 </script>
 </body>
 </html>

@@ -73,7 +73,11 @@ Scene.extends(Object, {
 		}
 		
 		this._entities.forEach(function(entity) {
-			entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
+			if (entity.transformable) {
+				entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
+			} else {
+				entity.viewZ = 10000.0;
+			}
 		});
 		
 		this._entities.sort(function(e1, e2) {
@@ -81,7 +85,9 @@ Scene.extends(Object, {
 		});
 		
 		this._entities.forEach(function(entity) {
-			params.uWorld = entity.transformable.transform.val;
+			if (entity.transformable) {
+				params.uWorld = entity.transformable.transform.val;
+			}
 			
 			entity.renderable.render(engine, params);
 		});
