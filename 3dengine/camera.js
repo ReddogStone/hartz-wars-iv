@@ -34,5 +34,8 @@ Camera.extends(Object, {
 	},
 	getProjection: function() {
 		return this._projection;
+	},
+	rotateAroundTarget: function(transformable) {
+		
 	}
 });

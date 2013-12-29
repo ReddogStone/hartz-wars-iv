@@ -19,7 +19,7 @@ Viewport.clone = function(value) {
 
 function Scene(viewport, camEntity) {
 	this._viewport = Viewport.clone(viewport);
-	this._camEntity = camera || {
+	this._camEntity = camEntity || {
 		camera: new Camera(),
 		transformable: new Transformable()
 	};
@@ -72,15 +72,15 @@ Scene.extends(Object, {
 			params.uColorLight2 = this._pointLight2.color.toArray3();
 		}
 		
-		scene._entities.forEach(function(entity) {
+		this._entities.forEach(function(entity) {
 			entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
 		});
 		
-		scene._entities.sort(function(e1, e2) {
+		this._entities.sort(function(e1, e2) {
 			return e1.viewZ - e2.viewZ;
 		});
 		
-		scene._entities.forEach(function(entity) {
+		this._entities.forEach(function(entity) {
 			params.uWorld = entity.transformable.transform.val;
 			
 			entity.renderable.render(engine, params);

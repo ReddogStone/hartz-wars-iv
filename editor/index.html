@@ -28,10 +28,16 @@
 <canvas id="canvas" width="1024" height="768"></canvas>
 
 <script>
+	var g_canvas;
+	var g_camEntity;
+	var g_scene;
+	var g_fpsLabel;
+	var g_mousePosLabel;
 	var lastTime = window.performance.now();
 	var g_fps = 0;
 	var g_frames = 0;
 	var g_framesTime = 0;
+	var g_mouse = {x: 0, y: 0, down: false};
 	
 	window.requestAnimFrame = (function () {
 		return window.requestAnimationFrame ||
@@ -57,50 +63,99 @@
 			g_fps = g_frames;
 			g_frames = 0;
 		}
-		fpsLabel.renderable.text = 'FPS: ' + g_fps;
+		g_fpsLabel.renderable.text = 'FPS: ' + g_fps;
 		
-		camera.transformable.pos = new Vecmath.Vector3(10 * Math.sin(0.001 * time), 5, 10);
+		g_mousePosLabel.renderable.text = 'Mouse: (' + g_mouse.x + ', ' + g_mouse.y + ', ' + (g_mouse.down ? 'down' : 'up') + ')';
+		
+//		camera.transformable.pos = new Vecmath.Vector3(10 * Math.sin(0.001 * time), 5, 10);
 	
 		Engine3D.clear();
-		scene.render(Engine3D);
+		g_scene.render(Engine3D);
 		
 		requestAnimFrame( function() { render(); } );
 	}
+	
+    function extractMouseCoords(canvas, evt){
+        // get canvas position
+        var obj = canvas;
+        var top = 0;
+        var left = 0;
+        while (obj && obj.tagName != 'BODY') {
+            top += obj.offsetTop;
+            left += obj.offsetLeft;
+            obj = obj.offsetParent;
+        }
 
-	var canvas = document.getElementById('canvas');
-	Engine3D.init(canvas);
+        // return relative mouse position
+        var mouseX = evt.clientX - left + window.pageXOffset;
+        var mouseY = evt.clientY - top + window.pageYOffset;
+        return {
+            x: mouseX,
+            y: mouseY
+        };
+    }
+
+	function handleMouseEvent(event, isDown, type) {
+		var coords = extractMouseCoords(canvas, event);
+		g_mouse.x = coords.x;
+		g_mouse.y = coords.y;
+		g_mouse.down = isDown;
+	}
+
+	function handleMouseDown(event) {
+		handleMouseEvent(event, true, 'mouseDown');
+	}
+
+	function handleMouseUp(event) {
+		handleMouseEvent(event, false, 'mouseUp');
+	}
+
+	function handleMouseMove(event) {
+		handleMouseEvent(event, g_mouse.down, 'mouseMove');
+	}
+
+	g_canvas = document.getElementById('canvas');
+	Engine3D.init(g_canvas);
 	Engine3D.setClearColor(new Color(0.3, 0.3, 0.3));
 	
-	var camera = {
-		camera: new Camera(0.5 * Math.PI, canvas.width / canvas.height, 0.01, 1000),
-		transformable: new Transformable(new Vecmath.Vector3(0, 0, 10))
+	g_camEntity = {
+		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
+		transformable: new Transformable(new Vecmath.Vector3(0, 5, 10))
 	};
-	camera.camera.target = new Vecmath.Vector3(0, 0, 0);
-	var scene = new Scene(new Viewport(), camera);
+	g_camEntity.camera.target = new Vecmath.Vector3(0, 0, 0);
+	g_scene = new Scene(new Viewport(), g_camEntity);
 	
-	var fpsLabel = {
-		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 20), Color.white),
+	g_fpsLabel = {
+		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
 		transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
 	};
+	g_fpsLabel.renderable.material.luminosity = 1;
+	g_scene.addEntity(g_fpsLabel);
 	
-	var count = 10;
-	for (var i = 0; i < count; ++i) {
-		var angle = (i / (count - 1) - 0.5) * Math.PI;
+	g_mousePosLabel = {
+		renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
+		transformable: new Transformable(new Vecmath.Vector3(800, 727, 0))
+	};
+	g_mousePosLabel.renderable.material.luminosity = 1;
+	g_scene.addEntity(g_mousePosLabel);
+	
+	const SPRITE_COUNT = 10;
+	for (var i = 0; i < SPRITE_COUNT; ++i) {
+		var angle = (i / (SPRITE_COUNT - 1) - 0.5) * Math.PI;
 		var sprite = {
-			renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
+			renderable: new SpriteRenderable(Engine3D, 'data/textures/node.png'),
 			transformable: new Transformable(new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle)))
 		};
 		var mat = sprite.renderable.material;
 		mat.color = Color.blue;
 		mat.luminosity = 1;
 		mat.size = new Vecmath.Vector2(24, 24);
-		scene.addEntity(sprite);
+		g_scene.addEntity(sprite);
 	}
 	
-	var mat = fpsLabel.renderable.material;
-	mat.luminosity = 1;
-	
-	scene.addEntity(fpsLabel);
+	g_canvas.addEventListener('mousedown', handleMouseDown, false);
+	g_canvas.addEventListener('mousemove', handleMouseMove, false);
+	g_canvas.addEventListener('mouseup', handleMouseUp, false);
 	
 	requestAnimFrame(function() { render(); });
 	alert('OK');
