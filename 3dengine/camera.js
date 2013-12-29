@@ -21,7 +21,7 @@ Camera.extends(Object, {
 	_createProjection: function() {
 		this._projection = new Vecmath.Matrix4().perspective(this._fov, this._aspect, this._near, this._far);
 	},
-	_getTargetPos: function() {
+	getTargetPos: function() {
 		if (this.target) {
 			return this.target;
 		} else if (this.targetTransformable) {
@@ -30,7 +30,7 @@ Camera.extends(Object, {
 		return null;
 	},
 	getView: function(transformable) {
-		var targetPos = this._getTargetPos();
+		var targetPos = this.getTargetPos();
 		if (targetPos) {
 			return new Vecmath.Matrix4().lookAt(transformable.pos, targetPos, transformable.up);
 		}
@@ -40,7 +40,7 @@ Camera.extends(Object, {
 		return this._projection;
 	},
 	rotateAroundTargetVert: function(transformable, angle) {
-		var targetPos = this._getTargetPos().clone();
+		var targetPos = this.getTargetPos().clone();
 		if (targetPos) {
 			var targetToPos = transformable.pos.clone().sub(targetPos);
 			var up = transformable.up;
@@ -50,7 +50,7 @@ Camera.extends(Object, {
 		}
 	},
 	rotateAroundTargetHoriz: function(transformable, angle) {
-		var targetPos = this._getTargetPos().clone();
+		var targetPos = this.getTargetPos().clone();
 		if (targetPos) {
 			var targetToPos = transformable.pos.clone().sub(targetPos);
 			var up = transformable.up;
