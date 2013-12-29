@@ -18,6 +18,12 @@ Transformable.extends(Object, {
 	set pos(value) {
 		this._pos = value.clone();
 	},
+	get rot() {
+		return this._rot;
+	},
+	set rot(value) {
+		this._rot = value.clone();
+	},
 	get direction() {
 		return new Vecmath.Vector3(0, 0, -1).transformQuat(this._rot);
 	},

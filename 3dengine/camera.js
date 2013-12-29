@@ -29,7 +29,7 @@ Camera.extends(Object, {
 			}
 			return new Vecmath.Matrix4().lookAt(transformable.pos, targetPos, transformable.up);
 		} else {
-			return null;
+			return new Vecmath.Matrix4().fromRotationTranslation(transformable.rot, transformable.pos).invert();
 		}
 	},
 	getProjection: function() {
