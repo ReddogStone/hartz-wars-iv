@@ -114,33 +114,35 @@
 				this._buffered = true;
 			}
 		
+			if (this._screenOffset) {
+				globalParams.uScreenOffset = this._screenOffset.toArray();
+			}
 			this.material.set(engine, globalParams);
 			this._mesh.render(engine);
 		}
 	});
 	
-	function TextRenderable(engine, text, font, color) {
+	function TextRenderable(engine, text, font, color, screenOffset) {
 		TextRenderableBase.call(this, engine, text, font, color);
-		this.material = new SimpleMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
+		this.material = new TextMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
+		this._screenOffset = screenOffset.clone() || new Vecmath.Vector2(0.0, 0.0);
 	}
 	TextRenderable.extends(TextRenderableBase, {
 		_createMesh: function(engine, size, canvasSize) {
-			var sy = 0.5 * size.y / size.x;
 			var su = size.x / canvasSize.x;
 			var sv = size.y / canvasSize.y;
 			var meshData = [
 				{
 					"vertices": [
-						//x, y, z, nx, ny, nz, tu, tv
-						-0.5,  sy, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-						 0.5,  sy, 0.0, 0.0, 0.0, 1.0,  su, 0.0,
-						-0.5, -sy, 0.0, 0.0, 0.0, 1.0, 0.0,  sv,
-						 0.5, -sy, 0.0, 0.0, 0.0, 1.0,  su,  sv],
+						//x, y, tu, tv
+						-0.5 * size.x,    0.0, 0.0,  sv,
+						 0.5 * size.x,    0.0,  su,  sv,
+						-0.5 * size.x, size.y, 0.0, 0.0,
+						 0.5 * size.x, size.y,  su, 0.0],
 					"indices": [0, 1, 2, 2, 1, 3],
 					"description": {
-						"aPosition": { "components": 3, "type": "FLOAT", "normalized": false, "stride": 8 * 4, "offset": 0 },
-						"aNormal": { "components": 3, "type": "FLOAT", "normalized": false, "stride": 8 * 4, "offset": 3 * 4 },
-						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 8 * 4, "offset": 6 * 4 }
+						"aPosition": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 4 * 4, "offset": 0 },
+						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 4 * 4, "offset": 2 * 4 }
 					}
 				}
 			];

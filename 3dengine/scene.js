@@ -13,6 +13,11 @@ function Viewport(x, y, sx, sy) {
 		this.sy = canvas.height;
 	}
 }
+Viewport.extends(Object, {
+	toVector4: function() {
+		return new Vecmath.Vector4(this.x, this.y, this.sx, this.sy);
+	}
+});
 Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
@@ -47,6 +52,12 @@ Scene.extends(Object, {
 	set camEntity(value) {
 		this._camEntity = value;
 	},
+	get viewport() {
+		return this._viewport;
+	},
+	set viewport(value) {
+		this._viewport = Viewport.clone(value);
+	},
 	addEntity: function(entity) {
 		this._entities.push(entity);
 	},
@@ -76,7 +87,7 @@ Scene.extends(Object, {
 			if (entity.transformable) {
 				entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
 			} else {
-				entity.viewZ = 10000.0;
+				entity.viewZ = 0.0;
 			}
 		});
 		
