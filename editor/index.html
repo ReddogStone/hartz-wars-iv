@@ -2,6 +2,14 @@
 <head>
 	<title>Hartz Wars IV - Editor</title>
 	
+	<script src="../3dengine/Matrix3.js" type="text/javascript"></script>
+	<script src="../3dengine/Matrix4.js" type="text/javascript"></script>
+	<script src="../3dengine/Vector2.js" type="text/javascript"></script>
+	<script src="../3dengine/Vector3.js" type="text/javascript"></script>
+	<script src="../3dengine/Vector4.js" type="text/javascript"></script>
+	<script src="../3dengine/Quaternion.js" type="text/javascript"></script>
+	<script src="../3dengine/Ray.js" type="text/javascript"></script>
+
 	<script src="../3dengine/utils.js" type="text/javascript"></script>
 	<script src="../3dengine/fileutils.js" type="text/javascript"></script>
 	<script src="../3dengine/webgl_utils.js" type="text/javascript"></script>
@@ -16,13 +24,8 @@
 	<script src="../3dengine/sprite_renderable.js" type="text/javascript"></script>
 	<script src="../3dengine/text_renderable.js" type="text/javascript"></script>
 	<script src="../3dengine/transformable.js" type="text/javascript"></script>
-	
-	<script src="../3dengine/Matrix3.js" type="text/javascript"></script>
-	<script src="../3dengine/Matrix4.js" type="text/javascript"></script>
-	<script src="../3dengine/Vector2.js" type="text/javascript"></script>
-	<script src="../3dengine/Vector3.js" type="text/javascript"></script>
-	<script src="../3dengine/Vector4.js" type="text/javascript"></script>
-	<script src="../3dengine/Quaternion.js" type="text/javascript"></script>
+
+	<script src="../3dengine/hierarchical_view.js" type="text/javascript"></script>
 </head>
 <body>
 <canvas id="canvas" width="1024" height="768"></canvas>
@@ -41,11 +44,8 @@
 	var g_frames = 0;
 	var g_framesTime = 0;
 	var g_mouse = {x: 0, y: 0, down: false};
-	var g_items = [];
-	var g_highlighted = null;
-	var g_selected = null;
-	var g_nextCamPos = new Vecmath.Vector3();
-	var g_nextCamTarget = new Vecmath.Vector3();
+	var g_viewport;
+	var g_view;
 	
 	window.requestAnimFrame = (function () {
 		return window.requestAnimationFrame ||
@@ -57,14 +57,6 @@
 				window.setTimeout(callback, 1000 / 60);
 			};
 	}) ();
-	
-	function distPointRay(point, ray) {
-		var baseToPoint = point.clone().sub(ray.from);
-		var rayDir = ray.to.clone().sub(ray.from).normalize();
-		var lenSq = baseToPoint.lenSq();
-		var dot = baseToPoint.dot(rayDir);
-		return Math.sqrt(lenSq - dot * dot);
-	}
 	
 	function animate() {
 		var time = window.performance.now();
@@ -83,47 +75,11 @@
 		
 		g_mousePosLabel.renderable.text = 'Mouse: (' + g_mouse.x + ', ' + g_mouse.y + ', ' + (g_mouse.down ? 'down' : 'up') + ')';
 		
-		var camera = g_camEntity.camera;
-		var view = camera.getView(g_camEntity.transformable);
-		var projection = camera.getProjection();
-		var invProjectionView = projection.clone().mul(view).invert();
-		var viewport = g_scene.viewport.toVector4();
-		var mouseRayFrom = new Vecmath.Vector3(g_mouse.x, g_mouse.y, 0.0).unproject(viewport, invProjectionView);
-		var mouseRayTo = new Vecmath.Vector3(g_mouse.x, g_mouse.y, 1.0).unproject(viewport, invProjectionView);
-		var mouseRay = {from: mouseRayFrom, to: mouseRayTo};
+		g_view.update(delta);
 		
-		var minDist = 10000000000.0;
-		g_highlighted = null;
-		g_items.forEach(function(item) {
-			var sprite = item.sprite;
-			var dist = distPointRay(sprite.transformable.pos, mouseRay);
-			if (dist < minDist) {
-				minDist = dist;
-				g_highlighted = item;
-			}
-		});
-		g_items.forEach(function(item) {
-			var color = BLUE;
-			if (item == g_highlighted) {
-				color = HIGHLIGHTED;
-			}
-			item.sprite.renderable.material.color = color;
-			if (item.label) {
-				item.label.renderable.material.color = color;
-			}
-			if (item.line) {
-				var lineColor = Color.clone(color);
-				lineColor.alpha = item.line.renderable.material.color.alpha;
-				item.line.renderable.material.color = lineColor;
-			}
-		});
-		
-		var amount = Math.pow(0.5, delta / 0.1);
-		g_camEntity.transformable.pos.lerp(g_nextCamPos, 1.0 - amount);
-		camera.target.lerp(g_nextCamTarget, 1.0 - amount);
-	
 		Engine3D.clear();
-		g_scene.render(Engine3D);
+		g_view.render(Engine3D);
+		g_scene.render(Engine3D, g_viewport, g_camEntity);
 		
 		requestAnimFrame( function() { animate(); } );
 	}
@@ -156,43 +112,20 @@
 		g_mouse.x = coords.x;
 		g_mouse.y = coords.y;
 		g_mouse.down = isDown;
+		
+		g_view[type](g_mouse);
 	}
 
 	function handleMouseDown(event) {
 		handleMouseEvent(event, true, 'mouseDown');
-		
-		g_drag = {x: g_mouse.x, y: g_mouse.y};
-		
-		g_click = true;
 	}
 
 	function handleMouseUp(event) {
 		handleMouseEvent(event, false, 'mouseUp');
-		
-		if (g_click && g_highlighted) {
-			var sprite = g_highlighted.sprite;
-			var camera = g_camEntity.camera;
-			var camTrans = g_camEntity.transformable;
-			
-			var targetPos = camera.getTargetPos();
-			var offset = camTrans.pos.clone().sub(targetPos);
-			g_nextCamTarget = sprite.transformable.pos.clone();
-			g_nextCamPos = g_nextCamTarget.clone().add(offset);
-		}
 	}
 
 	function handleMouseMove(event) {
 		handleMouseEvent(event, g_mouse.down, 'mouseMove');
-		
-		if (g_mouse.down) {
-			var dx = g_mouse.x - g_drag.x;
-			var dy = g_mouse.y - g_drag.y;
-			g_camEntity.camera.rotateAroundTargetHoriz(g_camEntity.transformable, -0.005 * dx);
-			g_camEntity.camera.rotateAroundTargetVert(g_camEntity.transformable, -0.01 * dy);
-			g_nextCamPos = g_camEntity.transformable.pos.clone();
-			g_drag = {x: g_mouse.x, y: g_mouse.y};
-			g_click = false;
-		}
 	}
 
 	function start() {
@@ -201,12 +134,11 @@
 		Engine3D.init(g_canvas);
 		Engine3D.setClearColor(new Color(0.1, 0.1, 0.1));
 		
-		g_camEntity = {
-			camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
-			transformable: new Transformable(new Vecmath.Vector3(0, 9, 5))
-		};
-		g_nextCamPos = g_camEntity.transformable.pos.clone();
-		g_scene = new Scene(new Viewport(), g_camEntity);
+		g_viewport = new Viewport();
+		g_view = new HierarchicalView(g_viewport);
+		
+		g_camEntity = { camera: new Camera(), transformable: new Transformable() };
+		g_scene = new Scene();
 		
 		g_fpsLabel = {
 			renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
@@ -220,77 +152,11 @@
 		};
 		g_scene.addEntity(g_mousePosLabel);
 		
-		const widgets = [
-			{text: 'Neu', icon: 'data/textures/new_icon.png'},
-			{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
-			{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
-			{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
-		];
-		const SPRITE_COUNT = widgets.length;
-		var transforms = [];
-		
-		var sprite = {
-			renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
-			transformable: new Transformable(new Vecmath.Vector3(0, 2, 0))
-		};
-		var mat = sprite.renderable.material;
-		mat.color = BLUE;
-		mat.size = new Vecmath.Vector2(80, 80);
-		
-		g_scene.addEntity(sprite);
-		transforms.push(sprite.transformable);
-		g_items.push({sprite: sprite});
-		
-		g_nextCamTarget = sprite.transformable.pos.clone();
-		g_camEntity.camera.target = g_nextCamTarget;
-		
-		for (var i = 0; i < SPRITE_COUNT; ++i) {
-			var angle = (i / SPRITE_COUNT - 0.5) * Math.PI * 2;
-			var pos = new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle));
-			
-			var sprite = {
-				renderable: new PointSpriteRenderable(Engine3D, widgets[i].icon),
-				transformable: new Transformable(pos)
-			};
-			var mat = sprite.renderable.material;
-			mat.color = BLUE;
-			mat.size = new Vecmath.Vector2(64, 64);
-
-			const font = new Font('Georgia', 12);
-			var label = {
-				renderable: new TextRenderable(Engine3D, widgets[i].text, font, BLUE, new Vecmath.Vector2(0.0, -50.0)),
-				transformable: new Transformable(pos)
-			};
-			var mat = label.renderable.material;
-			mat.color = BLUE;
-			
-			g_scene.addEntity(sprite);
-			g_scene.addEntity(label);
-			transforms.push(sprite.transformable);
-			
-			g_items.push({sprite: sprite, label: label});
-		}
-		
-		for (var i = 0; i < transforms.length - 1; ++i) {
-			var endPoint1 = transforms[0];
-			var endPoint2 = transforms[i + 1];
-			var line = {
-				renderable: new LineRenderable(Engine3D, 'data/textures/line_pattern.png', endPoint1, endPoint2)
-			};
-			var mat = line.renderable.material;
-			mat.color = BLUE;
-			mat.color.alpha = 0.4;
-			mat.width = 10;
-			g_scene.addEntity(line);
-			g_items[i + 1].line = line;
-		}
-		
 		g_canvas.addEventListener('mousedown', handleMouseDown, false);
 		g_canvas.addEventListener('mousemove', handleMouseMove, false);
 		g_canvas.addEventListener('mouseup', handleMouseUp, false);
 		
 		requestAnimFrame(function() { animate(); });
-		alert('OK');
 	}
 	
 	start();

@@ -22,13 +22,7 @@ Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
 
-function Scene(viewport, camEntity) {
-	this._viewport = Viewport.clone(viewport);
-	this._camEntity = camEntity || {
-		camera: new Camera(),
-		transformable: new Transformable()
-	};
-	
+function Scene() {
 	this._entities = [];
 	this._pointLight1 = null;
 	this._pointLight2 = null;
@@ -52,21 +46,15 @@ Scene.extends(Object, {
 	set camEntity(value) {
 		this._camEntity = value;
 	},
-	get viewport() {
-		return this._viewport;
-	},
-	set viewport(value) {
-		this._viewport = Viewport.clone(value);
-	},
 	addEntity: function(entity) {
 		this._entities.push(entity);
 	},
-	render: function(engine) {
-		engine.setViewport(this._viewport);
+	render: function(engine, viewport, camEntity) {
+		engine.setViewport(viewport);
 		
 		var bufferSize = engine.getDrawingBufferSize();
-		var camera = this._camEntity.camera;
-		var view = camera.getView(this._camEntity.transformable);
+		var camera = camEntity.camera;
+		var view = camera.getView(camEntity.transformable);
 		var projection = camera.getProjection();
 		
 		var params = {
