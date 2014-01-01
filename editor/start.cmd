@@ -1,4 +1,8 @@
-@echo off
 del editor.zip
-"C:\Program Files\7-Zip\7z" a -tzip editor.zip *.html *.json *.js ..\3dengine\*.js data\shaders\*.shader data\meshes\*.json data\textures\*.* code\*.js
+rmdir /s /q editor
+md editor
+copy index.html editor
+xcopy /s /e data editor\data\
+"C:\Program Files\7-Zip\7z" a -tzip editor.zip package.json ..\3dengine editor\index.html editor\data\shaders editor\data\textures
+rmdir /s /q editor
 ..\3rdparty\nw\nw.exe editor.zip
