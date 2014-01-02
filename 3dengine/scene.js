@@ -49,6 +49,9 @@ Scene.extends(Object, {
 	addEntity: function(entity) {
 		this._entities.push(entity);
 	},
+	removeEntity: function(entity) {
+		this._entities.remove(entity);
+	},
 	render: function(engine, viewport, camEntity) {
 		engine.setViewport(viewport);
 		

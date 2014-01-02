@@ -65,7 +65,7 @@
 		_getSize: function() {
 			var context = this._bufferCanvas.getContext('2d');
 			context.font = this._font.toString();
-			var width = context.measureText(this._text).width;
+			var width = context.measureText(this._text).width + 2;
 			var height = 2 * this._font.size;
 			return {x: width, y: height};
 		},
@@ -125,7 +125,7 @@
 	function TextRenderable(engine, text, font, color, screenOffset) {
 		TextRenderableBase.call(this, engine, text, font, color);
 		this.material = new TextMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
-		this._screenOffset = screenOffset.clone() || new Vecmath.Vector2(0.0, 0.0);
+		this._screenOffset = screenOffset ? screenOffset.clone() : new Vecmath.Vector2(0.0, 0.0);
 	}
 	TextRenderable.extends(TextRenderableBase, {
 		_createMesh: function(engine, size, canvasSize) {
@@ -147,6 +147,12 @@
 				}
 			];
 			this._mesh = Mesh.loadFromJson(engine, meshData);
+		},
+		get screenOffset() {
+			return this._screenOffset;
+		},
+		set screenOffset(value) {
+			this._screenOffset = value.clone();
 		}
 	});
 	

@@ -1,6 +1,6 @@
 'use strict';
 
-function HierarchicalView(viewport) {
+function HierarchicalView(engine, viewport) {
 	this._viewport = viewport || new Viewport();
 	this._cam = {
 		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
@@ -8,10 +8,10 @@ function HierarchicalView(viewport) {
 		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();
-	this._items = [];
+	this._widgets = [];
 
 //================ TEMP ================
-	var items = this._items;
+	var widgets = this._widgets;
 	var scene = this._scene;
 	var cam = this._cam;
 	var self = this;
@@ -25,26 +25,20 @@ function HierarchicalView(viewport) {
 
 	this._nextCamPos = cam.transformable.pos.clone();
 	
-	var widgets = [
+	var widgetDescriptions = [
 		{text: 'Neu', icon: 'data/textures/new_icon.png'},
 		{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
 		{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
 		{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
 	];
-	var SPRITE_COUNT = widgets.length;
+	var SPRITE_COUNT = widgetDescriptions.length;
 	var transforms = [];
 	
-	var sprite = {
-		renderable: new PointSpriteRenderable(Engine3D, 'data/textures/node.png'),
-		transformable: new Transformable(new Vecmath.Vector3(0, 2, 0))
-	};
-	var mat = sprite.renderable.material;
-	mat.color = BLUE;
-	mat.size = new Vecmath.Vector2(80, 80);
-	
-	scene.addEntity(sprite);
-	transforms.push(sprite.transformable);
-	items.push({sprite: sprite});
+	var widget = new IconTextWidget(engine, 'data/textures/node.png', 80, BLUE);
+	widget.transformable.pos = new Vecmath.Vector3(0, 2, 0);
+	widget.addToScene(scene);
+	widgets.push(widget);
+	transforms.push(widget.transformable);
 	
 	cam.camera.target = new Vecmath.Vector3(0, 0, 0);
 	this._nextCamTarget = cam.camera.target;
@@ -52,47 +46,30 @@ function HierarchicalView(viewport) {
 	var layout = new CircleLayout(5, new Vecmath.Vector3(0, -1, 0), new Vecmath.Vector3(0, -2, 0));
 	var childTransforms = [];
 	
+	var font = new Font('Helvetica', 12);
+	var textOffset = new Vecmath.Vector2(0.0, -50.0);
 	for (var i = 0; i < SPRITE_COUNT; ++i) {
-		var transformable = new Transformable();
-		
-		var childSprite = {
-			renderable: new PointSpriteRenderable(Engine3D, widgets[i].icon),
-			transformable: transformable
-		};
-		var mat = childSprite.renderable.material;
-		mat.color = BLUE;
-		mat.size = new Vecmath.Vector2(64, 64);
-
-		var font = new Font('Georgia', 12);
-		var label = {
-			renderable: new TextRenderable(Engine3D, widgets[i].text, font, BLUE, new Vecmath.Vector2(0.0, -50.0)),
-			transformable: transformable
-		};
-		var mat = label.renderable.material;
-		mat.color = BLUE;
-		
-		scene.addEntity(childSprite);
-		scene.addEntity(label);
-		childTransforms.push(transformable);
-		
-		items.push({sprite: childSprite, label: label});
+		var childWidget = new IconTextWidget(engine, widgetDescriptions[i].icon, 64, BLUE, widgetDescriptions[i].text, font, textOffset);
+		childWidget.addToScene(scene);
+		widgets.push(childWidget);
+		childTransforms.push(childWidget.transformable);
 	}
 	
-	layout.apply(sprite.transformable, childTransforms);
+	layout.apply(widget.transformable, childTransforms);
 	
 	transforms = transforms.concat(childTransforms);
 	for (var i = 0; i < transforms.length - 1; ++i) {
 		var endPoint1 = transforms[0];
 		var endPoint2 = transforms[i + 1];
 		var line = {
-			renderable: new LineRenderable(Engine3D, 'data/textures/line_pattern.png', endPoint1, endPoint2)
+			renderable: new LineRenderable(engine, 'data/textures/line_pattern.png', endPoint1, endPoint2)
 		};
 		var mat = line.renderable.material;
 		mat.color = BLUE;
 		mat.color.alpha = 0.4;
 		mat.width = 10;
 		scene.addEntity(line);
-		items[i + 1].line = line;
+		widgets[i + 1].line = line;
 	}
 //================ TEMP ================	
 }
@@ -120,27 +97,23 @@ HierarchicalView.extends(Object, {
 		
 		var minDist = 10000000000.0;
 		this._highlighted = null;
-		this._items.forEach(function(item) {
-			var sprite = item.sprite;
-			var dist = Vecmath.distPointRay(sprite.transformable.pos, mouseRay);
+		this._widgets.forEach(function(widget) {
+			var dist = Vecmath.distPointRay(widget.transformable.pos, mouseRay);
 			if (dist < minDist) {
 				minDist = dist;
-				this._highlighted = item;
+				this._highlighted = widget;
 			}
 		}, this);
-		this._items.forEach(function(item) {
+		this._widgets.forEach(function(widget) {
 			var color = BLUE;
-			if (item == this._highlighted) {
+			if (widget == this._highlighted) {
 				color = HIGHLIGHTED;
 			}
-			item.sprite.renderable.material.color = color;
-			if (item.label) {
-				item.label.renderable.material.color = color;
-			}
-			if (item.line) {
+			widget.color = color;
+			if (widget.line) {
 				var lineColor = Color.clone(color);
-				lineColor.alpha = item.line.renderable.material.color.alpha;
-				item.line.renderable.material.color = lineColor;
+				lineColor.alpha = widget.line.renderable.material.color.alpha;
+				widget.line.renderable.material.color = lineColor;
 			}
 		}, this);
 		
