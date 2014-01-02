@@ -54,6 +54,14 @@ function HierarchicalView(engine, viewport) {
 HierarchicalView.extends(Object, {
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
+		
+		this._nodeTree.forEach(function(layer) {
+			layer.nodes.forEach(function(node) {
+				if (node.updateable) {
+					node.updateable.update(node, delta);
+				}
+			});
+		});
 	},
 	render: function() {
 		this._scene.render(this._engine, this._viewport, this._cam);
@@ -94,6 +102,7 @@ HierarchicalView.extends(Object, {
 			if (node == this._highlighted) {
 				color = HIGHLIGHTED;
 			}
+			color.alpha = node.widget.color.alpha;
 			node.widget.color = color;
 			
 			var line = node.line;
@@ -142,10 +151,30 @@ HierarchicalView.extends(Object, {
 				});
 				this._nodeTree.splice(this._nodeTree.length - 1, 1);
 			} else {
+				var start = window.performance.now();
+				
 				var engine = this._engine;
 				var children = highlighted.createChildren(engine);
+				
+				var behavior = new ExpAttBehavior(0.5, 1.0, function(entity) {
+					return entity.widget.color.alpha;
+				}, function(entity, value) {
+					var color = entity.widget.color;
+					color.alpha = value;
+					entity.widget.color = color;
+					
+					var line = entity.line;
+					if (line) {
+						line.renderable.material.color.alpha = 0.4 * value;
+					}
+				});
+				
 				if (children.length > 0) {
 					children.forEach(function(child) {
+						child.updateable = new BehaviorsUpdateable();
+						child.updateable.addBehavior(behavior);
+						child.widget.color.alpha = 0.0;
+						
 						child.widget.addToScene(scene);
 						
 						var endPoint1 = highlighted.widget.transformable;
@@ -155,13 +184,15 @@ HierarchicalView.extends(Object, {
 						};
 						var mat = line.renderable.material;
 						mat.color = BLUE;
-						mat.color.alpha = 0.4;
+						mat.color.alpha = 0.0;
 						mat.width = 10;
 						scene.addEntity(line);
 						child.line = line;
 					});
 					this._nodeTree.push({nodes: children, parent: highlighted});
 				}
+				
+				console.log('Creating children took: ' + (window.performance.now() - start) + 'ms');
 			}
 		}
 	}
