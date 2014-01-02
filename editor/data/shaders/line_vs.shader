@@ -10,22 +10,38 @@ uniform vec3 uEndPoint1;
 uniform vec3 uEndPoint2;
 uniform vec2 uScreenSize;
 
+vec4 clipToNear(vec4 p1, vec3 dir) {
+	float deltaZ = -0.1 - p1.z;
+	if (deltaZ < 0.0) {
+		return vec4(p1.xyz + deltaZ / dir.z * dir, 1.0);
+	}
+	return p1;
+}
+
 void main() {
 	mat4 viewProj = uProjection * uView;
-	vec4 clipEnd1 = viewProj * vec4(uEndPoint1, 1.0);
-	vec4 clipEnd2 = viewProj * vec4(uEndPoint2, 1.0);
+	
+	vec4 viewEnd1 = uView * vec4(uEndPoint1, 1.0);
+	vec4 viewEnd2 = uView * vec4(uEndPoint2, 1.0);
+	
+	vec3 realDir = normalize(viewEnd2.xyz - viewEnd1.xyz);
+	viewEnd1 = clipToNear(viewEnd1, realDir);
+	viewEnd2 = clipToNear(viewEnd2, realDir);
+	
+	vec4 clipEnd1 = uProjection * viewEnd1;
+	vec4 clipEnd2 = uProjection * viewEnd2;
 	clipEnd1.xy /= clipEnd1.w;
 	clipEnd2.xy /= clipEnd2.w;
 	vec2 delta = clipEnd2.xy - clipEnd1.xy;
 	vec2 dir = normalize(delta);
 	vec2 norm = vec2(dir.y, -dir.x);
 
-	float pixelLength = length(delta * uScreenSize);
-	float width = 0.5 * uWidth / length(norm * uScreenSize);
+	float pixelLength = length(delta.xy * uScreenSize);
+	float width = 0.5 * uWidth / length(norm.xy * uScreenSize);
 	
 	vec2 end = mix(clipEnd1.xy, clipEnd2.xy, aPosition.x);
 	vec2 pos = end + norm * (aPosition.y * width);
 	gl_Position = vec4(pos, 0.0, 1.0);
-	
+
 	vTexCoord = aTexCoord * vec2(pixelLength / uWidth, 1.0);
 }

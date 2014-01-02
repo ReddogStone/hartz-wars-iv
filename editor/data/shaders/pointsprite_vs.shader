@@ -14,5 +14,5 @@ void main() {
 	
 	vec4 clipPos = uProjection * uView * uWorld * vec4(0.0, 0.0, 0.0, 1.0);
 	vec2 clipSize = vec2(2.0, 2.0) * uSize / uScreenSize;
-	gl_Position = vec4(clipPos.xy / clipPos.w + aPosition.xy * clipSize, 0.0, 1.0);
+	gl_Position = vec4(clipPos.xy / clipPos.w + aPosition.xy * clipSize, clipPos.z / clipPos.w, 1.0);
 }

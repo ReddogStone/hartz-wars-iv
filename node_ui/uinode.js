@@ -24,7 +24,8 @@ TemplateNode.extends(Object, {
 				childTransforms.push(childNode._widget.transformable);
 				result.push(childNode);
 			});
-			layout.apply(this._widget.transformable, childTransforms, 5 / (this._depth + 1), 2 / (this._depth + 1));
+			var expDepth = Math.pow(2, this._depth);
+			layout.apply(this._widget.transformable, childTransforms, 5 / expDepth, 0.5 / expDepth);
 		}
 		return result;
 	}

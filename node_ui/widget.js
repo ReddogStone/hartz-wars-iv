@@ -26,17 +26,27 @@ function IconTextWidget(engine, icon, iconSize, text, font, textOffset) {
 	};
 }
 IconTextWidget.extends(Object, {
+	setLayerIndex: function(value) {
+		var val = 64 / (value + 1);
+		this._sprite.renderable.material.size = new Vecmath.Vector2(val, val);
+	},
 	setHighlighted: function(value) {
 		var color = value ? HIGHLIGHTED : BLUE;
 		color.alpha = this._sprite.renderable.material.color.alpha;
 		this._sprite.renderable.material.color = color;
-		this._label.renderable.material.color = color;		
+
+		if (!this._attenuated) {
+			this._label.renderable.material.color = color;		
+		}
 	},
 	setAlpha: function(value) {
-		this._sprite.renderable.material.color.alpha = value;
-		this._label.renderable.material.color.alpha = value;
+		if (!this._attenuated) {
+			this._sprite.renderable.material.color.alpha = value;
+			this._label.renderable.material.color.alpha = value;
+		}
 	},
 	setAttenuated: function(value) {
+		this._attenuated = value;
 		if (value) {
 			this._sprite.renderable.material.color.alpha = 0.4;
 			this._label.renderable.material.color.alpha = 0;

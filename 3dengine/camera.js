@@ -8,8 +8,8 @@ function Camera(fov, aspect, nearPlane, farPlane) {
 		var canvas = document.getElementById('canvas');
 		this._aspect = canvas.width / canvas.height;
 	}
-	this._near = nearPlane;
-	this._far = farPlane;
+	this._near = nearPlane || 0.1;
+	this._far = farPlane || 1000.0;
 	
 	this.target = null;
 	this.targetTransformable = null;

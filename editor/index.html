@@ -165,9 +165,9 @@
 		g_viewport = new Viewport();
 		g_view = new HierarchicalView(Engine3D, g_viewport);
 		
-		g_camEntity = { camera: new Camera(), transformable: new Transformable() };
+		g_camEntity = { camera: new Camera(), transformable: new Transformable(new Vecmath.Vector3(0, 0, 0)) };
 		g_scene = new Scene();
-		
+
 		g_fpsLabel = {
 			renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),
 			transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
