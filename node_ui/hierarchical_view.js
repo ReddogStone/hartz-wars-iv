@@ -143,7 +143,7 @@ HierarchicalView.extends(Object, {
 			if (this._click) {
 				dx = event.x - this._dragStart.x;
 				dy = event.y - this._dragStart.y;
-				this._click = (dx + dy) < 10;
+				this._click = Math.abs(dx + dy) < 10;
 			}
 		}
 	},
