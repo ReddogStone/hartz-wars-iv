@@ -8,10 +8,10 @@ function HierarchicalView(engine, viewport) {
 		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();
-	this._widgets = [];
+	this._nodeTree = [];
+	this._engine = engine;
 
 //================ TEMP ================
-	var widgets = this._widgets;
 	var scene = this._scene;
 	var cam = this._cam;
 	var self = this;
@@ -24,61 +24,39 @@ function HierarchicalView(engine, viewport) {
 	}));
 
 	this._nextCamPos = cam.transformable.pos.clone();
-	
-	var widgetDescriptions = [
-		{text: 'Neu', icon: 'data/textures/new_icon.png'},
-		{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
-		{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
-		{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
-	];
-	var SPRITE_COUNT = widgetDescriptions.length;
-	var transforms = [];
-	
-	var widget = new IconTextWidget(engine, 'data/textures/node.png', 80, BLUE);
-	widget.transformable.pos = new Vecmath.Vector3(0, 2, 0);
-	widget.addToScene(scene);
-	widgets.push(widget);
-	transforms.push(widget.transformable);
-	
 	cam.camera.target = new Vecmath.Vector3(0, 0, 0);
 	this._nextCamTarget = cam.camera.target;
 	
+	var nodeTemplate = {
+		icon: 'data/textures/node.png',
+		text: 'Root',
+		children: [
+			{text: 'Neu', icon: 'data/textures/new_icon.png', children: [
+				{text: 'Dialog1', icon: 'data/textures/new_icon.png'},
+				{text: 'Dialog2', icon: 'data/textures/new_icon.png'},
+				{text: 'Dialog3', icon: 'data/textures/new_icon.png'},
+				{text: 'Dialog4', icon: 'data/textures/new_icon.png'},
+				{text: 'Dialog5', icon: 'data/textures/new_icon.png'},
+				{text: 'Dialog6', icon: 'data/textures/new_icon.png'},
+			]},
+			{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
+			{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
+			{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
+		]
+	};
 	var layout = new CircleLayout(5, new Vecmath.Vector3(0, -1, 0), new Vecmath.Vector3(0, -2, 0));
-	var childTransforms = [];
 	
-	var font = new Font('Helvetica', 12);
-	var textOffset = new Vecmath.Vector2(0.0, -50.0);
-	for (var i = 0; i < SPRITE_COUNT; ++i) {
-		var childWidget = new IconTextWidget(engine, widgetDescriptions[i].icon, 64, BLUE, widgetDescriptions[i].text, font, textOffset);
-		childWidget.addToScene(scene);
-		widgets.push(childWidget);
-		childTransforms.push(childWidget.transformable);
-	}
-	
-	layout.apply(widget.transformable, childTransforms);
-	
-	transforms = transforms.concat(childTransforms);
-	for (var i = 0; i < transforms.length - 1; ++i) {
-		var endPoint1 = transforms[0];
-		var endPoint2 = transforms[i + 1];
-		var line = {
-			renderable: new LineRenderable(engine, 'data/textures/line_pattern.png', endPoint1, endPoint2)
-		};
-		var mat = line.renderable.material;
-		mat.color = BLUE;
-		mat.color.alpha = 0.4;
-		mat.width = 10;
-		scene.addEntity(line);
-		widgets[i + 1].line = line;
-	}
+	var rootNode = new TemplateNode(engine, nodeTemplate, layout);
+	rootNode.widget.addToScene(scene);
+	this._nodeTree.push({nodes: [rootNode], parent: null});
 //================ TEMP ================	
 }
 HierarchicalView.extends(Object, {
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
 	},
-	render: function(engine) {
-		this._scene.render(engine, this._viewport, this._cam);
+	render: function() {
+		this._scene.render(this._engine, this._viewport, this._cam);
 	},
 	mouseDown: function(event) {
 		this._drag = {x: event.x, y: event.y};
@@ -97,23 +75,32 @@ HierarchicalView.extends(Object, {
 		
 		var minDist = 10000000000.0;
 		this._highlighted = null;
-		this._widgets.forEach(function(widget) {
-			var dist = Vecmath.distPointRay(widget.transformable.pos, mouseRay);
+		
+		var currentLayer = this._nodeTree.last();
+		var currentNodes = currentLayer.nodes.slice(0);
+		if (currentLayer.parent) {
+			currentNodes.push(currentLayer.parent);
+		}
+		
+		currentNodes.forEach(function(node) {
+			var dist = Vecmath.distPointRay(node.widget.transformable.pos, mouseRay);
 			if (dist < minDist) {
 				minDist = dist;
-				this._highlighted = widget;
+				this._highlighted = node;
 			}
 		}, this);
-		this._widgets.forEach(function(widget) {
+		currentNodes.forEach(function(node) {
 			var color = BLUE;
-			if (widget == this._highlighted) {
+			if (node == this._highlighted) {
 				color = HIGHLIGHTED;
 			}
-			widget.color = color;
-			if (widget.line) {
+			node.widget.color = color;
+			
+			var line = node.line;
+			if (line) {
 				var lineColor = Color.clone(color);
-				lineColor.alpha = widget.line.renderable.material.color.alpha;
-				widget.line.renderable.material.color = lineColor;
+				lineColor.alpha = line.renderable.material.color.alpha;
+				line.renderable.material.color = lineColor;
 			}
 		}, this);
 		
@@ -133,14 +120,49 @@ HierarchicalView.extends(Object, {
 		}
 	},
 	mouseUp: function(event) {
-		if (this._click && this._highlighted) {
+		var highlighted = this._highlighted;
+		if (this._click && highlighted) {
 			var camera = this._cam.camera;
 			var camTrans = this._cam.transformable;
 			
 			var targetPos = camera.getTargetPos();
 			var offset = camTrans.pos.clone().sub(targetPos);
-			this._nextCamTarget = this._highlighted.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
+			this._nextCamTarget = this._highlighted.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
+			
+			var scene = this._scene;
+			var currentLayer = this._nodeTree.last();
+			if (highlighted === currentLayer.parent) {
+				currentLayer.nodes.forEach(function(node) {
+					node.widget.removeFromScene(scene);
+					var line = node.line;
+					if (line) {
+						scene.removeEntity(line);
+					}
+				});
+				this._nodeTree.splice(this._nodeTree.length - 1, 1);
+			} else {
+				var engine = this._engine;
+				var children = highlighted.createChildren(engine);
+				if (children.length > 0) {
+					children.forEach(function(child) {
+						child.widget.addToScene(scene);
+						
+						var endPoint1 = highlighted.widget.transformable;
+						var endPoint2 = child.widget.transformable;
+						var line = {
+							renderable: new LineRenderable(engine, 'data/textures/line_pattern.png', endPoint1, endPoint2)
+						};
+						var mat = line.renderable.material;
+						mat.color = BLUE;
+						mat.color.alpha = 0.4;
+						mat.width = 10;
+						scene.addEntity(line);
+						child.line = line;
+					});
+					this._nodeTree.push({nodes: children, parent: highlighted});
+				}
+			}
 		}
 	}
 });

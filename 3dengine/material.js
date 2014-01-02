@@ -4,11 +4,7 @@ function SimpleMaterial(engine, texture, color, luminosity) {
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
 	this._color.alpha = luminosity || 0;
-	
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/simple_vs.shader'), 
-		FileUtils.loadFile('data/shaders/simple_fs.shader'));
-	
+	this._program = engine.getProgram('simple');
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
 SimpleMaterial.extends(Object, {
@@ -38,11 +34,7 @@ SimpleMaterial.extends(Object, {
 function ScreenSpaceMaterial(engine, texture, color) {
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/screenspace_vs.shader'), 
-		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
-	
+	this._program = engine.getProgram('screenspace');
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
 ScreenSpaceMaterial.extends(Object, {
@@ -66,11 +58,7 @@ ScreenSpaceMaterial.extends(Object, {
 function TextMaterial(engine, texture, color) {
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/text_vs.shader'), 
-		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
-	
+	this._program = engine.getProgram('text');
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
 TextMaterial.extends(Object, {
@@ -95,11 +83,7 @@ function PointSpriteMaterial(engine, texture, size, color) {
 	this._size = size || new Vecmath.Vector2(64, 64);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/pointsprite_vs.shader'), 
-		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
-	
+	this._program = engine.getProgram('pointsprite');
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
 PointSpriteMaterial.extends(Object, {
@@ -131,11 +115,7 @@ function LineMaterial(engine, patternTexture, width, color) {
 	this._width = width ? width : 1.0;
 	this._texture = patternTexture;
 	this._color = Color.clone(color) || Color.white;
-	
-	this._program = engine.createProgram(
-		FileUtils.loadFile('data/shaders/line_vs.shader'), 
-		FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
-	
+	this._program = engine.getProgram('line');
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
 LineMaterial.extends(Object, {

@@ -9,6 +9,8 @@ var BlendMode = {
 var Engine3D = (function() {
 	var gl = null;
 	var currentProgram = null;
+	
+	var shaderPrograms = {};
 
 	function init(canvas) {
 		gl = WebGL.setupWebGL(canvas);
@@ -32,8 +34,11 @@ var Engine3D = (function() {
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
 		return buffer;
 	}
-	function createProgram(vertexShader, fragmentShader) {
-		return WebGL.createProgram(gl, vertexShader, fragmentShader);
+	function createProgram(id, vertexShader, fragmentShader) {
+		shaderPrograms[id] = WebGL.createProgram(gl, vertexShader, fragmentShader);
+	}
+	function getProgram(id) {
+		return shaderPrograms[id];
 	}
 	
 	function handleLoadedTexture(texture) {
@@ -225,6 +230,7 @@ var Engine3D = (function() {
 		createVertexBuffer: createVertexBuffer,
 		createIndexBuffer: createIndexBuffer,
 		createProgram: createProgram,
+		getProgram: getProgram,
 		createTexture: createTexture,
 		createTextureFromFile: createTextureFromFile,
 		setClearColor: setClearColor,

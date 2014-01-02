@@ -30,6 +30,7 @@
 	<script src="../node_ui/hierarchical_view.js" type="text/javascript"></script>
 	<script src="../node_ui/layout.js" type="text/javascript"></script>
 	<script src="../node_ui/widget.js" type="text/javascript"></script>
+	<script src="../node_ui/uinode.js" type="text/javascript"></script>
 </head>
 <body>
 <canvas id="canvas" width="1024" height="768"></canvas>
@@ -137,6 +138,22 @@
 		
 		Engine3D.init(g_canvas);
 		Engine3D.setClearColor(new Color(0.1, 0.1, 0.1));
+		
+		Engine3D.createProgram('simple',
+			FileUtils.loadFile('data/shaders/simple_vs.shader'),
+			FileUtils.loadFile('data/shaders/simple_fs.shader'));
+		Engine3D.createProgram('screenspace',
+			FileUtils.loadFile('data/shaders/screenspace_vs.shader'),
+			FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
+		Engine3D.createProgram('text',
+			FileUtils.loadFile('data/shaders/text_vs.shader'),
+			FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
+		Engine3D.createProgram('pointsprite',
+			FileUtils.loadFile('data/shaders/pointsprite_vs.shader'),
+			FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
+		Engine3D.createProgram('line',
+			FileUtils.loadFile('data/shaders/line_vs.shader'),
+			FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
 		
 		g_viewport = new Viewport();
 		g_view = new HierarchicalView(Engine3D, g_viewport);

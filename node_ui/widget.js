@@ -34,7 +34,7 @@ IconTextWidget.extends(Object, {
 		scene.addEntity(this._sprite);
 		scene.addEntity(this._label);
 	},
-	femoveFromScene: function(scene) {
+	removeFromScene: function(scene) {
 		scene.removeEntity(this._sprite);
 		scene.removeEntity(this._label);
 	}

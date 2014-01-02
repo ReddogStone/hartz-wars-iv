@@ -52,7 +52,7 @@ var WebGL = (function() {
 
 	/**
 	 * Creates a program with shaders attached and binds the attribute locations.
-	 * It also links the program and calls useProgram.
+	 * It also links the program.
 	 */
 	function loadProgram(gl, shaders) {
 		var program = gl.createProgram();
