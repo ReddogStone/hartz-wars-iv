@@ -16,13 +16,13 @@ function HierarchicalView(viewport) {
 	
 	this._nextCamPos = cam.transformable.pos.clone();
 	
-	const widgets = [
+	var widgets = [
 		{text: 'Neu', icon: 'data/textures/new_icon.png'},
 		{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
 		{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
 		{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
 	];
-	const SPRITE_COUNT = widgets.length;
+	var SPRITE_COUNT = widgets.length;
 	var transforms = [];
 	
 	var sprite = {
@@ -52,7 +52,7 @@ function HierarchicalView(viewport) {
 		mat.color = BLUE;
 		mat.size = new Vecmath.Vector2(64, 64);
 
-		const font = new Font('Georgia', 12);
+		var font = new Font('Georgia', 12);
 		var label = {
 			renderable: new TextRenderable(Engine3D, widgets[i].text, font, BLUE, new Vecmath.Vector2(0.0, -50.0)),
 			transformable: new Transformable(pos)
