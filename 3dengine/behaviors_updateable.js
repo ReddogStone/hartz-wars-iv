@@ -20,24 +20,23 @@ function FollowTargetBehavior(halfTime, target) {
 }
 FollowTargetBehavior.extends(FollowTargetBaseBehavior);
 
-function ExpAttBehavior(halfTime, target, getValueFunc, setValueFunc) {
+function ExpAttBehavior(halfTime, from, to, callback) {
 	this._halfTime = halfTime;
-	this._target = target;
-	this._get = getValueFunc;
-	this._set = setValueFunc;
+	this._value = from;
+	this._target = to;
+	this._callback = callback;
 }
 ExpAttBehavior.extends(Object, {
 	update: function(entity, delta) {
-		var value = this._get(entity);
 		var amount = Math.pow(0.5, delta / this._halfTime);
-		var newValue = value * amount + this._target * (1.0 - amount);
+		this._value = this._value * amount + this._target * (1.0 - amount);
 		
-		if (Math.abs(newValue - this._target) < 0.00001) {
-			this._set(entity, this._target);
+		if (Math.abs(this._value - this._target) < 0.00001) {
+			this._callback(entity, this._target);
 			return true;
 		}
 		
-		this._set(entity, newValue);
+		this._callback(entity, this._value);
 	}
 });
 

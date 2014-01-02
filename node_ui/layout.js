@@ -1,14 +1,11 @@
 'use strict';
 
-function CircleLayout(radius, axis, offset) {
-	this._radius = radius || 5;
+function CircleLayout(axis, offset) {
 	this._axis = axis ? axis.clone() : new Vecmath.Vector3(0, -1, 0);
-	this._offset = offset ? offset.clone() : new Vecmath.Vector3(0, -2, 0);
 }
 CircleLayout.extends(Object, {
-	apply: function(root, children) {
-		var radius = this._radius;
-		var rootPos = root.pos.clone().add(this._offset);
+	apply: function(root, children, radius, offset) {
+		var rootPos = root.pos.clone().add(this._axis.clone().scale(offset));
 		var rotation = new Vecmath.Quaternion().rotationTo(new Vecmath.Vector3(0, 1, 0), this._axis);
 		var childCount = children.length;
 		children.forEach(function(child, index) {

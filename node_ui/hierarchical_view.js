@@ -9,6 +9,7 @@ function HierarchicalView(engine, viewport) {
 	};
 	this._scene = new Scene();
 	this._nodeTree = [];
+	this._layerIndex = 0;
 	this._engine = engine;
 
 //================ TEMP ================
@@ -37,14 +38,21 @@ function HierarchicalView(engine, viewport) {
 				{text: 'Dialog3', icon: 'data/textures/new_icon'},
 				{text: 'Dialog4', icon: 'data/textures/new_icon'},
 				{text: 'Dialog5', icon: 'data/textures/new_icon'},
-				{text: 'Dialog6', icon: 'data/textures/new_icon'},
+				{text: 'Dialog6', icon: 'data/textures/new_icon'}
 			]},
-			{text: 'Laden', icon: 'data/textures/load_icon'}, 
+			{text: 'Laden', icon: 'data/textures/load_icon', children: [
+				{text: 'Load1', icon: 'data/textures/load_icon'},
+				{text: 'Load2', icon: 'data/textures/load_icon'},
+				{text: 'Load3', icon: 'data/textures/load_icon'},
+				{text: 'Load4', icon: 'data/textures/load_icon'},
+				{text: 'Load5', icon: 'data/textures/load_icon'},
+				{text: 'Load6', icon: 'data/textures/load_icon'}
+			]}, 
 			{text: 'Speichern', icon: 'data/textures/save_icon'}, 
 			{text: 'Hilfe', icon: 'data/textures/help_icon'}
 		]
 	};
-	var layout = new CircleLayout(5, new Vecmath.Vector3(0, -1, 0), new Vecmath.Vector3(0, -2, 0));
+	var layout = new CircleLayout(new Vecmath.Vector3(0, -1, 0));
 	
 	var rootNode = new TemplateNode(engine, nodeTemplate, layout);
 	rootNode.widget.addToScene(scene);
@@ -52,6 +60,85 @@ function HierarchicalView(engine, viewport) {
 //================ TEMP ================	
 }
 HierarchicalView.extends(Object, {
+	_findParentIndex: function(node) {
+		for (var i = this._layerIndex; i >= 0; --i) {
+			if (this._nodeTree[i].parent === node) {
+				return i;
+			}
+		}
+		return -1;
+	},
+	_navigateToNode: function(node) {
+		var layerIndex = this._layerIndex;
+		var scene = this._scene;
+		var currentLayer = this._nodeTree[layerIndex];
+		
+		var parentIndex = this._findParentIndex(node);
+		if (parentIndex >= 0) {
+			layerIndex = parentIndex;
+		} else if (((layerIndex + 1) < this._nodeTree.length) && (this._nodeTree[layerIndex + 1].parent == node)) {
+			++layerIndex;
+		} else {
+			var start = window.performance.now();
+			
+			var engine = this._engine;
+			var children = node.createChildren(engine);
+			
+			var behavior = new ExpAttBehavior(0.5, 0.0, 1.0, function(entity, value) {
+				entity.widget.setAlpha(value);
+
+				var line = entity.line;
+				if (line) {
+					line.renderable.material.color.alpha = 0.4 * value;
+				}
+			});
+			
+			children.forEach(function(child) {
+				child.updateable = new BehaviorsUpdateable();
+				child.updateable.addBehavior(behavior);
+
+				child.widget.setAlpha(0);
+				child.widget.addToScene(scene);
+				
+				var endPoint1 = node.widget.transformable;
+				var endPoint2 = child.widget.transformable;
+				var line = {
+					renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
+				};
+				var mat = line.renderable.material;
+				mat.color = BLUE;
+				mat.color.alpha = 0.0;
+				mat.width = 10;
+				scene.addEntity(line);
+				child.line = line;
+			});
+			
+			for (var i = layerIndex + 1; i < this._nodeTree.length; ++i) {
+				this._nodeTree[i].nodes.forEach(function(node) {
+					node.widget.removeFromScene(scene);
+					if (node.line) {
+						scene.removeEntity(node.line);
+					}
+				});
+			}
+			this._nodeTree.splice(layerIndex + 1, this._nodeTree.length - layerIndex - 1, {nodes: children, parent: node});
+			++layerIndex;
+			
+			console.log('Creating children took: ' + (window.performance.now() - start) + 'ms');
+		}
+		
+		this._layerIndex = layerIndex;
+		
+		this._nodeTree[layerIndex].nodes.forEach(function(node) {
+			node.widget.setAttenuated(false);
+		});
+		for (var i = layerIndex + 1; i < this._nodeTree.length; ++i) {
+			var layer = this._nodeTree[i];
+			layer.nodes.forEach(function(node) {
+				node.widget.setAttenuated(true);
+			});
+		}
+	},
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
 		
@@ -84,11 +171,13 @@ HierarchicalView.extends(Object, {
 		var minDist = 10000000000.0;
 		this._highlighted = null;
 		
-		var currentLayer = this._nodeTree.last();
+		var currentLayer = this._nodeTree[this._layerIndex];
 		var currentNodes = currentLayer.nodes.slice(0);
-		if (currentLayer.parent) {
-			currentNodes.push(currentLayer.parent);
-		}
+		this._nodeTree.forEach(function(layer) {
+			if (layer.parent) {
+				currentNodes.push(layer.parent);				
+			}
+		});
 		
 		currentNodes.forEach(function(node) {
 			var dist = Vecmath.distPointRay(node.widget.transformable.pos, mouseRay);
@@ -98,13 +187,9 @@ HierarchicalView.extends(Object, {
 			}
 		}, this);
 		currentNodes.forEach(function(node) {
-			var color = BLUE;
-			if (node == this._highlighted) {
-				color = HIGHLIGHTED;
-			}
-			color.alpha = node.widget.color.alpha;
-			node.widget.color = color;
+			node.widget.setHighlighted(node == this._highlighted);
 			
+			var color = BLUE;
 			var line = node.line;
 			if (line) {
 				var lineColor = Color.clone(color);
@@ -131,69 +216,18 @@ HierarchicalView.extends(Object, {
 	mouseUp: function(event) {
 		var highlighted = this._highlighted;
 		if (this._click && highlighted) {
+			this._navigateToNode(highlighted);
+			
+			var currentLayer = this._nodeTree[this._layerIndex];
+			
 			var camera = this._cam.camera;
 			var camTrans = this._cam.transformable;
 			
 			var targetPos = camera.getTargetPos();
-			var offset = camTrans.pos.clone().sub(targetPos);
-			this._nextCamTarget = this._highlighted.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
+			var offset = camTrans.pos.clone().sub(targetPos).normalize();
+			offset.scale(20 / (this._layerIndex + 1));
+			this._nextCamTarget = currentLayer.parent.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
-			
-			var scene = this._scene;
-			var currentLayer = this._nodeTree.last();
-			if (highlighted === currentLayer.parent) {
-				currentLayer.nodes.forEach(function(node) {
-					node.widget.removeFromScene(scene);
-					var line = node.line;
-					if (line) {
-						scene.removeEntity(line);
-					}
-				});
-				this._nodeTree.splice(this._nodeTree.length - 1, 1);
-			} else {
-				var start = window.performance.now();
-				
-				var engine = this._engine;
-				var children = highlighted.createChildren(engine);
-				
-				var behavior = new ExpAttBehavior(0.5, 1.0, function(entity) {
-					return entity.widget.color.alpha;
-				}, function(entity, value) {
-					var color = entity.widget.color;
-					color.alpha = value;
-					entity.widget.color = color;
-					
-					var line = entity.line;
-					if (line) {
-						line.renderable.material.color.alpha = 0.4 * value;
-					}
-				});
-				
-				if (children.length > 0) {
-					children.forEach(function(child) {
-						child.updateable = new BehaviorsUpdateable();
-						child.updateable.addBehavior(behavior);
-						child.widget.color.alpha = 0.0;
-						
-						child.widget.addToScene(scene);
-						
-						var endPoint1 = highlighted.widget.transformable;
-						var endPoint2 = child.widget.transformable;
-						var line = {
-							renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
-						};
-						var mat = line.renderable.material;
-						mat.color = BLUE;
-						mat.color.alpha = 0.0;
-						mat.width = 10;
-						scene.addEntity(line);
-						child.line = line;
-					});
-					this._nodeTree.push({nodes: children, parent: highlighted});
-				}
-				
-				console.log('Creating children took: ' + (window.performance.now() - start) + 'ms');
-			}
 		}
 	}
 });

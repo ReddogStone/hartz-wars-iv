@@ -1,14 +1,17 @@
 'use strict';
 
-function IconTextWidget(engine, icon, iconSize, color, text, font, textOffset) {
+function IconTextWidget(engine, icon, iconSize, text, font, textOffset) {
 	var transformable = this.transformable = new Transformable();
 	
 	this._sprite = {
 		renderable: new PointSpriteRenderable(engine, icon),
 		transformable: transformable
 	};
+	
+	var color = BLUE;
+	
 	var mat = this._sprite.renderable.material;
-	mat.color = Color.clone(color) || Color.black;
+	mat.color = color;
 	if (typeof iconSize == 'object') {
 		mat.size = iconSize.clone();
 	} else if (iconSize) {
@@ -23,12 +26,23 @@ function IconTextWidget(engine, icon, iconSize, color, text, font, textOffset) {
 	};
 }
 IconTextWidget.extends(Object, {
-	get color() {
-		return this._sprite.renderable.material.color;
+	setHighlighted: function(value) {
+		var color = value ? HIGHLIGHTED : BLUE;
+		color.alpha = this._sprite.renderable.material.color.alpha;
+		this._sprite.renderable.material.color = color;
+		this._label.renderable.material.color = color;		
 	},
-	set color(value) {
-		this._sprite.renderable.material.color = value;
-		this._label.renderable.material.color = value;
+	setAlpha: function(value) {
+		this._sprite.renderable.material.color.alpha = value;
+		this._label.renderable.material.color.alpha = value;
+	},
+	setAttenuated: function(value) {
+		if (value) {
+			this._sprite.renderable.material.color.alpha = 0.4;
+			this._label.renderable.material.color.alpha = 0;
+		} else {
+			this.setAlpha(1);
+		}
 	},
 	addToScene: function(scene) {
 		scene.addEntity(this._sprite);
