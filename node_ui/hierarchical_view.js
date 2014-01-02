@@ -134,13 +134,12 @@ HierarchicalView.extends(Object, {
 	},
 	mouseUp: function(event) {
 		if (this._click && this._highlighted) {
-			var sprite = this._highlighted.sprite;
 			var camera = this._cam.camera;
 			var camTrans = this._cam.transformable;
 			
 			var targetPos = camera.getTargetPos();
 			var offset = camTrans.pos.clone().sub(targetPos);
-			this._nextCamTarget = sprite.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
+			this._nextCamTarget = this._highlighted.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
 		}
 	}
