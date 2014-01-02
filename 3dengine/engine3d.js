@@ -11,6 +11,7 @@ var Engine3D = (function() {
 	var currentProgram = null;
 	
 	var shaderPrograms = {};
+	var textures = {};
 
 	function init(canvas) {
 		gl = WebGL.setupWebGL(canvas);
@@ -38,7 +39,11 @@ var Engine3D = (function() {
 		shaderPrograms[id] = WebGL.createProgram(gl, vertexShader, fragmentShader);
 	}
 	function getProgram(id) {
-		return shaderPrograms[id];
+		var result = shaderPrograms[id];
+		if (!result) {
+			throw new Error('No shader program with id: "' + id + '"');
+		}
+		return result;
 	}
 	
 	function handleLoadedTexture(texture) {
@@ -63,7 +68,7 @@ var Engine3D = (function() {
 		return texture;
 	}
 	
-	function createTextureFromFile(path) {
+	function createTextureFromFile(id, path) {
 		var image = new Image();
 		
 		var texture = gl.createTexture();
@@ -72,7 +77,15 @@ var Engine3D = (function() {
 		image.onload = function() { handleLoadedTexture(texture); };
 		image.src = path;
 		
-		return texture;
+		textures[id] = texture;
+	}
+	
+	function getTexture(id) {
+		var result = textures[id];
+		if (!result) {
+			throw new Error('No texture with id: "' + id + '"');
+		}
+		return result;
 	}
 	
 	function setClearColor(color) {
@@ -233,6 +246,7 @@ var Engine3D = (function() {
 		getProgram: getProgram,
 		createTexture: createTexture,
 		createTextureFromFile: createTextureFromFile,
+		getTexture: getTexture,
 		setClearColor: setClearColor,
 		setViewport: setViewport,
 		setProgram: setProgram,

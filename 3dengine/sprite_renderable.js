@@ -1,6 +1,6 @@
 'use strict';
 
-function SpriteRenderable(engine, texturePath) {
+function SpriteRenderable(engine, textureId) {
 	var meshData = [
 		{
 			"vertices": [
@@ -19,7 +19,7 @@ function SpriteRenderable(engine, texturePath) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this.material = new SimpleMaterial(engine, engine.createTextureFromFile(texturePath));
+	this.material = new SimpleMaterial(engine, engine.getTexture(textureId));
 }
 SpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {
@@ -28,7 +28,7 @@ SpriteRenderable.extends(Object, {
 	}
 });
 
-function PointSpriteRenderable(engine, texturePath) {
+function PointSpriteRenderable(engine, textureId) {
 	var meshData = [
 		{
 			"vertices": [
@@ -46,7 +46,7 @@ function PointSpriteRenderable(engine, texturePath) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this.material = new PointSpriteMaterial(engine, engine.createTextureFromFile(texturePath));
+	this.material = new PointSpriteMaterial(engine, engine.getTexture(textureId));
 }
 PointSpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {
@@ -55,7 +55,7 @@ PointSpriteRenderable.extends(Object, {
 	}
 });
 
-function LineRenderable(engine, texturePath, endPoint1, endPoint2) {
+function LineRenderable(engine, textureId, endPoint1, endPoint2) {
 	this._endPoint1 = endPoint1;
 	this._endPoint2 = endPoint2;
 	var meshData = [
@@ -75,7 +75,7 @@ function LineRenderable(engine, texturePath, endPoint1, endPoint2) {
 	];
 	
 	this._mesh = Mesh.loadFromJson(engine, meshData);
-	this.material = new LineMaterial(engine, engine.createTextureFromFile(texturePath));
+	this.material = new LineMaterial(engine, engine.getTexture(textureId));
 }
 LineRenderable.extends(Object, {
 	get endPoint1() {

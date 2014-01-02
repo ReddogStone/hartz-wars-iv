@@ -28,20 +28,20 @@ function HierarchicalView(engine, viewport) {
 	this._nextCamTarget = cam.camera.target;
 	
 	var nodeTemplate = {
-		icon: 'data/textures/node.png',
+		icon: 'data/textures/node',
 		text: 'Root',
 		children: [
-			{text: 'Neu', icon: 'data/textures/new_icon.png', children: [
-				{text: 'Dialog1', icon: 'data/textures/new_icon.png'},
-				{text: 'Dialog2', icon: 'data/textures/new_icon.png'},
-				{text: 'Dialog3', icon: 'data/textures/new_icon.png'},
-				{text: 'Dialog4', icon: 'data/textures/new_icon.png'},
-				{text: 'Dialog5', icon: 'data/textures/new_icon.png'},
-				{text: 'Dialog6', icon: 'data/textures/new_icon.png'},
+			{text: 'Neu', icon: 'data/textures/new_icon', children: [
+				{text: 'Dialog1', icon: 'data/textures/new_icon'},
+				{text: 'Dialog2', icon: 'data/textures/new_icon'},
+				{text: 'Dialog3', icon: 'data/textures/new_icon'},
+				{text: 'Dialog4', icon: 'data/textures/new_icon'},
+				{text: 'Dialog5', icon: 'data/textures/new_icon'},
+				{text: 'Dialog6', icon: 'data/textures/new_icon'},
 			]},
-			{text: 'Laden', icon: 'data/textures/load_icon.png'}, 
-			{text: 'Speichern', icon: 'data/textures/save_icon.png'}, 
-			{text: 'Hilfe', icon: 'data/textures/help_icon.png'}
+			{text: 'Laden', icon: 'data/textures/load_icon'}, 
+			{text: 'Speichern', icon: 'data/textures/save_icon'}, 
+			{text: 'Hilfe', icon: 'data/textures/help_icon'}
 		]
 	};
 	var layout = new CircleLayout(5, new Vecmath.Vector3(0, -1, 0), new Vecmath.Vector3(0, -2, 0));
@@ -151,7 +151,7 @@ HierarchicalView.extends(Object, {
 						var endPoint1 = highlighted.widget.transformable;
 						var endPoint2 = child.widget.transformable;
 						var line = {
-							renderable: new LineRenderable(engine, 'data/textures/line_pattern.png', endPoint1, endPoint2)
+							renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
 						};
 						var mat = line.renderable.material;
 						mat.color = BLUE;

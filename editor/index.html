@@ -154,6 +154,13 @@
 		Engine3D.createProgram('line',
 			FileUtils.loadFile('data/shaders/line_vs.shader'),
 			FileUtils.loadFile('data/shaders/screenspace_fs.shader'));
+			
+		Engine3D.createTextureFromFile('data/textures/node', 'data/textures/node.png');
+		Engine3D.createTextureFromFile('data/textures/new_icon', 'data/textures/new_icon.png');
+		Engine3D.createTextureFromFile('data/textures/load_icon', 'data/textures/load_icon.png');
+		Engine3D.createTextureFromFile('data/textures/save_icon', 'data/textures/save_icon.png');
+		Engine3D.createTextureFromFile('data/textures/help_icon', 'data/textures/help_icon.png');
+		Engine3D.createTextureFromFile('data/textures/line_pattern', 'data/textures/line_pattern.png');
 		
 		g_viewport = new Viewport();
 		g_view = new HierarchicalView(Engine3D, g_viewport);
