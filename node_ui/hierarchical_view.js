@@ -4,8 +4,7 @@ function HierarchicalView(engine, viewport) {
 	this._viewport = viewport || new Viewport();
 	this._cam = {
 		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
-		transformable: new Transformable(new Vecmath.Vector3(0, 10, 0), 
-			new Vecmath.Quaternion().setAxisAngle(new Vecmath.Vector3(1, 0, 0), 0.5 * Math.PI)),
+		transformable: new Transformable(new Vecmath.Vector3(0, 10, 0.1)),
 		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();

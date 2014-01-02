@@ -43,19 +43,28 @@ Camera.extends(Object, {
 		var targetPos = this.getTargetPos().clone();
 		if (targetPos) {
 			var targetToPos = transformable.pos.clone().sub(targetPos);
+			var dir = targetToPos.clone().normalize();
 			var up = transformable.up;
-			var right = up.clone().cross(targetToPos).normalize();
-			var rotation = new Vecmath.Quaternion().setAxisAngle(right, angle);
-			transformable.pos = targetPos.add(targetToPos.transformQuat(rotation));
+			
+			var dirDotUp = dir.dot(up);
+			if ((Math.abs(dirDotUp) < 0.99) || ((dirDotUp * angle) > 0)) {
+				var right = up.clone().cross(dir).normalize();
+				var rotation = new Vecmath.Quaternion().setAxisAngle(right, angle);
+				transformable.pos = targetPos.add(targetToPos.transformQuat(rotation));
+			}
 		}
 	},
 	rotateAroundTargetHoriz: function(transformable, angle) {
 		var targetPos = this.getTargetPos().clone();
 		if (targetPos) {
 			var targetToPos = transformable.pos.clone().sub(targetPos);
+			var dir = targetToPos.clone().normalize();
+
 			var up = transformable.up;
-			var right = up.clone().cross(targetToPos).normalize();
-			up = targetToPos.clone().cross(right).normalize();
+			var right = up.clone().cross(dir);
+			angle *= right.length();
+			right.normalize();
+			up = dir.clone().cross(right).normalize();
 			var rotation = new Vecmath.Quaternion().setAxisAngle(up, angle);
 			transformable.pos = targetPos.add(targetToPos.transformQuat(rotation));
 		}
