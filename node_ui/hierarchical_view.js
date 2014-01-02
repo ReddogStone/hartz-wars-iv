@@ -49,33 +49,38 @@ function HierarchicalView(viewport) {
 	cam.camera.target = new Vecmath.Vector3(0, 0, 0);
 	this._nextCamTarget = cam.camera.target;
 	
+	var layout = new CircleLayout(5, new Vecmath.Vector3(0, -1, 0), new Vecmath.Vector3(0, -2, 0));
+	var childTransforms = [];
+	
 	for (var i = 0; i < SPRITE_COUNT; ++i) {
-		var angle = (i / SPRITE_COUNT - 0.5) * Math.PI * 2;
-		var pos = new Vecmath.Vector3(5 * Math.sin(angle), 0, 5 * Math.cos(angle));
+		var transformable = new Transformable();
 		
-		var sprite = {
+		var childSprite = {
 			renderable: new PointSpriteRenderable(Engine3D, widgets[i].icon),
-			transformable: new Transformable(pos)
+			transformable: transformable
 		};
-		var mat = sprite.renderable.material;
+		var mat = childSprite.renderable.material;
 		mat.color = BLUE;
 		mat.size = new Vecmath.Vector2(64, 64);
 
 		var font = new Font('Georgia', 12);
 		var label = {
 			renderable: new TextRenderable(Engine3D, widgets[i].text, font, BLUE, new Vecmath.Vector2(0.0, -50.0)),
-			transformable: new Transformable(pos)
+			transformable: transformable
 		};
 		var mat = label.renderable.material;
 		mat.color = BLUE;
 		
-		scene.addEntity(sprite);
+		scene.addEntity(childSprite);
 		scene.addEntity(label);
-		transforms.push(sprite.transformable);
+		childTransforms.push(transformable);
 		
-		items.push({sprite: sprite, label: label});
+		items.push({sprite: childSprite, label: label});
 	}
 	
+	layout.apply(sprite.transformable, childTransforms);
+	
+	transforms = transforms.concat(childTransforms);
 	for (var i = 0; i < transforms.length - 1; ++i) {
 		var endPoint1 = transforms[0];
 		var endPoint2 = transforms[i + 1];
@@ -94,9 +99,6 @@ function HierarchicalView(viewport) {
 HierarchicalView.extends(Object, {
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
-	
-//		Vecmath.expAttVec(this._cam.transformable.pos, this._nextCamPos, delta, 0.1);
-//		Vecmath.expAttVec(this._cam.camera.target, this._nextCamTarget, delta, 0.1);
 	},
 	render: function(engine) {
 		this._scene.render(engine, this._viewport, this._cam);
