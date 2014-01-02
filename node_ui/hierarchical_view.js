@@ -4,7 +4,8 @@ function HierarchicalView(viewport) {
 	this._viewport = viewport || new Viewport();
 	this._cam = {
 		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
-		transformable: new Transformable(new Vecmath.Vector3(0, 9, 5))
+		transformable: new Transformable(new Vecmath.Vector3(0, 9, 5)),
+		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();
 	this._items = [];
@@ -13,7 +14,15 @@ function HierarchicalView(viewport) {
 	var items = this._items;
 	var scene = this._scene;
 	var cam = this._cam;
+	var self = this;
 	
+	cam.updateable.addBehavior(new FollowTargetBaseBehavior(0.1, function(entity) {
+		return {value: entity.transformable.pos, target: self._nextCamPos};
+	}));
+	cam.updateable.addBehavior(new FollowTargetBaseBehavior(0.1, function(entity) {
+		return {value: entity.camera.target, target: self._nextCamTarget};
+	}));
+
 	this._nextCamPos = cam.transformable.pos.clone();
 	
 	var widgets = [
@@ -37,8 +46,8 @@ function HierarchicalView(viewport) {
 	transforms.push(sprite.transformable);
 	items.push({sprite: sprite});
 	
-	this._nextCamTarget = sprite.transformable.pos.clone();
-	cam.camera.target = this._nextCamTarget;
+	cam.camera.target = new Vecmath.Vector3(0, 0, 0);
+	this._nextCamTarget = cam.camera.target;
 	
 	for (var i = 0; i < SPRITE_COUNT; ++i) {
 		var angle = (i / SPRITE_COUNT - 0.5) * Math.PI * 2;
@@ -84,9 +93,10 @@ function HierarchicalView(viewport) {
 }
 HierarchicalView.extends(Object, {
 	update: function(delta) {
-		var amount = Math.pow(0.5, delta / 0.1);
-		this._cam.transformable.pos.lerp(this._nextCamPos, 1.0 - amount);
-		this._cam.camera.target.lerp(this._nextCamTarget, 1.0 - amount);
+		this._cam.updateable.update(this._cam, delta);
+	
+//		Vecmath.expAttVec(this._cam.transformable.pos, this._nextCamPos, delta, 0.1);
+//		Vecmath.expAttVec(this._cam.camera.target, this._nextCamTarget, delta, 0.1);
 	},
 	render: function(engine) {
 		this._scene.render(engine, this._viewport, this._cam);
@@ -155,7 +165,7 @@ HierarchicalView.extends(Object, {
 			
 			var targetPos = camera.getTargetPos();
 			var offset = camTrans.pos.clone().sub(targetPos);
-			this._nextCamTarget = sprite.transformable.pos.clone();
+			this._nextCamTarget = sprite.transformable.pos.clone().add(new Vecmath.Vector3(0, -2, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
 		}
 	}
