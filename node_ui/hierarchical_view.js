@@ -60,7 +60,7 @@ function HierarchicalView(engine, viewport) {
 		]
 	};
 	
-	var rootNode = new ReflectionNode(engine, this, 'this');
+	var rootNode = new ReflectionNode(engine, window, 'window');
 	var containerNode = new ContainerNode(engine, [rootNode]);
 	this._nodeTree = new NodeTree(containerNode);
 	

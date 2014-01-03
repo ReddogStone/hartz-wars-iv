@@ -125,6 +125,7 @@ NodeTree.extends(Object, {
 			}
 			
 			if (activeChild) {
+				// TODO: do a proper ascend
 				subtree.children.forEach(function(sibling) {
 					if (sibling !== activeChild) {
 						activated.push(sibling);

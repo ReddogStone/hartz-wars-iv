@@ -135,7 +135,6 @@ function ContainerNode(engine, containedNodes, name, depth) {
 	} else if (containedNodes.length == 1) {
 		var node = containedNodes[0];
 		this._widget = node.widget;
-		this._depth = node.depth;
 	} else {
 		throw new Error('ContainerNode can not be constructed from 0 nodes!');
 	}
@@ -164,17 +163,18 @@ ContainerNode.extends(Object, {
 		}
 		
 		var result = [];
+		var depth = this._depth;
 		var childCount = children.length;
 		if (childCount <= ContainerNode.MAX_CONTAINED_NODES) {
 			children.forEach(function(child) {
-				result.push(new ContainerNode(engine, [child]));
+				result.push(new ContainerNode(engine, [child], '', depth + 1));
 			});
 		} else if (childCount <= ContainerNode.MAX_CONTAINED_NODES * ContainerNode.MAX_CONTAINED_NODES) {
 			var i = 0;
 			var containerCount = 0;
 			while (i < childCount) {
 				var containedChildren = this._packContainer(children, i);
-				result.push(new ContainerNode(engine, containedChildren, 'Container ' + containerCount, this._depth + 1));
+				result.push(new ContainerNode(engine, containedChildren, 'Container ' + containerCount, depth + 1));
 				i += containedChildren.length;
 				++containerCount;
 			}
