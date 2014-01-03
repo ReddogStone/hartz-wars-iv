@@ -123,3 +123,65 @@ ReflectionNode.extends(Object, {
 		return result;
 	}	
 });
+
+function ContainerNode(engine, containedNodes, name, depth) {
+	this._containedNodes = containedNodes;
+	this._depth = depth || 0;
+	
+	if (containedNodes.length > 1) {
+		var font = new Font('Helvetica', 12);
+		var textOffset = new Vecmath.Vector2(0.0, -50.0);
+		this._widget = new IconTextWidget(engine, 'data/textures/container_icon', 64, name, font, textOffset);
+	} else if (containedNodes.length == 1) {
+		var node = containedNodes[0];
+		this._widget = node.widget;
+		this._depth = node.depth;
+	} else {
+		throw new Error('ContainerNode can not be constructed from 0 nodes!');
+	}
+}
+ContainerNode.extends(Object, {
+	_packContainer: function(children, index) {
+		var result = [];
+		for (var i = index; (i < index + ContainerNode.MAX_CONTAINED_NODES) && (i < children.length); ++i) {
+			result.push(children[i]);
+		}
+		return result;
+	},
+	get widget() {
+		return this._widget;
+	},
+	get depth() {
+		return this._depth;
+	},
+	createChildren: function(engine) {
+		var nodes = this._containedNodes;
+		var children;
+		if (nodes.length > 1) {
+			children = nodes;
+		} else {
+			children = nodes[0].createChildren(engine);
+		}
+		
+		var result = [];
+		var childCount = children.length;
+		if (childCount <= ContainerNode.MAX_CONTAINED_NODES) {
+			children.forEach(function(child) {
+				result.push(new ContainerNode(engine, [child]));
+			});
+		} else if (childCount <= ContainerNode.MAX_CONTAINED_NODES * ContainerNode.MAX_CONTAINED_NODES) {
+			var i = 0;
+			var containerCount = 0;
+			while (i < childCount) {
+				var containedChildren = this._packContainer(children, i);
+				result.push(new ContainerNode(engine, containedChildren, 'Container ' + containerCount, this._depth + 1));
+				i += containedChildren.length;
+				++containerCount;
+			}
+		} else {
+			
+		}
+		return result;
+	}
+});
+ContainerNode.MAX_CONTAINED_NODES = 15;

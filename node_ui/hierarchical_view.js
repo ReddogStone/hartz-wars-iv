@@ -61,7 +61,8 @@ function HierarchicalView(engine, viewport) {
 	};
 	
 	var rootNode = new ReflectionNode(engine, this, 'this');
-	this._nodeTree = new NodeTree(rootNode);
+	var containerNode = new ContainerNode(engine, [rootNode]);
+	this._nodeTree = new NodeTree(containerNode);
 	
 	rootNode.widget.addToScene(scene);
 //	this._nodeTree.push({nodes: [rootNode], parent: null});
@@ -75,7 +76,7 @@ HierarchicalView.extends(Object, {
 		var childTransformables = subtree.children.map(function(childTree) { return childTree.node.widget.transformable; });
 		
 		var expDepth = Math.pow(2, rootNode.depth);
-		layout.apply(rootTransformable, childTransformables, 5 / expDepth, 2 / expDepth);
+		layout.apply(rootTransformable, childTransformables, 5 / expDepth, 0.5 / expDepth);
 	},
 	_fadeIn: function(subtrees) {
 		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
@@ -248,7 +249,7 @@ HierarchicalView.extends(Object, {
 			var expDepth = Math.pow(2, activeNode.depth);
 			offset.scale(10 / expDepth);
 			
-			this._nextCamTarget = activeNode.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -2 / expDepth, 0));
+			this._nextCamTarget = activeNode.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -0.5 / expDepth, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
 		}
 	}
