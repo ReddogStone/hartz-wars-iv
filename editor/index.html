@@ -31,6 +31,7 @@
 	<script src="../node_ui/layout.js" type="text/javascript"></script>
 	<script src="../node_ui/widget.js" type="text/javascript"></script>
 	<script src="../node_ui/uinode.js" type="text/javascript"></script>
+	<script src="../node_ui/node_tree.js" type="text/javascript"></script>
 </head>
 <body>
 <canvas id="canvas" width="1024" height="768"></canvas>
@@ -161,9 +162,15 @@
 		Engine3D.createTextureFromFile('data/textures/save_icon', 'data/textures/save_icon.png');
 		Engine3D.createTextureFromFile('data/textures/help_icon', 'data/textures/help_icon.png');
 		Engine3D.createTextureFromFile('data/textures/line_pattern', 'data/textures/line_pattern.png');
+		Engine3D.createTextureFromFile('data/textures/object_icon', 'data/textures/object_icon.png');
+		Engine3D.createTextureFromFile('data/textures/array_icon', 'data/textures/array_icon.png');
+		Engine3D.createTextureFromFile('data/textures/number_icon', 'data/textures/number_icon.png');
+		Engine3D.createTextureFromFile('data/textures/string_icon', 'data/textures/string_icon.png');
+		Engine3D.createTextureFromFile('data/textures/function_icon', 'data/textures/function_icon.png');
+		Engine3D.createTextureFromFile('data/textures/null_icon', 'data/textures/null_icon.png');
+		Engine3D.createTextureFromFile('data/textures/boolean_icon', 'data/textures/boolean_icon.png');
 		
 		g_viewport = new Viewport();
-		g_view = new HierarchicalView(Engine3D, g_viewport);
 		
 		g_camEntity = { camera: new Camera(), transformable: new Transformable(new Vecmath.Vector3(0, 0, 0)) };
 		g_scene = new Scene();
@@ -179,6 +186,8 @@
 			transformable: new Transformable(new Vecmath.Vector3(800, 727, 0))
 		};
 		g_scene.addEntity(g_mousePosLabel);
+		
+		g_view = new HierarchicalView(Engine3D, g_viewport);
 		
 		g_canvas.addEventListener('mousedown', handleMouseDown, false);
 		g_canvas.addEventListener('mousemove', handleMouseMove, false);

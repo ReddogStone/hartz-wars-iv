@@ -8,8 +8,6 @@ function HierarchicalView(engine, viewport) {
 		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();
-	this._nodeTree = [];
-	this._layerIndex = 0;
 	this._engine = engine;
 	
 	this._mouse = {x: 0, y: 0};
@@ -61,93 +59,93 @@ function HierarchicalView(engine, viewport) {
 			{text: 'Hilfe', icon: 'data/textures/help_icon'}
 		]
 	};
-	var layout = new CircleLayout(new Vecmath.Vector3(0, -1, 0));
 	
-	var rootNode = new TemplateNode(engine, nodeTemplate, layout);
+	var rootNode = new ReflectionNode(engine, this, 'this');
+	this._nodeTree = new NodeTree(rootNode);
+	
 	rootNode.widget.addToScene(scene);
-	this._nodeTree.push({nodes: [rootNode], parent: null});
+//	this._nodeTree.push({nodes: [rootNode], parent: null});
 //================ TEMP ================	
 }
 HierarchicalView.extends(Object, {
-	_findParentIndex: function(node) {
-		for (var i = this._layerIndex; i >= 0; --i) {
-			if (this._nodeTree[i].parent === node) {
-				return i;
-			}
-		}
-		return -1;
+	_layoutSubtree: function(subtree) {
+		var layout = new CircleLayout(new Vecmath.Vector3(0, -1, 0));
+		var rootNode = subtree.node;
+		var rootTransformable = rootNode.widget.transformable;
+		var childTransformables = subtree.children.map(function(childTree) { return childTree.node.widget.transformable; });
+		
+		var expDepth = Math.pow(2, rootNode.depth);
+		layout.apply(rootTransformable, childTransformables, 5 / expDepth, 0.5 / expDepth);
 	},
-	_navigateToNode: function(node) {
-		var layerIndex = this._layerIndex;
+	_applyExpansionVisuals: function(subtree) {
+		var rootNode = subtree.node;
 		var scene = this._scene;
-		var currentLayer = this._nodeTree[layerIndex];
+		var engine = this._engine;
 		
-		var parentIndex = this._findParentIndex(node);
-		if (parentIndex >= 0) {
-			layerIndex = parentIndex;
-		} else if (((layerIndex + 1) < this._nodeTree.length) && (this._nodeTree[layerIndex + 1].parent == node)) {
-			++layerIndex;
-		} else {
-			var start = window.performance.now();
-			
-			var engine = this._engine;
-			var children = node.createChildren(engine);
-			
-			var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
-				entity.widget.setAlpha(value);
+		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
+			entity.widget.setAlpha(value);
 
-				var line = entity.line;
-				if (line) {
-					line.renderable.material.color.alpha = 0.4 * value;
-				}
-			});
-			
-			children.forEach(function(child) {
-				child.updateable = new BehaviorsUpdateable();
-				child.updateable.addBehavior(behavior);
-
-				child.widget.setAlpha(0);
-				child.widget.addToScene(scene);
-				
-				var endPoint1 = node.widget.transformable;
-				var endPoint2 = child.widget.transformable;
-				var line = {
-					renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
-				};
-				var mat = line.renderable.material;
-				mat.color = BLUE;
-				mat.color.alpha = 0.0;
-				mat.width = 10;
-				scene.addEntity(line);
-				child.line = line;
-			});
-			
-			for (var i = layerIndex + 1; i < this._nodeTree.length; ++i) {
-				this._nodeTree[i].nodes.forEach(function(node) {
-					node.widget.removeFromScene(scene);
-					if (node.line) {
-						scene.removeEntity(node.line);
-					}
-				});
+			var line = entity.line;
+			if (line) {
+				line.renderable.material.color.alpha = 0.4 * value;
 			}
-			this._nodeTree.splice(layerIndex + 1, this._nodeTree.length - layerIndex - 1, {nodes: children, parent: node});
-			++layerIndex;
+		});
+		
+		subtree.forEachChildNode(function(child) {
+			// fade-in
+			child.updateable = new BehaviorsUpdateable();
+			child.updateable.addBehavior(behavior);
+			child.widget.setAlpha(0);
 			
-			console.log('Creating children took: ' + (window.performance.now() - start) + 'ms');
+			// add line from parent
+			var endPoint1 = rootNode.widget.transformable;
+			var endPoint2 = child.widget.transformable;
+			var line = {
+				renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
+			};
+			var mat = line.renderable.material;
+			mat.color = BLUE;
+			mat.color.alpha = 0.0;
+			mat.width = 10;
+			scene.addEntity(line);
+			child.line = line;
+		});
+	},
+	_navigateToSubtree: function(subtree) {
+		var scene = this._scene;
+		var result = this._nodeTree.navigateTo(this._engine, subtree);
+		
+		var expanded = result.expanded;
+		if (expanded) {
+			this._layoutSubtree(expanded);
+			this._applyExpansionVisuals(expanded);
+			expanded.forEachChildNode(function(node) {
+				node.widget.addToScene(scene);
+			});
 		}
-		
-		this._layerIndex = layerIndex;
-		
-		this._nodeTree.forEach(function(layer, index) {
-			layer.nodes.forEach(function(node) {
-				var delta = index - layerIndex;
-				node.widget.setLayerIndex(Math.max(delta, 0));
-				if ((delta > 0) || (delta < -2)) {
-					node.widget.setAttenuated(true);
-				} else {
-					node.widget.setAttenuated(false);
+
+		var removed = result.removed;
+		removed.forEach(function(removedSubtree) {
+			removedSubtree.forEachNode(function(removedNode) {
+				removedNode.widget.removeFromScene(scene);
+				
+				var line = removedNode.line;
+				if (line) {
+					scene.removeEntity(line);
 				}
 			});
+		});
+		
+		var activeDepth = this._nodeTree.activeSubtree.node.depth;
+		this._nodeTree.forEachNode(function(node) {
+			var depth = node.depth;
+			var delta = depth - activeDepth;
+			node.widget.setLayerIndex(Math.max(delta - 1, 0));
+			if ((delta > 1) || (delta < -1)) {
+				node.widget.setAttenuated(true);
+			} else {
+				node.widget.setAttenuated(false);
+			}
 		});
 	},
 	_highlightNode: function(mouse) {
@@ -163,35 +161,18 @@ HierarchicalView.extends(Object, {
 		var minDist = 10000000000.0;
 		this._highlighted = null;
 		
-		this._nodeTree.forEach(function(layer, index) {
-			layer.nodes.forEach(function(node) {
-				node.widget.setHighlighted(false);
-				var line = node.line;
-				if (line) {
-					var lineColor = Color.clone(BLUE);
-					lineColor.alpha = line.renderable.material.color.alpha;
-					line.renderable.material.color = lineColor;
-				}
-			});
-		});
-		
-		var currentLayer = this._nodeTree[this._layerIndex];
-		var currentNodes = currentLayer.nodes.slice(0);
-		for (var i = 0; i <= this._layerIndex; ++i) {
-			if (this._nodeTree[i].parent) {
-				currentNodes.push(this._nodeTree[i].parent);
-			}
-		}
-		
-		currentNodes.forEach(function(node) {
+		var activeSubtrees = this._nodeTree.getActiveSubtrees();
+		activeSubtrees.forEach(function(subtree) {
+			var node = subtree.node;
 			var dist = Vecmath.distPointRay(node.widget.transformable.pos, mouseRay);
 			if (dist < minDist) {
 				minDist = dist;
-				this._highlighted = node;
+				this._highlighted = subtree;
 			}
 		}, this);
-		currentNodes.forEach(function(node) {
-			node.widget.setHighlighted(node == this._highlighted);
+		activeSubtrees.forEach(function(subtree) {
+			var node = subtree.node;
+			node.widget.setHighlighted(subtree == this._highlighted);
 			
 			var color = BLUE;
 			var line = node.line;
@@ -205,12 +186,10 @@ HierarchicalView.extends(Object, {
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
 		
-		this._nodeTree.forEach(function(layer) {
-			layer.nodes.forEach(function(node) {
-				if (node.updateable) {
-					node.updateable.update(node, delta);
-				}
-			});
+		this._nodeTree.forEachNode(function(node) {
+			if (node.updateable) {
+				node.updateable.update(node, delta);
+			}
 		});
 		
 		this._highlightNode(this._mouse);
@@ -245,18 +224,18 @@ HierarchicalView.extends(Object, {
 	mouseUp: function(event) {
 		var highlighted = this._highlighted;
 		if (this._click && highlighted) {
-			this._navigateToNode(highlighted);
-			
-			var currentLayer = this._nodeTree[this._layerIndex];
+			this._navigateToSubtree(highlighted);
 			
 			var camera = this._cam.camera;
 			var camTrans = this._cam.transformable;
+			var activeNode = this._nodeTree.activeSubtree.node;
 			
 			var targetPos = camera.getTargetPos();
 			var offset = camTrans.pos.clone().sub(targetPos).normalize();
-			var expDepth = Math.pow(2, this._layerIndex - 1);
+			var expDepth = Math.pow(2, activeNode.depth);
 			offset.scale(10 / expDepth);
-			this._nextCamTarget = currentLayer.parent.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -0.5 / expDepth, 0));
+			
+			this._nextCamTarget = activeNode.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -0.5 / expDepth, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
 		}
 	}

@@ -24,7 +24,7 @@ Object.defineProperty(Array.prototype, 'remove', {value: function(element) {
 }});
 
 Object.defineProperty(Array.prototype, 'clear', {value: function() {
-	this.splice(0, this.length);
+	this.length = 0;
 }});
 
 Object.defineProperty(Array.prototype, 'first', {value: function() {
@@ -66,7 +66,6 @@ Object.defineProperty(Array.prototype, 'reverseSome', {value: function(callback,
 
 Object.defineProperty(Function.prototype, 'extends', {value: function(parent, methods) {
     this.prototype = Object.create(parent.prototype);
-    Object.defineProperty(this.prototype, 'parent', {value: parent.prototype});
     Object.defineProperty(this.prototype, 'constructor', {value: this});
 	
 	Object.addProperties(this.prototype, methods);
