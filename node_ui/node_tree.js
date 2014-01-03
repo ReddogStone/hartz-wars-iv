@@ -125,12 +125,11 @@ NodeTree.extends(Object, {
 			}
 			
 			if (activeChild) {
-				// TODO: do a proper ascend
-				subtree.children.forEach(function(sibling) {
-					if (sibling !== activeChild) {
-						activated.push(sibling);
-					}
-				});
+				var current = this._activeSubtree;
+				while (current != subtree) {
+					activated = activated.concat(current.getSiblings());
+					current = current.parent;
+				}
 			} else {
 				subtree.getSiblings().forEach(function(sibling) {
 					removed.push(Subtree.clone(sibling));
