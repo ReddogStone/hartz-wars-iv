@@ -75,13 +75,9 @@ HierarchicalView.extends(Object, {
 		var childTransformables = subtree.children.map(function(childTree) { return childTree.node.widget.transformable; });
 		
 		var expDepth = Math.pow(2, rootNode.depth);
-		layout.apply(rootTransformable, childTransformables, 5 / expDepth, 0.5 / expDepth);
+		layout.apply(rootTransformable, childTransformables, 5 / expDepth, 2 / expDepth);
 	},
-	_applyExpansionVisuals: function(subtree) {
-		var rootNode = subtree.node;
-		var scene = this._scene;
-		var engine = this._engine;
-		
+	_fadeIn: function(subtrees) {
 		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
 			entity.widget.setAlpha(value);
 
@@ -91,15 +87,22 @@ HierarchicalView.extends(Object, {
 			}
 		});
 		
-		subtree.forEachChildNode(function(child) {
+		subtrees.forEach(function(subtree) {
 			// fade-in
-			child.updateable = new BehaviorsUpdateable();
-			child.updateable.addBehavior(behavior);
-			child.widget.setAlpha(0);
-			
-			// add line from parent
-			var endPoint1 = rootNode.widget.transformable;
-			var endPoint2 = child.widget.transformable;
+			var node = subtree.node;
+			node.updateable = new BehaviorsUpdateable();
+			node.updateable.addBehavior(behavior);
+			node.widget.setAlpha(0);
+		});
+	},
+	_addLines: function(subtrees) {
+		var scene = this._scene;
+		var engine = this._engine;
+		subtrees.forEach(function(subtree) {
+			var node = subtree.node;
+			var parentNode = subtree.parent.node;
+			var endPoint1 = parentNode.widget.transformable;
+			var endPoint2 = node.widget.transformable;
 			var line = {
 				renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
 			};
@@ -108,7 +111,7 @@ HierarchicalView.extends(Object, {
 			mat.color.alpha = 0.0;
 			mat.width = 10;
 			scene.addEntity(line);
-			child.line = line;
+			node.line = line;
 		});
 	},
 	_navigateToSubtree: function(subtree) {
@@ -118,7 +121,8 @@ HierarchicalView.extends(Object, {
 		var expanded = result.expanded;
 		if (expanded) {
 			this._layoutSubtree(expanded);
-			this._applyExpansionVisuals(expanded);
+			this._addLines(expanded.children);
+			this._fadeIn(expanded.children);
 			expanded.forEachChildNode(function(node) {
 				node.widget.addToScene(scene);
 			});
@@ -135,6 +139,15 @@ HierarchicalView.extends(Object, {
 				}
 			});
 		});
+		
+		var activated = result.activated;
+		this._addLines(activated);
+		this._fadeIn(activated);
+		activated.forEach(function(activatedSubtree) {
+			activatedSubtree.forEachNode(function(node) {
+				node.widget.addToScene(scene);
+			});
+		}, this);
 		
 		var activeDepth = this._nodeTree.activeSubtree.node.depth;
 		this._nodeTree.forEachNode(function(node) {
@@ -235,7 +248,7 @@ HierarchicalView.extends(Object, {
 			var expDepth = Math.pow(2, activeNode.depth);
 			offset.scale(10 / expDepth);
 			
-			this._nextCamTarget = activeNode.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -0.5 / expDepth, 0));
+			this._nextCamTarget = activeNode.widget.transformable.pos.clone().add(new Vecmath.Vector3(0, -2 / expDepth, 0));
 			this._nextCamPos = this._nextCamTarget.clone().add(offset);
 		}
 	}

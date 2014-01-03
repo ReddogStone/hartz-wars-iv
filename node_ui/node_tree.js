@@ -18,6 +18,18 @@ Subtree.extends(Object, {
 	get expanded() {
 		return (this._children.length > 0);
 	},
+	getSiblings: function() {
+		var result = [];
+		var parent = this._parent;
+		if (parent) {
+			parent.children.forEach(function(sibling) {
+				if (sibling !== this) {
+					result.push(sibling);
+				}
+			}, this);
+		}
+		return result;
+	},
 	// flat list of all nodes from this subtree
 	getNodeList: function() {
 		var result = [];
@@ -56,6 +68,7 @@ Subtree.extends(Object, {
 	},
 	expand: function(engine) {
 		var childNodes = this._node.createChildren(engine);
+		
 		childNodes.forEach(function(childNode) {
 			this._children.push(new Subtree(childNode, this));
 		}, this);
@@ -70,13 +83,14 @@ Subtree.clone = function(value) {
 	}
 	
 	var result = new Subtree(value._node, value._parent);
-	result._children = value._children;
+	result._children = value._children.slice(0);
 	return result;
 }
 
-function NavigationResult(expanded, removed) {
+function NavigationResult(expanded, removed, activated) {
 	this.expanded = expanded;
 	this.removed = removed;
+	this.activated = activated;
 }
 
 function NodeTree(rootNode) {
@@ -100,26 +114,42 @@ NodeTree.extends(Object, {
 	},
 	navigateTo: function(engine, subtree) {
 		var expanded = null;
+		var activated = [];
 		var removed = [];
 		
-		this._activeSubtree = subtree;
-		if (!subtree.expanded) {
+		if (subtree.expanded) {
+			// find active child
+			var activeChild = this._activeSubtree;
+			while (activeChild && (activeChild.parent !== subtree)) {
+				activeChild = activeChild.parent;
+			}
+			
+			if (activeChild) {
+				subtree.children.forEach(function(sibling) {
+					if (sibling !== activeChild) {
+						activated.push(sibling);
+					}
+				});
+			} else {
+				subtree.getSiblings().forEach(function(sibling) {
+					removed.push(Subtree.clone(sibling));
+					sibling.collapse();
+				});
+			}
+		} else {
 			// expand leaf
 			subtree.expand(engine);
 			expanded = subtree;
 			
 			// collapse siblings
-			if (subtree.parent) {
-				subtree.parent.children.forEach(function(sibling) {
-					if ((sibling !== subtree) && (sibling.expanded)) {
-						removed = removed.concat(sibling.children);
-						sibling.collapse();
-					}
-				});
-			}
+			subtree.getSiblings().forEach(function(sibling) {
+				removed.push(Subtree.clone(sibling));
+				sibling.collapse();
+			});
 		}
+		this._activeSubtree = subtree;
 		
-		return new NavigationResult(expanded, removed);
+		return new NavigationResult(expanded, removed, activated);
 	},
 	forEachNode: function(callback, thisArg) {
 		this._root.forEachNode(callback, thisArg);
