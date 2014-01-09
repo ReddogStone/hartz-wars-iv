@@ -36,10 +36,10 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			result.push(current._node);
 			current._children.forEach(function(child) {
 				stack.push(child);
 			});
+			result.push(current._node);
 		}
 		return result;
 	},
@@ -50,24 +50,32 @@ Subtree.extends(Object, {
 		});
 		while (stack.length > 0) {
 			var current = stack.shift();
-			callback.call(thisArg, current._node, current);
 			current._children.forEach(function(child) {
 				stack.push(child);
 			});
+			callback.call(thisArg, current._node, current);
 		}
 	},
 	forEachNode: function(callback, thisArg) {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			callback.call(thisArg, current._node, current);
 			current._children.forEach(function(child) {
 				stack.push(child);
 			});
+			callback.call(thisArg, current._node, current);
 		}
 	},
-	expand: function(engine) {
-		var childNodes = this._node.createChildren(engine);
+	forEachSubtree: function(callback, thisArg) {
+		var stack = [this];
+		while (stack.length > 0) {
+			var current = stack.shift();
+			stack = stack.concat(current._children);
+			callback.call(thisArg, current);
+		}		
+	},
+	expand: function() {
+		var childNodes = this._node.createChildren();
 		
 		childNodes.forEach(function(childNode) {
 			this._children.push(new Subtree(childNode, this));
@@ -98,6 +106,9 @@ function NodeTree(rootNode) {
 	this._activeSubtree = this._root;
 }
 NodeTree.extends(Object, {
+	get root() {
+		return this._root;
+	},
 	get activeSubtree() {
 		return this._activeSubtree;
 	},
@@ -112,7 +123,7 @@ NodeTree.extends(Object, {
 		}
 		return result;
 	},
-	navigateTo: function(engine, subtree) {
+	navigateTo: function(subtree) {
 		var expanded = null;
 		var activated = [];
 		var removed = [];
@@ -124,7 +135,7 @@ NodeTree.extends(Object, {
 				activeChild = activeChild.parent;
 			}
 			
-			if (activeChild) {
+/*			if (activeChild) {
 				var current = this._activeSubtree;
 				while (current != subtree) {
 					activated = activated.concat(current.getSiblings());
@@ -134,24 +145,35 @@ NodeTree.extends(Object, {
 				subtree.getSiblings().forEach(function(sibling) {
 					removed.push(Subtree.clone(sibling));
 					sibling.collapse();
-				});
-			}
+				}); 
+			}*/
 		} else {
 			// expand leaf
-			subtree.expand(engine);
+			subtree.expand();
 			expanded = subtree;
 			
 			// collapse siblings
-			subtree.getSiblings().forEach(function(sibling) {
+/*			subtree.getSiblings().forEach(function(sibling) {
 				removed.push(Subtree.clone(sibling));
 				sibling.collapse();
-			});
+			}); */
 		}
 		this._activeSubtree = subtree;
 		
 		return new NavigationResult(expanded, removed, activated);
 	},
+	expandAll: function() {
+		var stack = [this._root];
+		while (stack.length > 0) {
+			var current = stack.shift();
+			current.expand();
+			stack = stack.concat(current.children);
+		}
+	},
 	forEachNode: function(callback, thisArg) {
 		this._root.forEachNode(callback, thisArg);
+	},
+	forEachSubtree: function(callback, thisArg) {
+		this._root.forEachSubtree(callback, thisArg);
 	}
 });

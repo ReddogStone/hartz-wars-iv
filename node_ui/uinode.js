@@ -1,8 +1,7 @@
 'use strict';
 
-function TemplateNode(engine, template, layout, depth) {
+function TemplateNode(engine, template, depth) {
 	this._template = template;
-	this._layout = layout;
 	this._depth = depth || 0;
 	
 	var font = new Font('Helvetica', 12);
@@ -15,17 +14,13 @@ TemplateNode.extends(Object, {
 	},
 	createChildren: function(engine) {
 		var result = [];
-		var layout = this._layout;
 		var depth = this._depth;
-		var childTransforms = [];
 		if (this._template.children) {
 			this._template.children.forEach(function(child) {
-				var childNode = new TemplateNode(engine, child, layout, depth + 1);
-				childTransforms.push(childNode._widget.transformable);
+				var childNode = new TemplateNode(engine, child, depth + 1);
 				result.push(childNode);
 			});
 			var expDepth = Math.pow(2, this._depth);
-			layout.apply(this._widget.transformable, childTransforms, 5 / expDepth, 0.5 / expDepth);
 		}
 		return result;
 	}
@@ -108,7 +103,6 @@ ReflectionNode.extends(Object, {
 	
 		var result = [];
 		var depth = this._depth;
-		var childTransforms = [];
 		for (var key in this._subject) {
 			var value = this._subject[key];
 			
@@ -117,9 +111,65 @@ ReflectionNode.extends(Object, {
 			}
 			
 			var childNode = new ReflectionNode(engine, value, key, depth + 1);
-			childTransforms.push(childNode._widget.transformable);
 			result.push(childNode);
 		}
+		return result;
+	}	
+});
+
+function FileSystemNode(engine, path, depth) {
+	this._path = path;
+	this._depth = depth || 0;
+	
+	var fs = require('fs');
+	var stats = fs.lstatSync(path);
+
+	var pathModule = require('path');
+	
+	var icon = 'data/textures/file_icon';
+	this._final = true;
+	var name = path;
+	
+	var parts = path.split(pathModule.sep);
+	if (parts[parts.length - 1]) {
+		name = parts[parts.length - 1];
+	}
+	
+	if (stats.isDirectory()) {
+		icon = 'data/textures/directory_icon';
+		this._final = false;
+	}
+
+	var font = new Font('Helvetica', 12);
+	var textOffset = new Vecmath.Vector2(0.0, -50.0);
+	this._widget = new IconTextWidget(engine, icon, 64, name, font, textOffset);
+}
+FileSystemNode.extends(Object, {
+	get widget() {
+		return this._widget;
+	},
+	get depth() {
+		return this._depth;
+	},
+	createChildren: function(engine) {
+		if (this._final) {
+			return [];
+		}
+	
+		var fs = require('fs');
+		var pathModule = require('path');
+
+		var result = [];
+		var depth = this._depth;
+		var path = this._path;
+		var files = fs.readdirSync(path);
+		files.forEach(function(fileName) {
+			try {
+				var childNode = new FileSystemNode(engine, pathModule.join(path, fileName), depth + 1);
+				result.push(childNode);
+			} catch (e) {
+			}
+		});
 		return result;
 	}	
 });
@@ -184,4 +234,71 @@ ContainerNode.extends(Object, {
 		return result;
 	}
 });
-ContainerNode.MAX_CONTAINED_NODES = 15;
+ContainerNode.MAX_CONTAINED_NODES = 12;
+
+function DialogNode(template, depth) {
+	this._template = template;
+	this._depth = depth || 0;
+	
+	this._final = true;
+	var data = {};
+	if (Array.isArray(template)) {
+		data.type = 'list';
+		this._final = false;
+	} else if (template.right || template.left) {
+		data.type = 'statement';
+		data.text = template.right || template.left;
+		data.side = template.right ? 'right' : 'left';
+	} else if (template.options) {
+		data.type = 'options';
+		this._final = false;
+	} else if (template.text) {
+		data.type = 'option';
+		data.text = template.text;
+		this._final = !(template.consequence);
+	} else {
+		data.type = 'action';
+	}
+	
+	this._data = data;
+}
+
+DialogNode.extends(Object, {
+	get data() {
+		return this._data;
+	},
+	get depth() {
+		return this._depth;
+	},
+	get type() {
+		return this._type;
+	},
+	createChildren: function() {
+		if (this._final) {
+			return [];
+		}
+	
+		var result = [];
+		var depth = this._depth;
+		
+		switch (this._data.type) {
+			case 'list':
+				this._template.forEach(function(element) {
+					result.push(new DialogNode(element, depth + 1));
+				});
+				break;
+			case 'options':
+				this._template.options.forEach(function(element) {
+					result.push(new DialogNode(element, depth + 1));
+				});
+				break;
+			case 'option':
+				this._template.consequence.forEach(function(element) {
+					result.push(new DialogNode(element, depth + 1));
+				});
+				break;
+		}
+		
+		return result;
+	}	
+});

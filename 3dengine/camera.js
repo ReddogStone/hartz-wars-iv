@@ -45,7 +45,8 @@ Camera.extends(Object, {
 			var targetToPos = transformable.pos.clone().sub(targetPos);
 			var dir = targetToPos.clone().normalize();
 			var up = transformable.up;
-			
+
+			// TODO: implement snapping to the "down" view
 			var dirDotUp = dir.dot(up);
 			if ((Math.abs(dirDotUp) < 0.99) || ((dirDotUp * angle) > 0)) {
 				var right = up.clone().cross(dir).normalize();
