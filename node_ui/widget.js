@@ -66,8 +66,9 @@ IconTextWidget.extends(Object, {
 		this._attenuated = value;
 		if (value) {
 //			this._sprite.renderable.material.color.alpha = 0.4;
-			this._label.renderable.material.color.alpha = 0;
+			this._label.renderable.invisible = true;
 		} else {
+			this._label.renderable.invisible = false;
 			this.setAlpha(1);
 		}
 	},

@@ -35,6 +35,8 @@
 	<script src="../node_ui/uinode.js" type="text/javascript"></script>
 	<script src="../node_ui/node_tree.js" type="text/javascript"></script>
 	<script src="../node_ui/dialog_overview_controller.js" type="text/javascript"></script>
+	
+	<script src="../profiler/profiler.js" type="text/javascript"></script>
 </head>
 <body>
 <canvas id="canvas" width="1024" height="768"></canvas>
@@ -56,6 +58,7 @@
 	var g_mouse = {x: 0, y: 0, down: false};
 	var g_viewport;
 	var g_controller;
+	var g_profileLines = [];
 	
 	window.requestAnimFrame = (function () {
 		return window.requestAnimationFrame ||
@@ -69,6 +72,8 @@
 	}) ();
 	
 	function animate() {
+		FrameProfiler.startFrame();
+	
 		var time = window.performance.now();
 		var delta = (time - lastTime) * 0.001;
 		lastTime = time;
@@ -81,14 +86,24 @@
 			g_fps = g_frames;
 			g_frames = 0;
 		}
+
 		g_fpsLabel.renderable.text = 'FPS: ' + g_fps;
-		
 		g_mousePosLabel.renderable.text = 'Mouse: (' + g_mouse.x + ', ' + g_mouse.y + ', ' + (g_mouse.down ? 'down' : 'up') + ')';
 		
 		g_controller.update(delta);
 		
 		Engine3D.clear();
+		
+		FrameProfiler.start('RenderAll');
 		g_controller.render(Engine3D);
+		FrameProfiler.stop();
+		
+		FrameProfiler.stopFrame();
+		var lines = FrameProfiler.getReportStrings();
+		g_profileLines.forEach(function(profileLine, index) {
+			profileLine.renderable.text = lines[lines.length - 1 - index] || '';
+		});
+		
 		g_scene.render(Engine3D, g_viewport, g_camEntity);
 		
 		requestAnimFrame( function() { animate(); } );
@@ -199,6 +214,16 @@
 			transformable: new Transformable(new Vecmath.Vector3(10, 727, 0))
 		};
 		g_scene.addEntity(g_fpsLabel);
+
+		for (var i = 0; i < 30; ++i) {
+			var profileLineLabel = {
+				renderable: new ScreenTextRenderable(Engine3D, '', new Font('Lucida Console', 10), Color.white),
+				transformable: new Transformable(new Vecmath.Vector3(10, i * 15, 0))
+			};
+			g_scene.addEntity(profileLineLabel);
+			g_profileLines.push(profileLineLabel);
+		}
+		
 		
 		g_mousePosLabel = {
 			renderable: new ScreenTextRenderable(Engine3D, '', new Font('Georgia', 14), Color.white),

@@ -95,6 +95,7 @@
 			this._buffered = false;
 		},
 		render: function(engine, globalParams) {
+			FrameProfiler.start('TextRender');
 			var bufferCanvas = this._bufferCanvas;
 			if (!this._buffered) {
 				var size = this._getSize();
@@ -119,6 +120,7 @@
 			}
 			this.material.set(engine, globalParams);
 			this._mesh.render(engine);
+			FrameProfiler.stop();
 		}
 	});
 	

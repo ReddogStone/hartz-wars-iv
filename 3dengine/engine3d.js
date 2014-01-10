@@ -174,9 +174,12 @@ var Engine3D = (function() {
 	}
 	
 	function setProgram(program, parameters) {
+		FrameProfiler.start('SetProgram');
+	
 		gl.useProgram(program);
 		currentProgram = program;
 		
+		FrameProfiler.start('SetParameters');
 		var uniforms = currentProgram.activeUniforms;
 		for (var paramName in parameters) {
 			var param = parameters[paramName];
@@ -185,9 +188,13 @@ var Engine3D = (function() {
 				setMaterialParameter(info.location, info.type, param);
 			}
 		}
+		FrameProfiler.stop();
+		
+		FrameProfiler.stop();
 	}
 	
 	function setBlendMode(blendmode) {
+		FrameProfiler.start('SetBlendmode');
 		switch (blendmode) {
 			case BlendMode.SOLID:
 				gl.disable(gl.BLEND);
@@ -204,9 +211,11 @@ var Engine3D = (function() {
 				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 				break;
 		}
+		FrameProfiler.stop();
 	}
 	
 	function setBuffers(vb, ib, description) {
+		FrameProfiler.start('SetBuffers');
 		gl.bindBuffer(gl.ARRAY_BUFFER, vb);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
 		
@@ -216,14 +225,17 @@ var Engine3D = (function() {
 			var index = attributes[name];
 			gl.enableVertexAttribArray(index);
 			gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
-		}		
+		}
+		FrameProfiler.stop();
 	}
 	
 	function reloadTextureImage(texture) {
+		FrameProfiler.start('ReloadTextureImage');
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 		gl.generateMipmap(gl.TEXTURE_2D);
 		gl.bindTexture(gl.TEXTURE_2D, null);			
+		FrameProfiler.stop();
 	}	
 	
 	function clear() {
@@ -231,7 +243,9 @@ var Engine3D = (function() {
 	}
 	
 	function renderTriangles(count, offset) {
+		FrameProfiler.start('RenderTriangles');
 		gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
+		FrameProfiler.stop();
 	}
 	
 	function getDrawingBufferSize() {

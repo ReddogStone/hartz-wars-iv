@@ -53,13 +53,18 @@ Scene.extends(Object, {
 		this._entities.remove(entity);
 	},
 	render: function(engine, viewport, camEntity) {
+		FrameProfiler.start('SetViewport');
 		engine.setViewport(viewport);
+		FrameProfiler.stop();
 		
+		FrameProfiler.start('GetCameraStuff');
 		var bufferSize = engine.getDrawingBufferSize();
 		var camera = camEntity.camera;
 		var view = camera.getView(camEntity.transformable);
 		var projection = camera.getProjection();
+		FrameProfiler.stop();
 		
+		FrameProfiler.start('GatherParams');
 		var params = {
 			uView: view.val,
 			uProjection: projection.val,
@@ -73,7 +78,9 @@ Scene.extends(Object, {
 			params.uPosLight2 = this._pointLight2.pos.toArray();
 			params.uColorLight2 = this._pointLight2.color.toArray3();
 		}
+		FrameProfiler.stop();
 		
+		FrameProfiler.start('SortByZ');
 		this._entities.forEach(function(entity) {
 			if (entity.transformable) {
 				entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
@@ -85,13 +92,18 @@ Scene.extends(Object, {
 		this._entities.sort(function(e1, e2) {
 			return e1.viewZ - e2.viewZ;
 		});
+		FrameProfiler.stop();
 		
+		FrameProfiler.start('Render');
 		this._entities.forEach(function(entity) {
-			if (entity.transformable) {
-				params.uWorld = entity.transformable.transform.val;
+			if (!entity.renderable.invisible) {
+				if (entity.transformable) {
+					params.uWorld = entity.transformable.transform.val;
+				}
+				
+				entity.renderable.render(engine, params);
 			}
-			
-			entity.renderable.render(engine, params);
 		});
+		FrameProfiler.stop();
 	}
 });

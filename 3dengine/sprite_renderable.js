@@ -50,8 +50,14 @@ function PointSpriteRenderable(engine, textureId) {
 }
 PointSpriteRenderable.extends(Object, {
 	render: function(engine, globalParams) {
+		FrameProfiler.start('PointSprite');
+		FrameProfiler.start('SetMaterial');
 		this.material.set(engine, globalParams);
+		FrameProfiler.stop();
+		FrameProfiler.start('Render');
 		this._mesh.render(engine);
+		FrameProfiler.stop();
+		FrameProfiler.stop();
 	}
 });
 
