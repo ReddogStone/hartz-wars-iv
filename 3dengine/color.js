@@ -34,6 +34,10 @@ Color.clone = function(value) {
 	}
 	return undefined;
 }
+Color.equal = function(val1, val2) {
+	return (val1.red == val2.red) && (val1.green == val2.green) && (val1.blue == val2.blue) && (val1.alpha == val2.alpha);
+}
+
 Object.defineProperty(Color, 'white', {get: function() { return new Color(1, 1, 1, 1); } })
 Object.defineProperty(Color, 'black', {get: function() { return new Color(0, 0, 0, 1); } })
 Object.defineProperty(Color, 'red', {get: function() { return new Color(1, 0, 0, 1); } })

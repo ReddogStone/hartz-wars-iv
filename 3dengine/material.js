@@ -1,13 +1,22 @@
 'use strict';
 
+function Material(engine, programId, blendMode) {
+	this._program = engine.getProgram(programId);
+	this.blendMode = blendMode;
+}
+Material.extends(Object, {
+	get program() {
+		return this._program;
+	}
+});
+
 function SimpleMaterial(engine, texture, color, luminosity) {
+	Material.call(this, engine, 'simple', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
 	this._color.alpha = luminosity || 0;
-	this._program = engine.getProgram('simple');
-	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-SimpleMaterial.extends(Object, {
+SimpleMaterial.extends(Material, {
 	get color() {
 		return this._color;
 	},
@@ -23,21 +32,18 @@ SimpleMaterial.extends(Object, {
 	get texture() {
 		return this._texture;
 	},
-	set: function(engine, globalParams) {
+	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
-		engine.setProgram(this._program, globalParams);
-		engine.setBlendMode(this.blendMode);
 	}
 });
 
 function ScreenSpaceMaterial(engine, texture, color) {
+	Material.call(this, engine, 'screenspace', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	this._program = engine.getProgram('screenspace');
-	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-ScreenSpaceMaterial.extends(Object, {
+ScreenSpaceMaterial.extends(Material, {
 	get color() {
 		return this._color;
 	},
@@ -47,21 +53,18 @@ ScreenSpaceMaterial.extends(Object, {
 	get texture() {
 		return this._texture;
 	},
-	set: function(engine, globalParams) {
+	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
-		engine.setProgram(this._program, globalParams);
-		engine.setBlendMode(this.blendMode);
 	}
 });
 
 function TextMaterial(engine, texture, color) {
+	Material.call(this, engine, 'text', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	this._program = engine.getProgram('text');
-	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-TextMaterial.extends(Object, {
+TextMaterial.extends(Material, {
 	get color() {
 		return this._color;
 	},
@@ -71,22 +74,19 @@ TextMaterial.extends(Object, {
 	get texture() {
 		return this._texture;
 	},
-	set: function(engine, globalParams) {
+	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
-		engine.setProgram(this._program, globalParams);
-		engine.setBlendMode(this.blendMode);
 	}
 });
 
 function PointSpriteMaterial(engine, texture, size, color) {
+	Material.call(this, engine, 'pointsprite', BlendMode.PREMUL_ALPHA);
 	this._size = size || new Vecmath.Vector2(64, 64);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	this._program = engine.getProgram('pointsprite');
-	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-PointSpriteMaterial.extends(Object, {
+PointSpriteMaterial.extends(Material, {
 	get size() {
 		return this._size;
 	},
@@ -102,23 +102,33 @@ PointSpriteMaterial.extends(Object, {
 	get texture() {
 		return this._texture;
 	},
-	set: function(engine, globalParams) {
+	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
 		globalParams.uSize = this._size.toArray();
-		engine.setProgram(this._program, globalParams);
-		engine.setBlendMode(this.blendMode);
+	}
+});
+
+function PointSpriteInstMaterial(engine, texture) {
+	Material.call(this, engine, 'pointsprite_instanced', BlendMode.PREMUL_ALPHA);
+	this._texture = texture;
+}
+PointSpriteInstMaterial.extends(Material, {
+	get texture() {
+		return this._texture;
+	},
+	setParams: function(globalParams) {
+		globalParams.uTexture = {texture: this._texture, sampler: 0};
 	}
 });
 
 function LineMaterial(engine, patternTexture, width, color) {
+	Material.call(this, engine, 'line', BlendMode.PREMUL_ALPHA);
 	this._width = width ? width : 1.0;
 	this._texture = patternTexture;
 	this._color = Color.clone(color) || Color.white;
-	this._program = engine.getProgram('line');
-	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-LineMaterial.extends(Object, {
+LineMaterial.extends(Material, {
 	get width() {
 		return this._width;
 	},
@@ -134,12 +144,10 @@ LineMaterial.extends(Object, {
 	get texture() {
 		return this._texture;
 	},
-	set: function(engine, globalParams) {
+	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
 		globalParams.uWidth = [this._width];
-		engine.setProgram(this._program, globalParams);
-		engine.setBlendMode(this.blendMode);
 	}
 });
 

@@ -22,8 +22,12 @@ function SpriteRenderable(engine, textureId) {
 	this.material = new SimpleMaterial(engine, engine.getTexture(textureId));
 }
 SpriteRenderable.extends(Object, {
-	render: function(engine, globalParams) {
-		this.material.set(engine, globalParams);
+	prepare: function(engine) {
+	},
+	setParams: function(globalParams) {
+		this.material.setParams(globalParams);
+	},
+	render: function(engine) {
 		this._mesh.render(engine);
 	}
 });
@@ -49,14 +53,14 @@ function PointSpriteRenderable(engine, textureId) {
 	this.material = new PointSpriteMaterial(engine, engine.getTexture(textureId));
 }
 PointSpriteRenderable.extends(Object, {
-	render: function(engine, globalParams) {
-		FrameProfiler.start('PointSprite');
-		FrameProfiler.start('SetMaterial');
-		this.material.set(engine, globalParams);
-		FrameProfiler.stop();
-		FrameProfiler.start('Render');
+	prepare: function(engine) {
+	},
+	setParams: function(globalParams) {
+		this.material.setParams(globalParams);
+	},
+	render: function(engine) {
+		FrameProfiler.start('PointSpriteRender');
 		this._mesh.render(engine);
-		FrameProfiler.stop();
 		FrameProfiler.stop();
 	}
 });
@@ -96,10 +100,14 @@ LineRenderable.extends(Object, {
 	set endPoint2(value) {
 		this._endPoint2 = value;
 	},
-	render: function(engine, globalParams) {
+	prepare: function(engine) {
+	},
+	setParams: function(globalParams) {
 		globalParams.uEndPoint1 = this._endPoint1.pos.toArray();
 		globalParams.uEndPoint2 = this._endPoint2.pos.toArray();
-		this.material.set(engine, globalParams);
+		this.material.setParams(globalParams);
+	},
+	render: function(engine) {
 		this._mesh.render(engine);
 	}
 });

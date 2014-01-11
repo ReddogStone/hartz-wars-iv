@@ -94,8 +94,7 @@
 			this._text = value;
 			this._buffered = false;
 		},
-		render: function(engine, globalParams) {
-			FrameProfiler.start('TextRender');
+		prepare: function(engine) {
 			var bufferCanvas = this._bufferCanvas;
 			if (!this._buffered) {
 				var size = this._getSize();
@@ -114,11 +113,15 @@
 				
 				this._buffered = true;
 			}
-		
+		},
+		setParams: function(globalParams) {
 			if (this._screenOffset) {
 				globalParams.uScreenOffset = this._screenOffset.toArray();
 			}
-			this.material.set(engine, globalParams);
+			this.material.setParams(globalParams);
+		},
+		render: function(engine) {
+			FrameProfiler.start('TextRender');
 			this._mesh.render(engine);
 			FrameProfiler.stop();
 		}

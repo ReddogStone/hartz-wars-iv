@@ -23,20 +23,55 @@ var Engine3D = (function() {
 		gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 	}
 
-	function createVertexBuffer(data) {
+	function createVertexBuffer(data, dynamic) {
+		data = data || [];
+		dynamic = dynamic || false;
+	
 		var buffer = gl.createBuffer();
+//		console.log(gl.getError());
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+//		console.log(gl.getError());
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
+//		console.log(gl.getError());
 		return buffer;
 	}
 	function createIndexBuffer(data) {
+		data = data || [];
+	
 		var buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
 		return buffer;
 	}
+	function changeVertexBufferData(buffer, data, dynamic) {
+		dynamic = dynamic || false;
+	
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+//		console.log('bindBuffer: ' + gl.getError());
+		
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);		
+//		console.log(gl.getError());
+	}
+	function changeIndexBufferData(buffer, data) {
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+		gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, new Uint16Array(data), gl.STATIC_DRAW);
+	}
+	function updateVertexBufferData(buffer, data) {
+		console.log('before bindBuffer: ' + gl.getError());
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+		console.log('bindBuffer: ' + gl.getError());
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(data));
+		console.log(gl.getError());
+	}
+	function updateIndexBufferData(buffer, data) {
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+		gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, new Uint16Array(data));
+	}
+
 	function createProgram(id, vertexShader, fragmentShader) {
-		shaderPrograms[id] = WebGL.createProgram(gl, vertexShader, fragmentShader);
+		var program = WebGL.createProgram(gl, vertexShader, fragmentShader);
+		program._id = id;
+		shaderPrograms[id] = program;
 	}
 	function getProgram(id) {
 		var result = shaderPrograms[id];
@@ -173,43 +208,43 @@ var Engine3D = (function() {
 		}
 	}
 	
-	function setProgram(program, parameters) {
-		FrameProfiler.start('SetProgram');
-	
-		gl.useProgram(program);
-		currentProgram = program;
-		
+	function setProgramParameters(parameters) {
 		FrameProfiler.start('SetParameters');
 		var uniforms = currentProgram.activeUniforms;
 		for (var paramName in parameters) {
 			var param = parameters[paramName];
 			if (paramName in uniforms) {
-				var info = uniforms[paramName];
+				FrameProfiler.start('SetParam_' + paramName);
+				var info = uniforms[paramName];				
 				setMaterialParameter(info.location, info.type, param);
+				FrameProfiler.stop();
 			}
 		}
-		FrameProfiler.stop();
-		
+		FrameProfiler.stop();		
+	}
+	
+	function setProgram(program, parameters) {
+		FrameProfiler.start('SetProgram');
+	
+		gl.useProgram(program);
+		currentProgram = program;
+		setProgramParameters(parameters);
 		FrameProfiler.stop();
 	}
 	
 	function setBlendMode(blendmode) {
 		FrameProfiler.start('SetBlendmode');
-		switch (blendmode) {
-			case BlendMode.SOLID:
-				gl.disable(gl.BLEND);
-				gl.enable(gl.DEPTH_TEST);
-				break;
-			case BlendMode.ALPHA:
-				gl.enable(gl.BLEND);
-				gl.disable(gl.DEPTH_TEST);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-				break;
-			case BlendMode.PREMUL_ALPHA:
-				gl.enable(gl.BLEND);
-				gl.disable(gl.DEPTH_TEST);
-				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-				break;
+		if (blendmode === BlendMode.SOLID) {
+			gl.disable(gl.BLEND);
+			gl.enable(gl.DEPTH_TEST);
+		} else if (blendmode === BlendMode.ALPHA) {
+			gl.enable(gl.BLEND);
+			gl.disable(gl.DEPTH_TEST);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		} else if (blendmode === BlendMode.PREMUL_ALPHA) {
+			gl.enable(gl.BLEND);
+			gl.disable(gl.DEPTH_TEST);
+			gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		}
 		FrameProfiler.stop();
 	}
@@ -223,8 +258,30 @@ var Engine3D = (function() {
 		for (var name in description) {
 			var desc = description[name];
 			var index = attributes[name];
-			gl.enableVertexAttribArray(index);
-			gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
+			if (index !== undefined) {
+				gl.enableVertexAttribArray(index);
+				gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
+			} else {
+				throw new Error('No such attribute: "' + name + '" found in the program: "' + currentProgram._id + '"');
+			}
+		}
+		FrameProfiler.stop();
+	}
+	
+	function setVertexBuffer(vb, description) {
+		FrameProfiler.start('SetBuffers');
+		gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+		
+		var attributes = currentProgram.activeAttributes;
+		for (var name in description) {
+			var desc = description[name];
+			var index = attributes[name];
+			if (index !== undefined) {
+				gl.enableVertexAttribArray(index);
+				gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
+			} else {
+				throw new Error('No such attribute: "' + name + '" found in the program: "' + currentProgram._id + '"');
+			}
 		}
 		FrameProfiler.stop();
 	}
@@ -256,6 +313,10 @@ var Engine3D = (function() {
 		init: init,
 		createVertexBuffer: createVertexBuffer,
 		createIndexBuffer: createIndexBuffer,
+		changeVertexBufferData: changeVertexBufferData,
+		changeIndexBufferData: changeIndexBufferData,
+		updateVertexBufferData: updateVertexBufferData,
+		updateIndexBufferData: updateIndexBufferData,
 		createProgram: createProgram,
 		getProgram: getProgram,
 		createTexture: createTexture,
@@ -263,9 +324,11 @@ var Engine3D = (function() {
 		getTexture: getTexture,
 		setClearColor: setClearColor,
 		setViewport: setViewport,
+		setProgramParameters: setProgramParameters,
 		setProgram: setProgram,
 		setBlendMode: setBlendMode,
 		setBuffers: setBuffers,
+		setVertexBuffer: setVertexBuffer,
 		reloadTextureImage: reloadTextureImage,
 		clear: clear,
 		renderTriangles: renderTriangles,

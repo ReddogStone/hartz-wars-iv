@@ -117,26 +117,29 @@ HierarchicalView.extends(Object, {
 	keyDown: function(event) {
 //		console.log('keyDown: ' + String.fromCharCode(event.keyCode));
 		switch (event.keyCode) {
-			case 27:
+			case 27: // ESCAPE
 				if (this.onLevelUp) {
 					this.onLevelUp();
 				}
 				this._mouse.x = 512;
 				this._mouse.y = 384;
 				break;
-			case 38:
+			case 38: // UP_ARROW
 				var camera = this._cam.camera;
 				var camTrans = this._cam.transformable;
 				var targetPos = camera.getTargetPos();
 				var offset = camTrans.pos.clone().sub(targetPos);
 				this._nextCamPos = this._nextCamTarget.clone().add(offset.scale(1 / 1.1));
 				break;
-			case 40:
+			case 40: // DOWN_ARROW
 				var camera = this._cam.camera;
 				var camTrans = this._cam.transformable;
 				var targetPos = camera.getTargetPos();
 				var offset = camTrans.pos.clone().sub(targetPos);
 				this._nextCamPos = this._nextCamTarget.clone().add(offset.scale(1.1));
+				break;
+			case 80: // P
+				FrameProfiler.toggle();
 				break;
 		}
 	},

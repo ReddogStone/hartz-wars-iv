@@ -1,6 +1,4 @@
 var FrameProfiler = (function() {
-	var ENABLED = true;
-	
 	var module = {};
 	
 	var g_averages = {};
@@ -9,11 +7,11 @@ var FrameProfiler = (function() {
 	var g_timeStack = [];
 	var g_level = 0;
 	
-	module.startFrame = function() {
+	function startFrame() {
 		g_frameTimes = {};
 		g_times.length = 0;
 	};
-	module.stopFrame = function() {
+	function stopFrame() {
 		var nameStack = [];
 		var level = -1;
 		for (var i = 0; i < g_times.length; ++i) {
@@ -39,13 +37,13 @@ var FrameProfiler = (function() {
 			}
 		}
 	};
-	module.start = function(name) {
+	function start(name) {
 		var newTime = {name: name, level: g_level, start: window.performance.now()};
 		g_times.push(newTime);
 		g_timeStack.push(newTime);
 		++g_level;
 	};
-	module.stop = function() {
+	function stop() {
 		--g_level;
 		var time = g_timeStack.pop();
 		time.stop = window.performance.now();
@@ -55,7 +53,7 @@ var FrameProfiler = (function() {
 		return '            '.substr(string.length - number) + string;
 	}
 	
-	module.getReportStrings = function() {
+	function getReportStrings() {
 		var maxLength = 0;
 		for (var name in g_frameTimes) {
 			if (name.length > maxLength) {
@@ -74,9 +72,35 @@ var FrameProfiler = (function() {
 		
 		return lines;
 	};
+
+	var enabled = true;
+	module.enable = function() {
+		enabled = true;
+		module.startFrame = startFrame;
+		module.stopFrame = stopFrame;
+		module.start = start;
+		module.stop = stop;
+		module.getReportStrings = getReportStrings;
+	};
 	
 	function empty() {}
-	return ENABLED ? 
-		module : 
-		{startFrame: empty, stopFrame: empty, start: empty, stop: empty, getReportStrings: function() { return []; }};
+	module.disable = function() {
+		enabled = false;
+		module.startFrame = empty;
+		module.stopFrame = empty;
+		module.start = empty;
+		module.stop = empty;
+		module.getReportStrings = function() { return []; };
+	};
+	
+	module.toggle = function() {
+		if (enabled) {
+			module.disable();
+		} else {
+			module.enable();
+		}
+	};
+	
+	module.disable();
+	return module;
 })();

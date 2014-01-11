@@ -53,6 +53,46 @@ Scene.extends(Object, {
 		this._entities.remove(entity);
 	},
 	render: function(engine, viewport, camEntity) {
+		function arraysEqual(a1, a2) {
+			var l = a2.length;
+			for (var i = 0; i < l; ++i) {
+				if (a1[i] != a2[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	
+		function paramDiff(oldParams, newParams) {
+			var result = {};
+			for (var paramName in newParams) {
+				if (paramName in oldParams) {
+					var oldParam = oldParams[paramName];
+					var newParam = newParams[paramName];
+					var equal = false;
+					if (Array.isArray(newParam) && Array.isArray(oldParam)) {
+						equal = arraysEqual(oldParam, newParam);
+					} else {
+						equal = (oldParam == newParam);
+					}
+					if (equal) {
+						continue;
+					}
+				}
+				
+				result[paramName] = newParams[paramName];
+			}
+			return result;
+		}
+		
+		function cloneParams(params) {
+			var result = {};
+			for (var paramName in params) {
+				result[paramName] = params[paramName];
+			}
+			return result;
+		}
+	
 		FrameProfiler.start('SetViewport');
 		engine.setViewport(viewport);
 		FrameProfiler.stop();
@@ -81,13 +121,16 @@ Scene.extends(Object, {
 		FrameProfiler.stop();
 		
 		FrameProfiler.start('SortByZ');
-		this._entities.forEach(function(entity) {
+		var entities = this._entities;
+		var entityCount = entities.length;
+		for (var i = 0; i < entityCount; ++i) {
+			var entity = entities[i];
 			if (entity.transformable) {
 				entity.viewZ = entity.transformable.pos.clone().transformMat4(view).z;
 			} else {
 				entity.viewZ = 0.0;
 			}
-		});
+		}
 		
 		this._entities.sort(function(e1, e2) {
 			return e1.viewZ - e2.viewZ;
@@ -95,15 +138,42 @@ Scene.extends(Object, {
 		FrameProfiler.stop();
 		
 		FrameProfiler.start('Render');
-		this._entities.forEach(function(entity) {
-			if (!entity.renderable.invisible) {
+		var lastProgram = null;
+		var lastParams = {};
+		var lastBlendMode = null;
+		for (var i = 0; i < entityCount; ++i) {
+			var entity = entities[i];
+			var renderable = entity.renderable;
+			if (!renderable.invisible) {
 				if (entity.transformable) {
 					params.uWorld = entity.transformable.transform.val;
 				}
 				
-				entity.renderable.render(engine, params);
+				renderable.prepare(engine);
+				var material = renderable.material;
+				renderable.setParams(params);
+				
+				var program = material.program;
+				var blendMode = material.blendMode;
+				
+				if (lastBlendMode != blendMode) {
+					engine.setBlendMode(blendMode);
+					lastBlendMode = blendMode;
+				}
+				
+				if (lastProgram != program) {
+					engine.setProgram(program, params);
+					lastProgram = program;
+					lastParams = cloneParams(params);
+				} else {
+					var diff = paramDiff(lastParams, params);
+					lastParams = cloneParams(params);
+					engine.setProgramParameters(diff);
+				}
+				
+				renderable.render(engine);
 			}
-		});
+		}
 		FrameProfiler.stop();
 	}
 });
