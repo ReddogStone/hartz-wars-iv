@@ -13,6 +13,7 @@
 	<script src="../math/Ray.js" type="text/javascript"></script>
 	<script src="../math/Mathutils.js" type="text/javascript"></script>
 
+	<script src="../3dengine/webgl-debug.js" type="text/javascript"></script>
 	<script src="../3dengine/utils.js" type="text/javascript"></script>
 	<script src="../3dengine/fileutils.js" type="text/javascript"></script>
 	<script src="../3dengine/webgl_utils.js" type="text/javascript"></script>
@@ -23,6 +24,7 @@
 	<script src="../3dengine/color.js" type="text/javascript"></script>
 	<script src="../3dengine/point_light.js" type="text/javascript"></script>
 	<script src="../3dengine/camera.js" type="text/javascript"></script>
+	<script src="../3dengine/texture_atlas.js" type="text/javascript"></script>
 
 	<script src="../3dengine/sprite_renderable.js" type="text/javascript"></script>
 	<script src="../3dengine/text_renderable.js" type="text/javascript"></script>
@@ -99,7 +101,7 @@
 		Engine3D.clear();
 		
 		FrameProfiler.start('RenderAll');
-//		g_controller.render(Engine3D);
+		g_controller.render(Engine3D);
 		FrameProfiler.stop();
 		
 		FrameProfiler.stopFrame();
@@ -216,6 +218,7 @@
 		Engine3D.createTextureFromFile('data/textures/directory_icon', 'data/textures/directory_icon.png');
 		Engine3D.createTextureFromFile('data/textures/none_icon', 'data/textures/none_icon.png');
 		Engine3D.createTextureFromFile('data/textures/bg_box', 'data/textures/bg_box.png');
+		Engine3D.createTextureFromFile('data/textures/icon_atlas', 'data/textures/icon_atlas.png');
 		
 		g_viewport = new Viewport();
 		
@@ -250,10 +253,10 @@
 		g_scene.addEntity(g_mousePosLabel);
 		
 		var instancedTest = {
-			renderable: new PointSpriteBatchRenderable(Engine3D, 'data/textures/node'),
+			renderable: new PointSpriteBatchRenderable(Engine3D, 'data/textures/icon_atlas', new AtlasDesc(8, 8)),
 			transformable: new Transformable(new Vecmath.Vector3(0, 0, 0))
 		};
-		g_scene.addEntity(instancedTest);		
+//		g_scene.addEntity(instancedTest);		
 		
 		g_controller = new DialogOverviewController(Engine3D, g_viewport);
 		

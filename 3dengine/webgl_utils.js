@@ -16,7 +16,7 @@ var WebGL = (function() {
 				break;
 			}
 		}
-		return context;
+		return WebGLDebugUtils.makeDebugContext(context);
 	}
 
 	/**

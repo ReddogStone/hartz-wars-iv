@@ -139,7 +139,7 @@ var motherDialogTemplate = [
 ];
 
 function DialogOverviewController(engine, viewport) {
-	var view = this._view = new HierarchicalView(viewport);
+	var view = this._view = new HierarchicalView(engine, viewport);
 	this._engine = engine;
 
 //================ TEMP ================

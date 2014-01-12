@@ -1,6 +1,6 @@
 'use strict';
 
-function HierarchicalView(viewport) {
+function HierarchicalView(engine, viewport) {
 	this._viewport = viewport || new Viewport();
 	this._cam = {
 		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
@@ -8,6 +8,12 @@ function HierarchicalView(viewport) {
 		updateable: new BehaviorsUpdateable()
 	};
 	this._scene = new Scene();
+	var spriteBatch = new PointSpriteBatchRenderable(engine, 'data/textures/icon_atlas', new AtlasDesc(8, 8));
+	var spriteBatchEntity = {
+		renderable: spriteBatch
+	};
+	this._scene.spriteBatch = spriteBatch;
+	this._scene.addEntity(spriteBatchEntity);
 	
 	this._mouse = {x: 0, y: 0};
 	

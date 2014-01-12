@@ -23,21 +23,32 @@ var Engine3D = (function() {
 		gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 	}
 
+	function createVertexBufferWithSize(sizeInBytes, dynamic) {
+		dynamic = dynamic || false;
+		
+		var buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, sizeInBytes, dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
+		return buffer;
+	}
 	function createVertexBuffer(data, dynamic) {
 		data = data || [];
 		dynamic = dynamic || false;
 	
 		var buffer = gl.createBuffer();
-//		console.log(gl.getError());
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-//		console.log(gl.getError());
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
-//		console.log(gl.getError());
+		return buffer;
+	}
+	function createIndexBufferWithSize(sizeInBytes) {
+		var buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, sizeInBytes, gl.STATIC_DRAW);
 		return buffer;
 	}
 	function createIndexBuffer(data) {
 		data = data || [];
-	
+		
 		var buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
@@ -47,21 +58,17 @@ var Engine3D = (function() {
 		dynamic = dynamic || false;
 	
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-//		console.log('bindBuffer: ' + gl.getError());
-		
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);		
-//		console.log(gl.getError());
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
 	}
-	function changeIndexBufferData(buffer, data) {
+	function changeIndexBufferData(buffer, data, offset) {
+		offset = offset || 0;
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-		gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, new Uint16Array(data), gl.STATIC_DRAW);
+		gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, offset, new Uint16Array(data), gl.STATIC_DRAW);
 	}
-	function updateVertexBufferData(buffer, data) {
-		console.log('before bindBuffer: ' + gl.getError());
+	function updateVertexBufferData(buffer, data, offset) {
+		offset = offset || 0;
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-		console.log('bindBuffer: ' + gl.getError());
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(data));
-		console.log(gl.getError());
+		gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(data));
 	}
 	function updateIndexBufferData(buffer, data) {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
@@ -311,7 +318,9 @@ var Engine3D = (function() {
 	
 	return {
 		init: init,
+		createVertexBufferWithSize: createVertexBufferWithSize,
 		createVertexBuffer: createVertexBuffer,
+		createIndexBufferWithSize: createIndexBufferWithSize,
 		createIndexBuffer: createIndexBuffer,
 		changeVertexBufferData: changeVertexBufferData,
 		changeIndexBufferData: changeIndexBufferData,
@@ -332,6 +341,9 @@ var Engine3D = (function() {
 		reloadTextureImage: reloadTextureImage,
 		clear: clear,
 		renderTriangles: renderTriangles,
-		getDrawingBufferSize: getDrawingBufferSize
+		getDrawingBufferSize: getDrawingBufferSize,
+		get gl() {
+			return gl;
+		}
 	};
 })();

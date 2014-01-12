@@ -3,6 +3,7 @@ attribute vec2 aTexCoord;
 attribute vec3 aWorldPos;
 attribute vec2 aSize;
 attribute vec4 aColor;
+attribute float aAtlasIndex;
 
 varying vec2 vTexCoord;
 varying vec4 vColor;
@@ -10,9 +11,14 @@ varying vec4 vColor;
 uniform mat4 uView;
 uniform mat4 uProjection;
 uniform vec2 uScreenSize;
+uniform vec2 uTextureAtlasSize;
 
 void main() {
-	vTexCoord = aTexCoord;
+	vec2 tileSize = vec2(1.0, 1.0) / uTextureAtlasSize.xy;
+	float cols = uTextureAtlasSize.x;
+	float yCoord = floor(aAtlasIndex / cols);
+	vec2 tileCoords = vec2(aAtlasIndex - cols * yCoord, yCoord);
+	vTexCoord = aTexCoord + tileCoords * tileSize;
 	vColor = aColor;
 	
 	vec3 worldPos = aWorldPos;

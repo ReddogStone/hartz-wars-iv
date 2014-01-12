@@ -59,6 +59,7 @@
 		this._color = Color.clone(color) || new Color();
 
 		var canvas = this._bufferCanvas = document.createElement('canvas');
+		canvas.width = canvas.height = 1;
 		this._buffered = false;
 	}
 	TextRenderableBase.extends(Object, {
@@ -82,6 +83,7 @@
 		
 			var width = nextPowerOf2(size.x);
 			var height = nextPowerOf2(size.y);
+//			width = height = Math.max(width, height);
 			this._bufferCanvas.width = width;
 			this._bufferCanvas.height = height;
 			

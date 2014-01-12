@@ -25,25 +25,42 @@ InstancedRenderable.extends(Object, {
 		var description = instanceMesh.description;
 		var componentCount = 0;
 		for (var name in description) {
-			componentCount += description[name].components;
+			var attributeDesc = description[name];
+			attributeDesc.offset = componentCount * 4;
+			componentCount += attributeDesc.components;
+		}
+		for (var name in description) {
+			description[name].stride = componentCount * 4;
 		}
 		this._instanceVertexCount = instanceMesh.vertices.length / componentCount;
+		this._instanceIndexCount = instanceMesh.indices.length;
 		
 		var instanceDataDesc = this._instanceDataDesc;
 		var instanceDataLength = 0;
 		for (var name in instanceDataDesc) {
-			instanceDataLength += instanceDataDesc[name].components;
+			var attributeDesc = instanceDataDesc[name];
+			attributeDesc.offset = instanceDataLength * 4;
+			instanceDataLength += attributeDesc.components;
+		}
+		for (var name in instanceDataDesc) {
+			instanceDataDesc[name].stride = instanceDataLength * 4;
 		}
 		this._instanceDataLength = instanceDataLength;
 	},
 	_createBuffers: function(engine) {
-		this._vb = engine.createVertexBuffer();
-		this._ib = engine.createIndexBuffer();
-		this._instanceDataBuffer = engine.createVertexBuffer();
+		this._vb = engine.createVertexBufferWithSize(2 << 18);
+		this._ib = engine.createIndexBufferWithSize(2 << 18);
+		this._instanceDataBuffer = engine.createVertexBufferWithSize(2 << 18, true);
 
 		this._vertices._dirty = false;
 		this._indices._dirty = false;
 		this._instanceData._dirty = false;
+	},
+	get instanceDataLength() {
+		return this._instanceDataLength;
+	},
+	getInstanceCount: function() {
+		return this._instanceCount;
 	},
 	setInstanceCount: function(value) {
 		if (this._instanceCount != value) {
@@ -83,19 +100,52 @@ InstancedRenderable.extends(Object, {
 		
 		instanceData._dirty = true;
 	},
+	addSingleInstance: function(data) {
+		var instanceDataLength = this._instanceDataLength;
+		var instanceVertexCount = this._instanceVertexCount;
+		var instanceData = this._instanceData;
+		var offset = instanceData.length;
+		
+		instanceData.length += instanceDataLength * instanceVertexCount;
+		for (var i = 0; i < instanceVertexCount; ++i) {
+			copyArray(data, 0, 0, instanceData, offset + i * instanceDataLength, instanceDataLength);
+		}
+		
+		instanceData._dirty = true;
+		this.setInstanceCount(this._instanceCount + 1);
+	},
+	getSingleInstance: function(index) {
+		var instanceDataLength = this._instanceDataLength;
+		var instanceVertexCount = this._instanceVertexCount;
+		var instanceData = this._instanceData;
+		
+		var result = new Array(instanceDataLength);
+		copyArray(instanceData, index * instanceDataLength * instanceVertexCount, 0, result, 0, instanceDataLength);
+		return result;
+	},
+	setSingleInstance: function(index, data) {
+		var instanceDataLength = this._instanceDataLength;
+		var instanceVertexCount = this._instanceVertexCount;
+		var instanceData = this._instanceData;
+		var offset = index * instanceDataLength * instanceVertexCount;
+		
+		for (var i = 0; i < instanceVertexCount; ++i) {
+			copyArray(data, 0, 0, instanceData, offset + i * instanceDataLength, instanceDataLength);
+		}
+		
+		instanceData._dirty = true;
+	},
 	
 	// renderable interface
 	prepare: function(engine) {
 		if (this._instanceData._dirty) {
-			this._instanceDataBuffer = engine.createVertexBuffer(this._instanceData);
+			engine.updateVertexBufferData(this._instanceDataBuffer, this._instanceData);
 		}
 		if (this._vertices._dirty) {
-			this._vb = engine.createVertexBuffer(this._vertices);
-//			engine.updateVertexBufferData(this._vb, this._vertices);
+			engine.updateVertexBufferData(this._vb, this._vertices);
 		}
 		if (this._indices._dirty) {
-			this._ib = engine.createIndexBuffer(this._indices);
-			//engine.changeIndexBufferData(this._ib, this._indices);
+			engine.updateIndexBufferData(this._ib, this._indices);
 		}
 		
 		this._vertices._dirty = false;
@@ -111,65 +161,85 @@ InstancedRenderable.extends(Object, {
 	}
 });
 
-function PointSpriteBatchRenderable(engine, textureId) {
+function PointSpriteBatchRenderable(engine, textureId, atlasSize) {
+	var cols = atlasSize.columns;
+	var rows = atlasSize.rows;
 	var mesh = {
 		"vertices": [
-			//x	   y	z	 tu   tv
-			-0.5,  0.5, 0.0, 0.0, 0.0,
-			 0.5,  0.5, 0.0, 1.0, 0.0,
-			-0.5, -0.5, 0.0, 0.0, 1.0,
-			 0.5, -0.5, 0.0, 1.0, 1.0],
+			//x	y z tu tv
+			-0.5,  0.5, 0.0, 0.0       , 0.0,
+			 0.5,  0.5, 0.0, 1.0 / cols, 0.0,
+			-0.5, -0.5, 0.0, 0.0       , 1.0 / rows,
+			 0.5, -0.5, 0.0, 1.0 / cols, 1.0 / rows],
 		"indices": [0, 1, 2, 2, 1, 3],
 		"description": {
-			"aPosition": { "components": 3, "type": "FLOAT", "normalized": false, "stride": 5 * 4, "offset": 0 },
-			"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 5 * 4, "offset": 3 * 4 }
+			"aPosition": { "components": 3, "type": "FLOAT", "normalized": false},
+			"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false}
 		}
 	}
+	var stride = 10;
 	var instanceDataDesc = {
-		"aWorldPos": { "components": 3, "type": "FLOAT", "normalized": false, "stride": 9 * 4, "offset": 0 },
-		"aSize": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 9 * 4, "offset": 3 * 4 },
-		"aColor": { "components": 4, "type": "FLOAT", "normalized": false, "stride": 9 * 4, "offset": 5 * 4 }
+		"aWorldPos": { "components": 3, "type": "FLOAT", "normalized": false },
+		"aSize": { "components": 2, "type": "FLOAT", "normalized": false },
+		"aColor": { "components": 4, "type": "FLOAT", "normalized": false },
+		"aAtlasIndex": { "components": 1, "type": "FLOAT", "normalized": false }
 	};
 	
 	this._instancedRenderable = new InstancedRenderable(engine, mesh, instanceDataDesc);
 	this.material = new PointSpriteInstMaterial(engine, engine.getTexture(textureId));
+	this._atlasSize = AtlasDesc.clone(atlasSize);
 
 	this._instanceData = [];
 	this._instanceData._dirty = false;
 	this._instanceIndices = [];
-	this._instanceTransformables = [];
-	
-	// TEMP
-	var count = 100;
-	this._instancedRenderable.setInstanceCount(count);
-	
-	for (var i = 0; i < count; ++i) {
-		this._instanceData[9 * i] = Math.random() * 10 - 5;
-		this._instanceData[9 * i + 1] = Math.random() * 10 - 5;
-		this._instanceData[9 * i + 2] = Math.random() * 10 - 5;
-		this._instanceData[9 * i + 3] = (Math.random() > 0.5) ? 64 : 32;
-		this._instanceData[9 * i + 4] = this._instanceData[9 * i + 3];
-		this._instanceData[9 * i + 5] = Math.random() * 0.5 + 0.5;
-		this._instanceData[9 * i + 6] = Math.random() * 0.5 + 0.5;
-		this._instanceData[9 * i + 7] = Math.random() * 0.5 + 0.5;
-		this._instanceData[9 * i + 8] = 1;
-	}
-	this._instanceData._dirty = true;
-	// END OF TEMP
 }
 PointSpriteBatchRenderable.extends(Object, {
-	
+	_setSpriteComponent: function(id, setter) {
+		var instancedRenderable = this._instancedRenderable;
+		var data = instancedRenderable.getSingleInstance(id);
+		setter(data);
+		instancedRenderable.setSingleInstance(id, data);		
+	},
+	addSprite: function(pos, size, color, atlasIndex) {
+		var instancedRenderable = this._instancedRenderable;
+		var data = pos.toArray().concat(size.toArray()).concat(color.toArray4()).concat([atlasIndex]);
+		instancedRenderable.addSingleInstance(data);
+		return instancedRenderable.getInstanceCount() - 1;
+	},
+	getSpriteData: function(id) {
+		var data = this._instancedRenderable.getSingleInstance(id);
+		return {
+			pos: new Vecmath.Vector3(data[0], data[1], data[2]),
+			size: new Vecmath.Vector2(data[3], data[4]),
+			color: new Color(data[5], data[6], data[7], data[8]),
+			atlasIndex: data[9]
+		};
+	},
+	setSpriteData: function(id, pos, size, color, atlasIndex) {
+		var data = pos.toArray().concat(size.toArray()).concat(color.toArray4()).concat([atlasIndex]);
+		this._instancedRenderable.setSingleInstance(id, data);
+	},
+	setSpritePos: function(id, value) {
+		this._setSpriteComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.y; });
+	},
+	setSpriteSize: function(id, value) {
+		this._setSpriteComponent(id, function(data) { data[3] = value.x; data[4] = value.y; });
+	},
+	setSpriteColor: function(id, value) {
+		this._setSpriteComponent(id, function(data) { 
+			data[5] = value.red; data[6] = value.green; data[7] = value.blue; data[8] = value.alpha;
+		});
+	},
+	setSpriteAtlasIndex: function(id, value) {
+		this._setSpriteComponent(id, function(data) { data[9] = value; });
+	},
 
 	// renderable interface
 	prepare: function(engine) {
-		var instancedRenderable = this._instancedRenderable;
-		if (this._instanceData._dirty) {
-			instancedRenderable.setInstanceData(this._instanceData);
-			this._instanceData._dirty = false;
-		}
-		instancedRenderable.prepare(engine);
+		this._instancedRenderable.prepare(engine);
 	},
 	setParams: function(globalParams) {
+		globalParams.uTextureAtlasSize = this._atlasSize.toArray();
 		this.material.setParams(globalParams);
 	},
 	render: function(engine) {

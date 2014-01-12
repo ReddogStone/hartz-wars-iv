@@ -37,6 +37,8 @@ IconTextWidget.extends(Object, {
 			size = new Vecmath.Vector2(value, value);
 		}
 		this._sprite.renderable.material.size = size;
+		
+		this._spriteBatch.setSpriteSize(this._spriteId, size);
 	},
 	setLayerIndex: function(value) {
 		var newSize = this._baseIconSize.clone().scale(1.0 / (value + 1));
@@ -52,6 +54,8 @@ IconTextWidget.extends(Object, {
 		color.alpha = this._sprite.renderable.material.color.alpha;
 		this._sprite.renderable.material.color = color;
 
+		this._spriteBatch.setSpriteColor(this._spriteId, color);
+		
 		if (!this._attenuated) {
 			this._label.renderable.material.color = color;		
 		}
@@ -59,6 +63,7 @@ IconTextWidget.extends(Object, {
 	setAlpha: function(value) {
 		if (!this._attenuated) {
 			this._sprite.renderable.material.color.alpha = value;
+			this._spriteBatch.setSpriteColor(this._spriteId, this._sprite.renderable.material.color);
 			this._label.renderable.material.color.alpha = value;
 		}
 	},
@@ -73,11 +78,13 @@ IconTextWidget.extends(Object, {
 		}
 	},
 	addToScene: function(scene) {
-		scene.addEntity(this._sprite);
+//		scene.addEntity(this._sprite);
+		this._spriteBatch = scene.spriteBatch;
+		this._spriteId = this._spriteBatch.addSprite(this.transformable.pos, this.iconSize, this._sprite.renderable.material.color, 13);
 		scene.addEntity(this._label);
 	},
 	removeFromScene: function(scene) {
-		scene.removeEntity(this._sprite);
+//		scene.removeEntity(this._sprite);
 		scene.removeEntity(this._label);
 	}
 });
