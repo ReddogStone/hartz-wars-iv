@@ -167,7 +167,7 @@ function DialogOverviewController(engine, viewport) {
 			self._navigateToSubtree(active.parent);
 		}
 	};
-//================ TEMP ================	
+//================ END TEMP ================	
 }
 
 DialogOverviewController.extends(Object, {
@@ -175,7 +175,7 @@ DialogOverviewController.extends(Object, {
 		return this._view;
 	},
 	_createWidget: function(node) {
-		var icon = 'data/textures/line_pattern';
+		var iconAtlasIndex = 13;
 		var text = '';
 		var offset = new Vecmath.Vector2(0.0, 0.0);
 		var color = BLUE;
@@ -183,7 +183,7 @@ DialogOverviewController.extends(Object, {
 		var data = node.data;
 		switch (data.type) {
 			case 'list':
-				icon = 'data/textures/array_icon';
+				iconAtlasIndex = 0;
 				offset = new Vecmath.Vector2(50.0, 0.0);
 				break;
 			case 'statement':
@@ -193,16 +193,17 @@ DialogOverviewController.extends(Object, {
 				}
 				break;
 			case 'options':
-				icon = 'data/textures/object_icon';
+				iconAtlasIndex = 10;
 				offset = new Vecmath.Vector2(50.0, 0.0);
 				break;
 			case 'action':
-				icon = 'data/textures/function_icon'
+				iconAtlasIndex = 5;
 				offset = new Vecmath.Vector2(50.0, 0.0);
 				break;
 		}
 		var font = new Font('Helvetica', 9);
-		return new IconTextWidget(this._engine, icon, data.text ? 16 : 64, color, data.text || data.type, font, offset);
+		var spriteBatch = this._view._scene.spriteBatch;
+		return new IconTextWidget(this._engine, spriteBatch, iconAtlasIndex, data.text ? 16 : 64, color, data.text || data.type, font, offset);
 	},
 	_layoutAll: function() {
 		this._layoutSubtree(this._nodeTree.root);
@@ -247,28 +248,32 @@ DialogOverviewController.extends(Object, {
 		});
 		
 		var rootNode = subtree.node;
-		var length;
-		var layout;
-		var offset;
-		if (rootNode.data.type == 'options') {
-			length = 0;
-			subtree.children.forEach(function(child) {
-				length += 5 + child.layout.width;
-			});
-			layout = new LinearLayout(new Vecmath.Vector3(1, 0, 0));
-			offset = new Vecmath.Vector3(-0.5 * length, 0, 3);
-		} else {
-			length = 3 * subtree.children.length;
-			layout = new LinearLayout(new Vecmath.Vector3(0, 0, 1));
-			offset = new Vecmath.Vector3(0, 0, 3);
-		}
-		
 		rootNode.widget = this._createWidget(rootNode);
 		
 		var rootTransformable = rootNode.widget.transformable;
-		var childTransformables = subtree.children.map(function(childTree) { return childTree.node.widget.transformable; });
 		
-		layout.apply(rootTransformable, childTransformables, length, offset);
+		var length = 0;
+		var layout;
+		var offset;
+		if (rootNode.data.type == 'options') {
+			subtree.children.forEach(function(child) {
+				length += 5 + child.layout.width;
+			});
+			offset = new Vecmath.Vector3((subtree.children.length == 1) ? 0 : -0.5 * length, 0, 3);
+			
+			length = 0;
+			subtree.children.forEach(function(child) {
+				child.node.widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(length, 0, 0).add(offset));
+				length += 10 + child.layout.width;
+			});
+		} else {
+			offset = new Vecmath.Vector3(0, 0, 3);
+			subtree.children.forEach(function(child) {
+				child.node.widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
+				length += 3 + child.layout.height;
+			});
+		}
+		
 		subtree.layout = this._calculateLayoutInfo(subtree);
 	},
 	_fadeIn: function(subtrees) {
