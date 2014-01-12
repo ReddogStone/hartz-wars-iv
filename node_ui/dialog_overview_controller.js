@@ -256,21 +256,50 @@ DialogOverviewController.extends(Object, {
 		var layout;
 		var offset;
 		if (rootNode.data.type == 'options') {
+			var childWidths = [];
 			subtree.children.forEach(function(child) {
-				length += 5 + child.layout.width;
+				var width = child.layout.width;
+				childWidths.push(width);
+				length += width;
 			});
+			var margin = Math.max(0.3 * length, 10);
+			length += margin * (subtree.children.length - 1);
+			
 			offset = new Vecmath.Vector3((subtree.children.length == 1) ? 0 : -0.5 * length, 0, 3);
 			
-			length = 0;
-			subtree.children.forEach(function(child) {
-				child.node.widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(length, 0, 0).add(offset));
-				length += 10 + child.layout.width;
+			var xPos = 0;
+			var engine = this._engine;
+			subtree.children.forEach(function(child, index) {
+				var widget = child.node.widget;
+				widget.transformable.pos = 
+					rootTransformable.pos.clone().add(new Vecmath.Vector3(xPos + 0.5 * childWidths[index], 0, 0).add(offset));
+				var line = new LineRenderable(engine, 'data/textures/line_pattern', rootTransformable, widget.transformable);
+				var mat = line.material;
+				mat.color = BLUE;
+				mat.color.alpha = 0.3;
+				mat.width = 10;
+				widget.addLine(line);
+				
+				xPos += margin + childWidths[index];
 			});
 		} else {
 			offset = new Vecmath.Vector3(0, 0, 3);
+			var last = subtree;
+			var engine = this._engine;
 			subtree.children.forEach(function(child) {
-				child.node.widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
+				var widget = child.node.widget;
+				widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
+				if (last) {
+					var lastWidget = last.node.widget;
+					var line = new LineRenderable(engine, 'data/textures/full_line_pattern', lastWidget.transformable, widget.transformable);
+					var mat = line.material;
+					mat.color = BLUE;
+					mat.color.alpha = 0.3;
+					mat.width = 2;
+					widget.addLine(line);
+				}
 				length += 3 + child.layout.height;
+				last = child;
 			});
 		}
 		
@@ -320,7 +349,7 @@ DialogOverviewController.extends(Object, {
 		var result = this._nodeTree.navigateTo(subtree);
 		var view = this._view;
 		
-		var expanded = result.expanded;
+/*		var expanded = result.expanded;
 		if (expanded) {
 			this._layoutSubtree(expanded);
 			this._addLines(expanded.children);
@@ -349,7 +378,7 @@ DialogOverviewController.extends(Object, {
 			activatedSubtree.forEachSubtree(function(subtree) {
 				view.showSubtree(subtree);
 			});
-		}, this);
+		}, this); */
 		
 		var activeDepth = this._nodeTree.activeSubtree.node.depth;
 		this._nodeTree.forEachNode(function(node) {
@@ -357,10 +386,10 @@ DialogOverviewController.extends(Object, {
 			node.widget.setAttenuated(false);
 			node.widget.setAttenuated(true);
 		});
-		this._nodeTree.activeSubtree.node.widget.setLayerIndex(0);
+		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
 		this._nodeTree.activeSubtree.node.widget.setAttenuated(false);
 		this._nodeTree.activeSubtree.children.forEach(function(child) {
-			child.node.widget.setLayerIndex(1);
+			child.node.widget.setLayerIndex(2);
 			child.node.widget.setAttenuated(false);
 		});
 		

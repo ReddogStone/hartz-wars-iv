@@ -1,6 +1,8 @@
 'use strict';
 
 var WebGL = (function() {
+	var ENABLE_DEBUG = false;
+
 	/**
 	 * Creates a webgl context.
 	 */
@@ -16,7 +18,7 @@ var WebGL = (function() {
 				break;
 			}
 		}
-		return WebGLDebugUtils.makeDebugContext(context);
+		return ENABLE_DEBUG ? WebGLDebugUtils.makeDebugContext(context) : context;
 	}
 
 	/**

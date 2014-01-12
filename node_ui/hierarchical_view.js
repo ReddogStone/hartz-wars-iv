@@ -41,7 +41,7 @@ HierarchicalView.extends(Object, {
 
 		var layout = subtree.layout;
 		this._nextCamTarget = layout.center.clone().add(subtree.node.widget.transformable.pos);
-		this._nextCamPos = this._nextCamTarget.clone().add(offset.normalize().scale(3 + 0.5 * Math.max(layout.width, layout.height)));
+		this._nextCamPos = this._nextCamTarget.clone().add(offset.normalize().scale(5 + 0.5 * Math.max(layout.width, layout.height)));
 	},
 	highlightNode: function(nodeTree) {
 		var mouse = this._mouse;
