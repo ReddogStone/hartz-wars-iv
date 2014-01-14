@@ -74,6 +74,26 @@ Subtree.extends(Object, {
 			callback.call(thisArg, current);
 		}		
 	},
+	postOrderSubtrees: function(callback, thisArg) {
+		var childIndexStack = [0];
+		var current = this;
+		while (childIndexStack.length > 0) {
+			var currentChildIndex = childIndexStack[childIndexStack.length - 1];
+			if (currentChildIndex < current._children.length) {
+				// go down
+				current = current._children[currentChildIndex];
+				++childIndexStack[childIndexStack.length - 1];
+				childIndexStack.push(0);
+			} else {
+				// finished subtree
+				callback.call(thisArg, current);
+
+				// go up
+				current = current._parent;
+				childIndexStack.pop();
+			}
+		}
+	},
 	expand: function() {
 		var childNodes = this._node.createChildren();
 		

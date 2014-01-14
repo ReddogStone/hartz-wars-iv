@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF8">
+	<meta charset="UTF-8"/>
 	<title>Hartz Wars IV - Editor</title>
 	
 	<script src="../math/Matrix3.js" type="text/javascript"></script>
@@ -45,6 +45,8 @@
 <canvas id="canvas" width="1024" height="768"></canvas>
 
 <script>
+	console.log('ß');
+
 	const BLUE = new Color(0.3, 0.5, 0.7);
 	const RED = new Color(0.7, 0.0, 0.0);
 	const HIGHLIGHTED = new Color(1.0, 0.2, 0.2);
@@ -91,7 +93,7 @@
 			g_frames = 0;
 		}
 
-		g_fpsLabel.renderable.text = 'FPS: ' + g_fps;
+		g_fpsLabel.renderable.text = 'FPß: ' + g_fps;
 		g_mousePosLabel.renderable.text = 'Mouse: (' + g_mouse.x + ', ' + g_mouse.y + ', ' + (g_mouse.down ? 'down' : 'up') + ')';
 		
 		FrameProfiler.start('UpdateAll');

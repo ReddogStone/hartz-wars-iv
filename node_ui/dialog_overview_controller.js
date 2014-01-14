@@ -174,13 +174,12 @@ DialogOverviewController.extends(Object, {
 	get view() {
 		return this._view;
 	},
-	_createWidget: function(node) {
+	_createWidget: function(data) {
 		var iconAtlasIndex = 13;
 		var text = '';
 		var offset = new Vecmath.Vector2(0.0, 0.0);
 		var color = BLUE;
 		
-		var data = node.data;
 		switch (data.type) {
 			case 'list':
 				iconAtlasIndex = 0;
@@ -241,69 +240,47 @@ DialogOverviewController.extends(Object, {
 		};
 	},
 	_layoutSubtree: function(subtree) {
-		var self = this;
-		
-		subtree.children.forEach(function(subtree) {
-			self._layoutSubtree(subtree);
-		});
-		
-		var rootNode = subtree.node;
-		rootNode.widget = this._createWidget(rootNode);
-		
-		var rootTransformable = rootNode.widget.transformable;
-		
-		var length = 0;
-		var layout;
-		var offset;
-		if (rootNode.data.type == 'options') {
-			var childWidths = [];
-			subtree.children.forEach(function(child) {
-				var width = child.layout.width;
-				childWidths.push(width);
-				length += width;
-			});
-			var margin = Math.max(0.3 * length, 10);
-			length += margin * (subtree.children.length - 1);
-			
-			offset = new Vecmath.Vector3((subtree.children.length == 1) ? 0 : -0.5 * length, 0, 3);
-			
-			var xPos = 0;
-			var engine = this._engine;
-			subtree.children.forEach(function(child, index) {
-				var widget = child.node.widget;
-				widget.transformable.pos = 
-					rootTransformable.pos.clone().add(new Vecmath.Vector3(xPos + 0.5 * childWidths[index], 0, 0).add(offset));
-				var line = new LineRenderable(engine, 'data/textures/line_pattern', rootTransformable, widget.transformable);
-				var mat = line.material;
-				mat.color = BLUE;
-				mat.color.alpha = 0.3;
-				mat.width = 10;
-				widget.addLine(line);
-				
-				xPos += margin + childWidths[index];
-			});
-		} else {
-			offset = new Vecmath.Vector3(0, 0, 3);
-			var last = subtree;
-			var engine = this._engine;
-			subtree.children.forEach(function(child) {
-				var widget = child.node.widget;
-				widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
-				if (last) {
-					var lastWidget = last.node.widget;
-					var line = new LineRenderable(engine, 'data/textures/full_line_pattern', lastWidget.transformable, widget.transformable);
+		subtree.forEachSubtree(function(child) {
+			var node = child.node;
+			node.widget = this._createWidget(node.data);
+		}, this);
+
+		Layout.treeOverviewLayout(subtree, function(tree) { return (tree.node.data.type == 'options'); });
+
+		// add lines
+		var engine = this._engine;
+		subtree.forEachSubtree(function(root) {
+			var rootTrans = root.node.widget.transformable;
+			if (root.node.data.type == 'options') {
+				root.children.forEach(function(child) {
+					var widget = child.node.widget;
+					var line = new LineRenderable(engine, 'data/textures/line_pattern', rootTrans, widget.transformable);
 					var mat = line.material;
 					mat.color = BLUE;
 					mat.color.alpha = 0.3;
-					mat.width = 2;
+					mat.width = 10;
 					widget.addLine(line);
-				}
-				length += 3 + child.layout.height;
-				last = child;
-			});
-		}
-		
-		subtree.layout = this._calculateLayoutInfo(subtree);
+				});
+			} else {
+				var last = root;
+				root.children.forEach(function(child) {
+					var widget = child.node.widget;
+					if (last) {
+						var lastWidget = last.node.widget;
+						var line = new LineRenderable(engine, 
+								'data/textures/full_line_pattern', 
+								lastWidget.transformable,
+								widget.transformable);
+						var mat = line.material;
+						mat.color = BLUE;
+						mat.color.alpha = 0.3;
+						mat.width = 2;
+						widget.addLine(line);
+					}
+					last = child;
+				});
+			}
+		});
 	},
 	_fadeIn: function(subtrees) {
 		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
