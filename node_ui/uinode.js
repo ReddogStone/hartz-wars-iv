@@ -258,6 +258,7 @@ function DialogNode(template, depth) {
 		this._final = !(template.consequence);
 	} else {
 		data.type = 'action';
+		data.text = template.toString();
 	}
 	
 	this._data = data;

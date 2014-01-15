@@ -138,6 +138,11 @@ var Layout = (function() {
 				verticalLinearLayout(child);
 			}
 		});
+		subtree.forEachSubtree(function(child) {
+			if (child.parent) {
+				child.node.widget.transformable.translate(child.parent.node.widget.transformable.pos);
+			}
+		});
 	};
 
 	return module;

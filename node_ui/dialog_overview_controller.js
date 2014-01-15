@@ -140,7 +140,6 @@ var motherDialogTemplate = [
 
 function DialogOverviewController(engine, viewport) {
 	var view = this._view = new HierarchicalView(engine, viewport);
-	this._engine = engine;
 
 //================ TEMP ================
 	var rootNode = new DialogNode(motherDialogTemplate);
@@ -148,14 +147,10 @@ function DialogOverviewController(engine, viewport) {
 	this._nodeTree = new NodeTree(rootNode);
 	this._nodeTree.expandAll();
 
-	this._layoutAll();
-	this._nodeTree.forEachSubtree(function(subtree) {
-		view.showSubtree(subtree);
-	});
-	
+	view.showSubtree(this._nodeTree.root);
+
 	var rootSubtree = this._nodeTree.root;
 	this._navigateToSubtree(rootSubtree);
-	view.focusCamera(rootSubtree);
 	
 	var self = this;
 	view.onSubtreeClicked = function(subtree) {
@@ -174,190 +169,9 @@ DialogOverviewController.extends(Object, {
 	get view() {
 		return this._view;
 	},
-	_createWidget: function(data) {
-		var iconAtlasIndex = 13;
-		var text = '';
-		var offset = new Vecmath.Vector2(0.0, 0.0);
-		var color = BLUE;
-		
-		switch (data.type) {
-			case 'list':
-				iconAtlasIndex = 0;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-			case 'statement':
-				switch (data.side) {
-					case 'left': color = RED; break;
-					case 'right': color = BLUE; break;
-				}
-				break;
-			case 'options':
-				iconAtlasIndex = 10;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-			case 'action':
-				iconAtlasIndex = 5;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-		}
-		var font = new Font('Helvetica', 9);
-		var spriteBatch = this._view._scene.spriteBatch;
-		return new IconTextWidget(this._engine, spriteBatch, iconAtlasIndex, data.text ? 16 : 64, color, data.text || data.type, font, offset);
-	},
-	_layoutAll: function() {
-		this._layoutSubtree(this._nodeTree.root);
-		this._nodeTree.forEachSubtree(function(subtree) {
-			if (subtree.parent) {
-				subtree.node.widget.transformable.translate(subtree.parent.node.widget.transformable.pos);
-			}
-		});
-	},
-	_calculateLayoutInfo: function(subtree) {
-		var ownPos = subtree.node.widget.transformable.pos;
-		var minZ = 0;
-		var maxZ = 0;
-		var minX = 0;
-		var maxX = 0;
-		subtree.children.forEach(function(child) {
-			var childLayout = child.layout;
-			var childPos = child.node.widget.transformable.pos;
-			var delta = childPos.clone().sub(ownPos);
-			var center = delta.add(childLayout.center);
-			var childMinX = center.x - 0.5 * childLayout.width;
-			var childMaxX = center.x + 0.5 * childLayout.width;
-			var childMinZ = center.z - 0.5 * childLayout.height;
-			var childMaxZ = center.z + 0.5 * childLayout.height;
-			
-			minX = Math.min(minX, childMinX);
-			maxX = Math.max(maxX, childMaxX);
-			minZ = Math.min(minZ, childMinZ);
-			maxZ = Math.max(maxZ, childMaxZ);
-		});
-		return {
-			center: new Vecmath.Vector3(0.5 * (minX + maxX), 0.0, 0.5 * (minZ + maxZ)),
-			width: maxX - minX,
-			height: maxZ - minZ
-		};
-	},
-	_layoutSubtree: function(subtree) {
-		subtree.forEachSubtree(function(child) {
-			var node = child.node;
-			node.widget = this._createWidget(node.data);
-		}, this);
-
-		Layout.treeOverviewLayout(subtree, function(tree) { return (tree.node.data.type == 'options'); });
-
-		// add lines
-		var engine = this._engine;
-		subtree.forEachSubtree(function(root) {
-			var rootTrans = root.node.widget.transformable;
-			if (root.node.data.type == 'options') {
-				root.children.forEach(function(child) {
-					var widget = child.node.widget;
-					var line = new LineRenderable(engine, 'data/textures/line_pattern', rootTrans, widget.transformable);
-					var mat = line.material;
-					mat.color = BLUE;
-					mat.color.alpha = 0.3;
-					mat.width = 10;
-					widget.addLine(line);
-				});
-			} else {
-				var last = root;
-				root.children.forEach(function(child) {
-					var widget = child.node.widget;
-					if (last) {
-						var lastWidget = last.node.widget;
-						var line = new LineRenderable(engine, 
-								'data/textures/full_line_pattern', 
-								lastWidget.transformable,
-								widget.transformable);
-						var mat = line.material;
-						mat.color = BLUE;
-						mat.color.alpha = 0.3;
-						mat.width = 2;
-						widget.addLine(line);
-					}
-					last = child;
-				});
-			}
-		});
-	},
-	_fadeIn: function(subtrees) {
-		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
-			entity.widget.setAlpha(value);
-
-			var line = entity.line;
-			if (line) {
-				line.renderable.material.color.alpha = 0.4 * value;
-			}
-		});
-		
-		subtrees.forEach(function(subtree) {
-			var node = subtree.node;
-			node.updateable = new BehaviorsUpdateable();
-			node.updateable.addBehavior(behavior);
-			node.widget.setAlpha(0);
-		});
-	},
-	_addLines: function(subtrees) {
-		var engine = this._engine;
-		subtrees.forEach(function(subtree) {
-			var node = subtree.node;
-			var parentNode = subtree.parent.node;
-			if (parentNode.type !== 'options') {
-				return;
-			}
-			
-			var endPoint1 = parentNode.widget.transformable;
-			var endPoint2 = node.widget.transformable;
-			var line = {
-				renderable: new LineRenderable(engine, 'data/textures/line_pattern', endPoint1, endPoint2)
-			};
-			var mat = line.renderable.material;
-			mat.color = BLUE;
-			mat.color.alpha = 0.0;
-			mat.width = 10;
-//			scene.addEntity(line);
-			node.line = line;
-		});
-	},
 	_navigateToSubtree: function(subtree) {
 		var scene = this._scene;
-		var result = this._nodeTree.navigateTo(subtree);
-		var view = this._view;
-		
-/*		var expanded = result.expanded;
-		if (expanded) {
-			this._layoutSubtree(expanded);
-			this._addLines(expanded.children);
-			this._fadeIn(expanded.children);
-			expanded.forEachSubtree(function(subtree) {
-				view.showSubtree(subtree);
-			});
-		}
-
-		var removed = result.removed;
-		removed.forEach(function(removedSubtree) {
-			removedSubtree.forEachSubtree(function(subtree) {
-				view.hideSubtree(subtree);
-				
-				var line = removedNode.line;
-				if (line) {
-//					scene.removeEntity(line);
-				}
-			});
-		});
-		
-		var activated = result.activated;
-		this._addLines(activated);
-		this._fadeIn(activated);
-		activated.forEach(function(activatedSubtree) {
-			activatedSubtree.forEachSubtree(function(subtree) {
-				view.showSubtree(subtree);
-			});
-		}, this); */
-		
-		var activeDepth = this._nodeTree.activeSubtree.node.depth;
+		this._nodeTree.navigateTo(subtree);
 		this._nodeTree.forEachNode(function(node) {
 			node.widget.setLayerIndex(2);
 			node.widget.setAttenuated(false);
@@ -370,7 +184,7 @@ DialogOverviewController.extends(Object, {
 			child.node.widget.setAttenuated(false);
 		});
 		
-		view.focusCamera(this._nodeTree.activeSubtree);
+		this._view.focusCamera(subtree);
 	},
 	update: function(delta) {
 		this._nodeTree.forEachNode(function(node) {

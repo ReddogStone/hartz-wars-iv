@@ -1,6 +1,7 @@
 'use strict';
 
 function HierarchicalView(engine, viewport) {
+	this._engine = engine;
 	this._viewport = viewport || new Viewport();
 	this._cam = {
 		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
@@ -32,6 +33,108 @@ function HierarchicalView(engine, viewport) {
 }
 
 HierarchicalView.extends(Object, {
+	_createWidget: function(data) {
+		var iconAtlasIndex = 13;
+		var offset = new Vecmath.Vector2(0.0, 0.0);
+		var color = BLUE;
+		var iconSize = 64;
+		
+		switch (data.type) {
+			case 'list':
+				iconAtlasIndex = 0;
+				offset = new Vecmath.Vector2(50.0, 0.0);
+				break;
+			case 'statement':
+				switch (data.side) {
+					case 'left': color = RED; break;
+					case 'right': color = BLUE; break;
+				}
+				iconSize = 16;
+				break;
+			case 'options':
+				iconAtlasIndex = 10;
+				offset = new Vecmath.Vector2(50.0, 0.0);
+				break;
+			case 'option':
+				iconSize = 16;
+				break;
+			case 'action':
+				iconAtlasIndex = 5;
+				offset = new Vecmath.Vector2(50.0, 0.0);
+				break;
+		}
+		var font = new Font('Helvetica', 9);
+		var spriteBatch = this._scene.spriteBatch;
+		return new IconTextWidget(this._engine, spriteBatch, iconAtlasIndex, iconSize, color, data.text || data.type, font, offset);
+	},
+	_createLine: function(engine, from, to, type) {
+		var pattern;
+		var alpha;
+		var width;
+		var color = BLUE;
+
+		if (type == 'horizontal') {
+			pattern = 'data/textures/line_pattern';
+			color.alpha = 0.8;
+			width = 10;
+		} else if (type == 'vertical') {
+			pattern = 'data/textures/full_line_pattern';
+			color.alpha = 0.3;
+			width = 3;
+		}
+
+		var result = new LineRenderable(engine, pattern, from, to);
+		var mat = result.material;
+		mat.color = color;
+		mat.width = width;
+		return result;
+	},
+	_layoutSubtree: function(subtree) {
+		subtree.forEachSubtree(function(child) {
+			var node = child.node;
+			node.widget = this._createWidget(node.data);
+		}, this);
+
+		Layout.treeOverviewLayout(subtree, function(tree) { return (tree.node.data.type == 'options'); });
+
+		// add lines
+		var engine = this._engine;
+		subtree.forEachSubtree(function(root) {
+			var rootTrans = root.node.widget.transformable;
+			var children = root.children;
+			if (root.node.data.type == 'options') {
+				for (var i = 0; i < children.length; ++i) {
+					var widget = children[i].node.widget;
+					widget.addLine(this._createLine(engine, rootTrans, widget.transformable, 'horizontal'));
+				}
+			} else {
+				var last = root;
+				for (var i = 0; i < children.length; ++i) {
+					var child = children[i];
+					var widget = child.node.widget;
+					widget.addLine(this._createLine(engine, last.node.widget.transformable, widget.transformable, 'vertical'));
+					last = child;
+				}
+			}
+		}, this);
+	},
+	_fadeIn: function(subtrees) {
+		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
+			entity.widget.setAlpha(value);
+
+			var line = entity.line;
+			if (line) {
+				line.renderable.material.color.alpha = 0.4 * value;
+			}
+		});
+		
+		subtrees.forEach(function(subtree) {
+			var node = subtree.node;
+			node.updateable = new BehaviorsUpdateable();
+			node.updateable.addBehavior(behavior);
+			node.widget.setAlpha(0);
+		});
+	},	
 	focusCamera: function(subtree) {
 		var camera = this._cam.camera;
 		var camTrans = this._cam.transformable;
@@ -79,10 +182,16 @@ HierarchicalView.extends(Object, {
 		}, this);
 	},
 	showSubtree: function(subtree) {
-		subtree.node.widget.addToScene(this._scene);
+		var scene = this._scene;
+		this._layoutSubtree(subtree);
+		subtree.forEachNode(function(node) {
+			node.widget.addToScene(scene);
+		}, this);
 	},
 	hideSubtree: function(subtree) {
-		subtree.node.widget.removeFromScene(this._scene);
+		subtree.forEachNode(function(node) {
+			node.widget.removeFromScene(scene);
+		}, this);
 	},
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
@@ -121,7 +230,6 @@ HierarchicalView.extends(Object, {
 		}
 	},
 	keyDown: function(event) {
-//		console.log('keyDown: ' + String.fromCharCode(event.keyCode));
 		switch (event.keyCode) {
 			case 27: // ESCAPE
 				if (this.onLevelUp) {
@@ -150,9 +258,7 @@ HierarchicalView.extends(Object, {
 		}
 	},
 	keyPress: function(event) {
-//		console.log('keyPress: ' + String.fromCharCode(event.keyCode));
 	},
 	keyUp: function(event) {
-//		console.log('keyUp:' + String.fromCharCode(event.keyCode));
 	}
 });

@@ -22,11 +22,12 @@ Subtree.extends(Object, {
 		var result = [];
 		var parent = this._parent;
 		if (parent) {
-			parent.children.forEach(function(sibling) {
+			for (var i = 0; i < parent._children.length; ++i) {
+				var sibling = parent._children[i];
 				if (sibling !== this) {
 					result.push(sibling);
 				}
-			}, this);
+			}
 		}
 		return result;
 	},
@@ -36,23 +37,20 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			current._children.forEach(function(child) {
-				stack.push(child);
-			});
+			for (var i = 0; i < current._children.length; ++i) {
+				stack.push(current._children[i]);
+			}
 			result.push(current._node);
 		}
 		return result;
 	},
 	forEachChildNode: function(callback, thisArg) {
-		var stack = [];
-		this._children.forEach(function(child) {
-			stack.push(child);
-		});
+		var stack = this._children.slice(0);
 		while (stack.length > 0) {
 			var current = stack.shift();
-			current._children.forEach(function(child) {
-				stack.push(child);
-			});
+			for (var i = 0; i < current._children.length; ++i) {
+				stack.push(current._children[i]);
+			}
 			callback.call(thisArg, current._node, current);
 		}
 	},
@@ -60,17 +58,29 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			current._children.forEach(function(child) {
-				stack.push(child);
-			});
+			for (var i = 0; i < current._children.length; ++i) {
+				stack.push(current._children[i]);
+			}
 			callback.call(thisArg, current._node, current);
 		}
+	},
+	forEachChildSubtree: function(callback, thisArg) {
+		var stack = this._children.slice(0);
+		while (stack.length > 0) {
+			var current = stack.shift();
+			for (var i = 0; i < current._children.length; ++i) {
+				stack.push(current._children[i]);
+			}
+			callback.call(thisArg, current);
+		}		
 	},
 	forEachSubtree: function(callback, thisArg) {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			stack = stack.concat(current._children);
+			for (var i = 0; i < current._children.length; ++i) {
+				stack.push(current._children[i]);
+			}
 			callback.call(thisArg, current);
 		}		
 	},
@@ -96,10 +106,9 @@ Subtree.extends(Object, {
 	},
 	expand: function() {
 		var childNodes = this._node.createChildren();
-		
-		childNodes.forEach(function(childNode) {
-			this._children.push(new Subtree(childNode, this));
-		}, this);
+		for (var i = 0; i < childNodes.length; ++i) {
+			this._children.push(new Subtree(childNodes[i], this));
+		}
 	},
 	collapse: function() {
 		this._children.clear();
