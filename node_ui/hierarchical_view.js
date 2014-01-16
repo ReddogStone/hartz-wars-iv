@@ -34,38 +34,10 @@ function HierarchicalView(engine, viewport) {
 
 HierarchicalView.extends(Object, {
 	_createWidget: function(data) {
-		var iconAtlasIndex = 13;
-		var offset = new Vecmath.Vector2(0.0, 0.0);
-		var color = BLUE;
-		var iconSize = 64;
-		
-		switch (data.type) {
-			case 'list':
-				iconAtlasIndex = 0;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-			case 'statement':
-				switch (data.side) {
-					case 'left': color = RED; break;
-					case 'right': color = BLUE; break;
-				}
-				iconSize = 16;
-				break;
-			case 'options':
-				iconAtlasIndex = 10;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-			case 'option':
-				iconSize = 16;
-				break;
-			case 'action':
-				iconAtlasIndex = 5;
-				offset = new Vecmath.Vector2(50.0, 0.0);
-				break;
-		}
 		var font = new Font('Helvetica', 9);
 		var spriteBatch = this._scene.spriteBatch;
-		return new IconTextWidget(this._engine, spriteBatch, iconAtlasIndex, iconSize, color, data.text || data.type, font, offset);
+		return new IconTextWidget(this._engine, spriteBatch, 
+				data.iconAtlasIndex, data.iconSize, data.color, data.text, font, data.textOffset);
 	},
 	_createLine: function(engine, from, to, type) {
 		var pattern;
@@ -95,14 +67,14 @@ HierarchicalView.extends(Object, {
 			node.widget = this._createWidget(node.data);
 		}, this);
 
-		Layout.treeOverviewLayout(subtree, function(tree) { return (tree.node.data.type == 'options'); });
+		Layout.dialogTreeOverviewLayout(subtree);
 
-		// add lines
+		// decorate
 		var engine = this._engine;
 		subtree.forEachSubtree(function(root) {
 			var rootTrans = root.node.widget.transformable;
 			var children = root.children;
-			if (root.node.data.type == 'options') {
+			if (root.node.data.type == 'parallel') {
 				for (var i = 0; i < children.length; ++i) {
 					var widget = children[i].node.widget;
 					widget.addLine(this._createLine(engine, rootTrans, widget.transformable, 'horizontal'));
@@ -112,7 +84,8 @@ HierarchicalView.extends(Object, {
 				for (var i = 0; i < children.length; ++i) {
 					var child = children[i];
 					var widget = child.node.widget;
-					widget.addLine(this._createLine(engine, last.node.widget.transformable, widget.transformable, 'vertical'));
+					widget.addLine(this._createLine(engine, 
+						last.node.widget.transformable, widget.transformable, 'vertical'));
 					last = child;
 				}
 			}
@@ -144,7 +117,8 @@ HierarchicalView.extends(Object, {
 
 		var layout = subtree.layout;
 		this._nextCamTarget = layout.center.clone().add(subtree.node.widget.transformable.pos);
-		this._nextCamPos = this._nextCamTarget.clone().add(offset.normalize().scale(5 + 0.5 * Math.max(layout.width, layout.height)));
+		this._nextCamPos = this._nextCamTarget.clone().
+			add(offset.normalize().scale(5 + 0.5 * Math.max(layout.width, layout.height)));
 	},
 	highlightNode: function(nodeTree) {
 		var mouse = this._mouse;

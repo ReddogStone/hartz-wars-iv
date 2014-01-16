@@ -138,11 +138,63 @@ var motherDialogTemplate = [
 	]},
 ];
 
+/*motherDialogTemplate = [
+	{right: 'Hallo'},
+	{left: 'Hi'},
+	{right: 'Wie geht\'s?'},
+	{options: [
+		{text: 'Gut', consequence: [
+		]},
+		{text: 'Es geht', consequence: [
+		]},
+		{text: 'Nicht so gut', consequence: [
+		]}
+	]},
+	{right: 'Also mir geht\'s blendend'}
+];
+
+motherDialogTemplate = {
+	game: {
+
+	},
+	editor: {
+		'3dengine': {},
+		'ui': {
+			controller: [
+				{
+					name: 'dialog_overview_controller',
+					start: '10.01.2014',
+					length: 4
+				}, 
+				{
+					name: 'factor out view stuff',
+					start: '14.01.2014',
+					length: 1
+				}, 
+				{
+					name: 'add some fancy stuff',
+					start: '17.01.2014',
+					length: 1
+				}, 
+			],
+			view: {
+
+			},
+			nodes: {
+
+			}
+		},
+		'data I/O': {}
+	}
+};
+*/
+
 function DialogOverviewController(engine, viewport) {
 	var view = this._view = new HierarchicalView(engine, viewport);
 
 //================ TEMP ================
-	var rootNode = new DialogNode(motherDialogTemplate);
+//	var rootNode = new DialogNode(motherDialogTemplate);
+	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
 //	var containerNode = new ContainerNode(engine, [rootNode]);
 	this._nodeTree = new NodeTree(rootNode);
 	this._nodeTree.expandAll();
@@ -173,14 +225,14 @@ DialogOverviewController.extends(Object, {
 		var scene = this._scene;
 		this._nodeTree.navigateTo(subtree);
 		this._nodeTree.forEachNode(function(node) {
-			node.widget.setLayerIndex(2);
+			node.widget.setLayerIndex(6);
 			node.widget.setAttenuated(false);
 			node.widget.setAttenuated(true);
 		});
-		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
+		this._nodeTree.activeSubtree.node.widget.setLayerIndex(6);
 		this._nodeTree.activeSubtree.node.widget.setAttenuated(false);
 		this._nodeTree.activeSubtree.children.forEach(function(child) {
-			child.node.widget.setLayerIndex(2);
+			child.node.widget.setLayerIndex(6);
 			child.node.widget.setAttenuated(false);
 		});
 		

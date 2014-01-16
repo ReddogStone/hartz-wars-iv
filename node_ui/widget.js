@@ -122,9 +122,9 @@ IconTextWidget.extends(Object, {
 			this._spriteBatch.setSpriteColor(this._spriteId, color);
 		}
 
-		if (!this._attenuated) {
+//		if (!this._attenuated) {
 			this._label.renderable.material.color = color;
-		}
+//		}
 		
 		this._lines.forEach(function(lineEntity) {
 			var alpha = lineEntity.renderable.material.color.alpha;

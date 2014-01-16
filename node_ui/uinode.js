@@ -27,17 +27,17 @@ TemplateNode.extends(Object, {
 });
 
 var TYPE_ICONS = {
-	'string': 'data/textures/string_icon',
-	'number': 'data/textures/number_icon',
-	'array': 'data/textures/array_icon',
-	'object': 'data/textures/object_icon',
-	'function': 'data/textures/function_icon',
-	'null': 'data/textures/null_icon',
-	'undefined': 'data/textures/null_icon',
-	'boolean': 'data/textures/boolean_icon'
+	'string': 12,
+	'number': 9,
+	'array': 0,
+	'object': 10,
+	'function': 5,
+	'null': 13,
+	'undefined': 13,
+	'boolean': 1
 };
 
-function ReflectionNode(engine, subject, name, depth) {
+function ReflectionNode(subject, name, depth) {
 	this._subject = subject;
 	this._depth = depth || 0;
 	
@@ -52,15 +52,15 @@ function ReflectionNode(engine, subject, name, depth) {
 		subjectType = typeof subject;
 	}
 	
-	var icon = TYPE_ICONS[subjectType];
-	if (!icon) {
-		icon = 'data/textures/node'
-	}
-	
+	var data = {};
 	this._final = false;
 	switch (subjectType) {
 		case 'array':
+			data.type = 'sequential';
+			break;
+
 		case 'object':
+			data.type = 'parallel';
 			break;
 			
 		case 'string':
@@ -85,18 +85,21 @@ function ReflectionNode(engine, subject, name, depth) {
 			break;
 	}
 
-	var font = new Font('Helvetica', 12);
-	var textOffset = new Vecmath.Vector2(0.0, -50.0);
-	this._widget = new IconTextWidget(engine, icon, 64, name, font, textOffset);
+	data.iconAtlasIndex = TYPE_ICONS[subjectType];
+	data.text = name;
+	data.textOffset = new Vecmath.Vector2(0.0, 10.0);
+	data.color = BLUE;
+	data.iconSize = 64;
+	this._data = data;
 }
 ReflectionNode.extends(Object, {
-	get widget() {
-		return this._widget;
+	get data() {
+		return this._data;
 	},
 	get depth() {
 		return this._depth;
 	},
-	createChildren: function(engine) {
+	createChildren: function() {
 		if (this._final) {
 			return [];
 		}
@@ -106,11 +109,7 @@ ReflectionNode.extends(Object, {
 		for (var key in this._subject) {
 			var value = this._subject[key];
 			
-			if (typeof value == 'function') {
-				continue;
-			}
-			
-			var childNode = new ReflectionNode(engine, value, key, depth + 1);
+			var childNode = new ReflectionNode(value, key, depth + 1);
 			result.push(childNode);
 		}
 		return result;
@@ -242,25 +241,52 @@ function DialogNode(template, depth) {
 	
 	this._final = true;
 	var data = {};
+	data.color = BLUE;
+	data.iconSize = 64;
+	data.type = '';
+	data.textOffset = new Vecmath.Vector2(0.0, 0.0);
+
 	if (Array.isArray(template)) {
-		data.type = 'list';
+		this._type = 'list';
+
+		data.iconAtlasIndex = 0;
+		data.text = 'list';
+		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
+
 		this._final = false;
 	} else if (template.right || template.left) {
-		data.type = 'statement';
+		this._type = 'statement';
+
+		data.iconAtlasIndex = 13;
 		data.text = template.right || template.left;
 		data.side = template.right ? 'right' : 'left';
+		data.color = template.right ? BLUE : RED;
+		data.iconSize = 16;
 	} else if (template.options) {
-		data.type = 'options';
+		this._type = 'options';
+
+		data.type = 'parallel';
+		data.iconAtlasIndex = 10;
+		data.text = 'options';
+		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
+
 		this._final = false;
 	} else if (template.text) {
-		data.type = 'option';
+		this._type = 'option';
+
+		data.iconAtlasIndex = 13;
 		data.text = template.text;
+		data.iconSize = 16;
+
 		this._final = !(template.consequence);
 	} else {
-		data.type = 'action';
+		this._type = 'action';
+
+		data.iconAtlasIndex = 5;
 		data.text = template.toString();
+		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
 	}
-	
+
 	this._data = data;
 }
 
@@ -282,7 +308,7 @@ DialogNode.extends(Object, {
 		var result = [];
 		var depth = this._depth;
 		
-		switch (this._data.type) {
+		switch (this._type) {
 			case 'list':
 				this._template.forEach(function(element) {
 					result.push(new DialogNode(element, depth + 1));
