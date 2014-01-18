@@ -9,8 +9,7 @@ var otherTopicDialogTemplate = [
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
 			{right: '*tuut*', wait: 1},
-			{right: '*tuut*', wait: 1},
-			function(scene, world) { scene.exit(); }
+			{right: '*tuut*', wait: 1}
 		]}
 	]}
 ];
@@ -136,24 +135,26 @@ var motherDialogTemplate = [
 			]}
 		]}
 	]},
+	function(scene, world) { scene.exit(); }	
 ];
 
 /*motherDialogTemplate = [
-	{right: 'Hallo'},
-	{left: 'Hi'},
-	{right: 'Wie geht\'s?'},
 	{options: [
-		{text: 'Gut', consequence: [
+		{text: 'Neue Arbeit läuft schlecht', consequence: [
+			[
+				{right: 'Du kommst schon noch rein.', wait: 1}
+			]
 		]},
-		{text: 'Es geht', consequence: [
-		]},
-		{text: 'Nicht so gut', consequence: [
+		{text: 'Neue Arbeit läuft schlecht', consequence: [
+			[
+				{right: 'Du kommst schon noch rein.', wait: 1}
+			]
 		]}
 	]},
-	{right: 'Also mir geht\'s blendend'}
+	{right: 'Du kommst schon noch rein.', wait: 1}
 ];
 
-motherDialogTemplate = {
+/*motherDialogTemplate = {
 	game: {
 
 	},
@@ -186,15 +187,14 @@ motherDialogTemplate = {
 		},
 		'data I/O': {}
 	}
-};
-*/
+};*/
 
 function DialogOverviewController(engine, viewport) {
 	var view = this._view = new HierarchicalView(engine, viewport);
 
 //================ TEMP ================
-//	var rootNode = new DialogNode(motherDialogTemplate);
-	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
+	var rootNode = new DialogNode(motherDialogTemplate);
+//	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
 //	var containerNode = new ContainerNode(engine, [rootNode]);
 	this._nodeTree = new NodeTree(rootNode);
 	this._nodeTree.expandAll();
@@ -225,14 +225,14 @@ DialogOverviewController.extends(Object, {
 		var scene = this._scene;
 		this._nodeTree.navigateTo(subtree);
 		this._nodeTree.forEachNode(function(node) {
-			node.widget.setLayerIndex(6);
+			node.widget.setLayerIndex(2);
 			node.widget.setAttenuated(false);
 			node.widget.setAttenuated(true);
 		});
-		this._nodeTree.activeSubtree.node.widget.setLayerIndex(6);
+		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
 		this._nodeTree.activeSubtree.node.widget.setAttenuated(false);
 		this._nodeTree.activeSubtree.children.forEach(function(child) {
-			child.node.widget.setLayerIndex(6);
+			child.node.widget.setLayerIndex(2);
 			child.node.widget.setAttenuated(false);
 		});
 		
@@ -242,6 +242,9 @@ DialogOverviewController.extends(Object, {
 		this._nodeTree.forEachNode(function(node) {
 			if (node.updateable) {
 				node.updateable.update(node, delta);
+			}
+			if (node.widget.updateable) {
+				node.widget.updateable.update(node.widget, delta);
 			}
 		});
 		

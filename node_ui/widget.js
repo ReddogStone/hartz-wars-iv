@@ -1,65 +1,11 @@
 'use strict';
 
-function IconWidgetElement(engine, spriteBatch, atlasIndex, configuration) {
-	this._spriteBatch = spriteBatch;
-	this._id = -1;
-	this._index = atlasIndex;
-	this._config = configuration;
-	this._size = configuration.defaultSize.clone();
-	this._color = Color.clone(configuration.defaultColor);
-}
-IconWidgetElement.extends(Object, {
-	addToScene: function(scene, entity) {
-		if (entity.transformable) {
-			var pos = entity.transformable.pos;
-			this._id = this._spriteBatch.addSprite(pos, this._size, this._color, this._index);
-		}
-	},
-	updateTransform: function(transformable) {
-		var id = this._id;
-		if (id >= 0) {
-			var pos = transformable.pos;
-			this._spriteBatch.setSpritePos(id, pos);
-		}
-	},
-	setHighlighted: function(value) {
-		var id = this._id;
-		if (id >= 0) {
-			var config = this._config;
-			var color = Color.clone(value ? config.highlightedColor : config.defaultColor);
-			color.alpha = this._color.alpha;
-			this._spriteBatch.setSpriteColor(id, color);
-			this._color = color;
-		}
+function updateTransformables(widget, delta) {
+	for (var i = 0; i < widget._childPoints.length; ++i) {
+		var childPoint = widget._childPoints[i];
+		childPoint.transformable.pos = widget.transformable.pos.clone().add(childPoint.offset);
 	}
-});
-
-function TextWidgetElement(engine, text, font, textoffset, configuration) {
-	this._config = configuration;
-	this._renderable = new TextRenderable(engine, text, font, color, textOffset);
 }
-TextWidgetElement.extends(Object, {
-	addToScene: function(scene, entity) {
-		scene.addEntity(entity);
-	},
-	updateTransform: function(transformable) {
-		var id = this._id;
-		if (id >= 0) {
-			var pos = transformable.pos;
-			this._spriteBatch.setSpritePos(id, pos);
-		}
-	},
-	setHighlighted: function(value) {
-		var id = this._id;
-		if (id >= 0) {
-			var config = this._config;
-			var color = Color.clone(value ? config.highlightedColor : config.defaultColor);
-			color.alpha = this._color.alpha;
-			this._spriteBatch.setSpriteColor(id, color);
-			this._color = color;
-		}
-	}
-});
 
 function IconTextWidget(engine, spriteBatch, atlasIndex, iconSize, color, text, font, textOffset) {
 	this._spriteBatch = spriteBatch;
@@ -83,8 +29,11 @@ function IconTextWidget(engine, spriteBatch, atlasIndex, iconSize, color, text, 
 		renderable: new TextRenderable(engine, text, font, color, textOffset),
 		transformable: transformable
 	};
+
+	this.updateable = {update: updateTransformables};
 	
 	this._lines = [];
+	this._childPoints = [];
 }
 IconTextWidget.extends(Object, {
 	get iconSize() {
@@ -105,6 +54,9 @@ IconTextWidget.extends(Object, {
 	},
 	addLine: function(lineRenderable) {
 		this._lines.push({ renderable: lineRenderable} );
+	},
+	addChildPoint: function(offset, transformable) {
+		this._childPoints.push({offset: offset, transformable: transformable});
 	},
 	setLayerIndex: function(value) {
 		var newSize = this._baseIconSize.clone().scale(1.0 / (value + 1));

@@ -16,7 +16,11 @@ void main() {
 	vec4 pos = vp * worldPos;
 	pos.xyz /= pos.w;
 	pos.w = 1.0;
-	pos.xy += 2.0 * (aPosition + uScreenOffset) / uScreenSize;
+	pos.xy *= 0.5 * uScreenSize;
+	pos.xy += aPosition + uScreenOffset;
+	pos.xy = floor(pos.xy);
+	pos.xy *= vec2(2, 2) / uScreenSize;
+	//pos.xy += 2.0 * (aPosition + uScreenOffset) / uScreenSize;
 	gl_Position = pos;
 	
 	vTexCoord = aTexCoord;

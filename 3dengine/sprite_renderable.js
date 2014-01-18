@@ -108,6 +108,8 @@ LineRenderable.extends(Object, {
 		this.material.setParams(globalParams);
 	},
 	render: function(engine) {
+		FrameProfiler.start('LineRender');
 		this._mesh.render(engine);
+		FrameProfiler.stop();
 	}
 });

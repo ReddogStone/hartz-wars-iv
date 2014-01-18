@@ -38,35 +38,8 @@ HalfCircleLayout.extends(Object, {
 	}
 });
 
-var Layout = (function() {
+var Layout = (function(module) {
 	var module = {};
-
-	function calculateLayoutInfo(subtree) {
-		// own position is (0, 0, 0) at this point
-		var minZ = 0;
-		var maxZ = 0;
-		var minX = 0;
-		var maxX = 0;
-		subtree.children.forEach(function(child) {
-			var childLayout = child.layout;
-			var childPos = child.node.widget.transformable.pos;
-			var center = childPos.clone().add(childLayout.center);
-			var childMinX = center.x - 0.5 * childLayout.width;
-			var childMaxX = center.x + 0.5 * childLayout.width;
-			var childMinZ = center.z - 0.5 * childLayout.height;
-			var childMaxZ = center.z + 0.5 * childLayout.height;
-			
-			minX = Math.min(minX, childMinX);
-			maxX = Math.max(maxX, childMaxX);
-			minZ = Math.min(minZ, childMinZ);
-			maxZ = Math.max(maxZ, childMaxZ);
-		});
-		return {
-			center: new Vecmath.Vector3(0.5 * (minX + maxX), 0.0, 0.5 * (minZ + maxZ)),
-			width: maxX - minX,
-			height: maxZ - minZ
-		};
-	};
 
 	function horizontalLinearLayout(subtree) {
 		var rootNode = subtree.node;
@@ -91,13 +64,6 @@ var Layout = (function() {
 				rootTransformable.pos.clone().add(new Vecmath.Vector3(xPos + 0.5 * childWidths[index], 0, 0).add(offset));
 			xPos += margin + childWidths[index];
 		});
-		
-		var layout = calculateLayoutInfo(subtree);
-		var oldHeight = layout.height;
-		var newHeight = oldHeight + offset.z;
-		layout.center.z += 0.5 * (newHeight - oldHeight);
-		layout.height = newHeight;
-		subtree.layout = layout;
 	}
 
 	function verticalLinearLayout(subtree) {
@@ -113,26 +79,28 @@ var Layout = (function() {
 			widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
 			length += 3 + child.layout.height;
 		});
-
-		subtree.layout = calculateLayoutInfo(subtree);
 	}
 
-	module.dialogTreeOverviewLayout = function(subtree) {
+	module.dialogTreeOverviewLayout = function(engine, scene, subtree, decorate) {
 		subtree.postOrderSubtrees(function(child) {
-			if (child.node.data.type == 'parallel') {
+			child.node.createWidget(engine, scene);
+			if (child.node.type == 'parallel') {
 				horizontalLinearLayout(child);
 			} else {
 				verticalLinearLayout(child);
 			}
+			child.layout = decorate(engine, scene, child);
 		});
 		subtree.forEachChildSubtree(function(child) {
 			child.node.widget.transformable.translate(child.parent.node.widget.transformable.pos);
 		});
 	};
 
-	module.treeOverviewLayout = function(subtree) {
+	module.treeOverviewLayout = function(engine, scene, subtree, decorate) {
 		subtree.postOrderSubtrees(function(child) {
+			child.node.createWidget(engine, scene);
 			horizontalLinearLayout(child);
+			child.layout = decorate(engine, scene, child);
 		});
 		subtree.forEachChildSubtree(function(child) {
 			child.node.widget.transformable.translate(child.parent.node.widget.transformable.pos);
@@ -140,4 +108,4 @@ var Layout = (function() {
 	};
 
 	return module;
-})();
+})(Layout || {});

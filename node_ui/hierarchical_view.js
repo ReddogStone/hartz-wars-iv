@@ -33,64 +33,6 @@ function HierarchicalView(engine, viewport) {
 }
 
 HierarchicalView.extends(Object, {
-	_createWidget: function(data) {
-		var font = new Font('Helvetica', 9);
-		var spriteBatch = this._scene.spriteBatch;
-		return new IconTextWidget(this._engine, spriteBatch, 
-				data.iconAtlasIndex, data.iconSize, data.color, data.text, font, data.textOffset);
-	},
-	_createLine: function(engine, from, to, type) {
-		var pattern;
-		var alpha;
-		var width;
-		var color = BLUE;
-
-		if (type == 'horizontal') {
-			pattern = 'data/textures/line_pattern';
-			color.alpha = 0.8;
-			width = 10;
-		} else if (type == 'vertical') {
-			pattern = 'data/textures/full_line_pattern';
-			color.alpha = 0.3;
-			width = 3;
-		}
-
-		var result = new LineRenderable(engine, pattern, from, to);
-		var mat = result.material;
-		mat.color = color;
-		mat.width = width;
-		return result;
-	},
-	_layoutSubtree: function(subtree) {
-		subtree.forEachSubtree(function(child) {
-			var node = child.node;
-			node.widget = this._createWidget(node.data);
-		}, this);
-
-		Layout.dialogTreeOverviewLayout(subtree);
-
-		// decorate
-		var engine = this._engine;
-		subtree.forEachSubtree(function(root) {
-			var rootTrans = root.node.widget.transformable;
-			var children = root.children;
-			if (root.node.data.type == 'parallel') {
-				for (var i = 0; i < children.length; ++i) {
-					var widget = children[i].node.widget;
-					widget.addLine(this._createLine(engine, rootTrans, widget.transformable, 'horizontal'));
-				}
-			} else {
-				var last = root;
-				for (var i = 0; i < children.length; ++i) {
-					var child = children[i];
-					var widget = child.node.widget;
-					widget.addLine(this._createLine(engine, 
-						last.node.widget.transformable, widget.transformable, 'vertical'));
-					last = child;
-				}
-			}
-		}, this);
-	},
 	_fadeIn: function(subtrees) {
 		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
 			entity.widget.setAlpha(value);
@@ -157,7 +99,7 @@ HierarchicalView.extends(Object, {
 	},
 	showSubtree: function(subtree) {
 		var scene = this._scene;
-		this._layoutSubtree(subtree);
+		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateOverview);
 		subtree.forEachNode(function(node) {
 			node.widget.addToScene(scene);
 		}, this);

@@ -52,15 +52,14 @@ function ReflectionNode(subject, name, depth) {
 		subjectType = typeof subject;
 	}
 	
-	var data = {};
 	this._final = false;
 	switch (subjectType) {
 		case 'array':
-			data.type = 'sequential';
+			this._type = 'sequential';
 			break;
 
 		case 'object':
-			data.type = 'parallel';
+			this._type = 'parallel';
 			break;
 			
 		case 'string':
@@ -85,19 +84,25 @@ function ReflectionNode(subject, name, depth) {
 			break;
 	}
 
-	data.iconAtlasIndex = TYPE_ICONS[subjectType];
-	data.text = name;
-	data.textOffset = new Vecmath.Vector2(0.0, 10.0);
-	data.color = BLUE;
-	data.iconSize = 64;
-	this._data = data;
+	this._subjectType = subjectType;
+	this._text = name;
+	this._color = BLUE;
 }
 ReflectionNode.extends(Object, {
-	get data() {
-		return this._data;
+	get type() {
+		return this._type;
 	},
 	get depth() {
 		return this._depth;
+	},
+	createWidget: function(engine, scene) {
+		var icon = TYPE_ICONS[this._subjectType];
+		var iconSize = 64;
+		var color = this._color;
+		var text = this._text;
+		var font = new Font('Helvetica', 9);
+		var textOffset = new Vecmath.Vector2(0.0, 10.0);
+		this.widget = new IconTextWidget(engine, scene.spriteBatch, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {
@@ -247,58 +252,67 @@ function DialogNode(template, depth) {
 	data.textOffset = new Vecmath.Vector2(0.0, 0.0);
 
 	if (Array.isArray(template)) {
-		this._type = 'list';
-
-		data.iconAtlasIndex = 0;
-		data.text = 'list';
-		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
-
+		this._templateType = 'list';
 		this._final = false;
 	} else if (template.right || template.left) {
-		this._type = 'statement';
-
-		data.iconAtlasIndex = 13;
-		data.text = template.right || template.left;
-		data.side = template.right ? 'right' : 'left';
-		data.color = template.right ? BLUE : RED;
-		data.iconSize = 16;
+		this._templateType = 'statement';
 	} else if (template.options) {
-		this._type = 'options';
-
-		data.type = 'parallel';
-		data.iconAtlasIndex = 10;
-		data.text = 'options';
-		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
-
+		this._templateType = 'options';
+		this._type = 'parallel';
 		this._final = false;
 	} else if (template.text) {
-		this._type = 'option';
-
-		data.iconAtlasIndex = 13;
-		data.text = template.text;
-		data.iconSize = 16;
-
+		this._templateType = 'option';
 		this._final = !(template.consequence);
 	} else {
-		this._type = 'action';
-
-		data.iconAtlasIndex = 5;
-		data.text = template.toString();
-		data.textOffset = new Vecmath.Vector2(50.0, 0.0);
+		this._templateType = 'action';
 	}
-
-	this._data = data;
 }
 
 DialogNode.extends(Object, {
-	get data() {
-		return this._data;
+	get type() {
+		return this._type;
 	},
 	get depth() {
 		return this._depth;
 	},
-	get type() {
-		return this._type;
+	createWidget: function(engine, scene) {
+		var icon;
+		var iconSize = 64;
+		var color = BLUE;
+		var text;
+		var font = new Font('Helvetica', 9);		
+		var textOffset = new Vecmath.Vector2(0.0, 0.0);
+
+		switch (this._templateType) {
+			case 'list':
+				icon = 0;
+				text = 'list';
+				textOffset = new Vecmath.Vector2(50.0, 0.0);
+				break;
+			case 'statement':
+				icon = 13;
+				text = this._template.right || this._template.left;
+				color = this._template.right ? BLUE : RED;
+				iconSize = 32;
+				break;
+			case 'options':
+				icon = 10;
+				text = 'options';
+				textOffset = new Vecmath.Vector2(50.0, 0.0);
+				break;
+			case 'option':
+				icon = 13;
+				text = this._template.text;
+				iconSize = 32;
+				break;
+			case 'action':
+				icon = 5;
+				text = this._template.toString();
+				textOffset = new Vecmath.Vector2(0.0, 10.0);
+				break;
+		}
+
+		this.widget = new IconTextWidget(engine, scene.spriteBatch, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {
@@ -308,7 +322,7 @@ DialogNode.extends(Object, {
 		var result = [];
 		var depth = this._depth;
 		
-		switch (this._type) {
+		switch (this._templateType) {
 			case 'list':
 				this._template.forEach(function(element) {
 					result.push(new DialogNode(element, depth + 1));
