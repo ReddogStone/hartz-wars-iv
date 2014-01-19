@@ -272,16 +272,11 @@ DialogOverviewController.extends(Object, {
 			node.widget.setAttenuated(true);
 		});
 		this._selection.forEach(function(selected) {
+			selected.node.widget.setAttenuated(false);
 			selected.children.forEach(function(child) {
 				child.node.widget.setAttenuated(false);
 			});
 		});
-/*		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
-		this._nodeTree.activeSubtree.node.widget.setAttenuated(false);
-		this._nodeTree.activeSubtree.children.forEach(function(child) {
-			child.node.widget.setLayerIndex(2);
-			child.node.widget.setAttenuated(false);
-		}); */
 	},
 	update: function(delta) {
 		this._nodeTree.forEachNode(function(node) {
