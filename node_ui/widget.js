@@ -102,9 +102,7 @@ IconTextWidget.extends(Object, {
 
 		var color = Color.clone(this._color);
 		if (value) {
-			color.red += 0.8;
-			color.green += 0;
-			color.blue += 0;
+			color.green += 0.3;
 		}
 
 		if (this._spriteId >= 0) {

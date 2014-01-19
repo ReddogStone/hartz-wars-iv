@@ -204,10 +204,15 @@ function DialogOverviewController(engine, viewport) {
 
 	var rootSubtree = this._nodeTree.root;
 	this._navigateToSubtree(rootSubtree);
+	this._view.focusCamera(rootSubtree);
 	
 	var self = this;
 	view.onSubtreeClicked = function(subtree) {
 		var selection = self._selection;
+		if (selection.indexOf(subtree) >= 0) {
+			self._view.focusCamera(subtree);
+		}
+
 		selection.forEach(function(selected) {
 			self._unselectSubtree(selected);
 		});
@@ -239,6 +244,7 @@ function DialogOverviewController(engine, viewport) {
 		var active = self._nodeTree.activeSubtree;
 		if (active.parent) {
 			self._navigateToSubtree(active.parent);
+			self._view.focusCamera(active.parent);
 		}
 	};
 //================ END TEMP ================	
@@ -276,8 +282,6 @@ DialogOverviewController.extends(Object, {
 			child.node.widget.setLayerIndex(2);
 			child.node.widget.setAttenuated(false);
 		}); */
-		
-		this._view.focusCamera(subtree);
 	},
 	update: function(delta) {
 		this._nodeTree.forEachNode(function(node) {
