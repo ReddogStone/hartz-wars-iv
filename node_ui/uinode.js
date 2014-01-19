@@ -121,41 +121,49 @@ ReflectionNode.extends(Object, {
 	}	
 });
 
-function FileSystemNode(engine, path, depth) {
+function FileSystemNode(path, depth) {
 	this._path = path;
 	this._depth = depth || 0;
 	
 	var fs = require('fs');
 	var stats = fs.lstatSync(path);
 
-	var pathModule = require('path');
-	
-	var icon = 'data/textures/file_icon';
 	this._final = true;
-	var name = path;
-	
-	var parts = path.split(pathModule.sep);
-	if (parts[parts.length - 1]) {
-		name = parts[parts.length - 1];
-	}
-	
 	if (stats.isDirectory()) {
-		icon = 'data/textures/directory_icon';
 		this._final = false;
 	}
-
-	var font = new Font('Helvetica', 12);
-	var textOffset = new Vecmath.Vector2(0.0, -50.0);
-	this._widget = new IconTextWidget(engine, icon, 64, name, font, textOffset);
 }
 FileSystemNode.extends(Object, {
-	get widget() {
-		return this._widget;
+	get type() {
+		return this._type;
 	},
 	get depth() {
 		return this._depth;
 	},
-	createChildren: function(engine) {
+	createWidget: function(engine, scene) {
+		var path = this._path;
+		var fs = require('fs');
+		var stats = fs.lstatSync(path);
+
+		var pathModule = require('path');
+		
+		var icon = 0;
+		var name = path;
+		
+		var parts = path.split(pathModule.sep);
+		if (parts[parts.length - 1]) {
+			name = parts[parts.length - 1];
+		}
+		
+		if (stats.isDirectory()) {
+			icon = 1;
+		}
+
+		var font = new Font('Helvetica', 12);
+		var textOffset = new Vecmath.Vector2(0.0, -50.0);
+		this.widget = new IconTextWidget(engine, scene, icon, 64, BLUE, name, font, textOffset);
+	},
+	createChildren: function() {
 		if (this._final) {
 			return [];
 		}
@@ -169,7 +177,7 @@ FileSystemNode.extends(Object, {
 		var files = fs.readdirSync(path);
 		files.forEach(function(fileName) {
 			try {
-				var childNode = new FileSystemNode(engine, pathModule.join(path, fileName), depth + 1);
+				var childNode = new FileSystemNode(pathModule.join(path, fileName), depth + 1);
 				result.push(childNode);
 			} catch (e) {
 			}
