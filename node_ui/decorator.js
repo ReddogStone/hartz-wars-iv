@@ -39,7 +39,7 @@ var Decorator = (function(module) {
 		var pattern;
 		var alpha;
 		var width;
-		var color = BLUE;
+		var color = Color.clone(BLUE);
 
 		if (type == 'horizontal') {
 			pattern = 0;
@@ -48,7 +48,7 @@ var Decorator = (function(module) {
 		} else if (type == 'vertical') {
 			pattern = 1;
 			color.alpha = 0.3;
-			width = 3;
+			width = 5;
 		} else if (type == 'weak') {
 			pattern = 0;
 			color.alpha = 0.3;

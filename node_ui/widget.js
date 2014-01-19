@@ -87,11 +87,11 @@ IconTextWidget.extends(Object, {
 			this._label.renderable.material.color = color;
 		}
 		
-		/*this._lines.forEach(function(lineEntity) {
-			var alpha = lineEntity.renderable.material.color.alpha;
-			color.alpha = alpha; 
-			lineEntity.renderable.material.color = color;
-		}); */
+		var lineBatch = this._lineBatch;
+		this._lines.forEach(function(lineDesc) {
+			color.alpha = lineDesc.color.alpha;
+			lineBatch.setColor(lineDesc._id, color);
+		});
 	},
 	setAlpha: function(value) {
 		if (!this._attenuated) {

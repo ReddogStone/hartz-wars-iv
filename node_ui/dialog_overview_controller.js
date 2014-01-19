@@ -143,7 +143,7 @@ var motherDialogTemplate = [
 	{right: ' '},
 ];
 
-/*motherDialogTemplate = [
+motherDialogTemplate = [
 	{options: [
 		{text: 'Neue Arbeit läuft schlecht', consequence: [
 			[
