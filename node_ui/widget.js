@@ -5,10 +5,19 @@ function updateTransformables(widget, delta) {
 		var childPoint = widget._childPoints[i];
 		childPoint.transformable.pos = widget.transformable.pos.clone().add(childPoint.offset);
 	}
+	var lineBatch = widget._lineBatch;
+	for (var i = 0; i < widget._lines.length; ++i) {
+		var line = widget._lines[i];
+		if (line._id !== undefined) {
+			lineBatch.setEndPoint1(line._id, line.from.pos);
+			lineBatch.setEndPoint2(line._id, line.to.pos);
+		}
+	}
 }
 
-function IconTextWidget(engine, spriteBatch, atlasIndex, iconSize, color, text, font, textOffset) {
-	this._spriteBatch = spriteBatch;
+function IconTextWidget(engine, scene, atlasIndex, iconSize, color, text, font, textOffset) {
+	this._spriteBatch = scene.spriteBatch;
+	this._lineBatch = scene.lineBatch;
 	this._spriteId = -1;
 	
 	this._atlasIndex = atlasIndex;
@@ -52,8 +61,8 @@ IconTextWidget.extends(Object, {
 			this._spriteBatch.setSpriteSize(this._spriteId, size);
 		}
 	},
-	addLine: function(lineRenderable) {
-		this._lines.push({ renderable: lineRenderable} );
+	addLine: function(lineDesc) {
+		this._lines.push(lineDesc);
 	},
 	addChildPoint: function(offset, transformable) {
 		this._childPoints.push({offset: offset, transformable: transformable});
@@ -74,15 +83,15 @@ IconTextWidget.extends(Object, {
 			this._spriteBatch.setSpriteColor(this._spriteId, color);
 		}
 
-//		if (!this._attenuated) {
+		if (!this._attenuated) {
 			this._label.renderable.material.color = color;
-//		}
+		}
 		
-		this._lines.forEach(function(lineEntity) {
+		/*this._lines.forEach(function(lineEntity) {
 			var alpha = lineEntity.renderable.material.color.alpha;
 			color.alpha = alpha; 
 			lineEntity.renderable.material.color = color;
-		});
+		}); */
 	},
 	setAlpha: function(value) {
 		if (!this._attenuated) {
@@ -106,16 +115,14 @@ IconTextWidget.extends(Object, {
 	addToScene: function(scene) {
 		this._spriteId = this._spriteBatch.addSprite(this.transformable.pos, this._iconSize, this._color, this._atlasIndex);
 		scene.addEntity(this._label);
-		this._lines.forEach(function(lineEntity) {
-			scene.addEntity(lineEntity);
+		this._lines.forEach(function(lineDesc) {
+			lineDesc._id = scene.lineBatch.addLine(
+				lineDesc.from.pos, lineDesc.to.pos, lineDesc.color, lineDesc.width, lineDesc.patternIndex);
 		});
 	},
 	removeFromScene: function(scene) {
 //		scene.removeEntity(this._sprite);
 		scene.removeEntity(this._label);
-		this._lines.forEach(function(lineEntity) {
-			scene.removeEntity(lineEntity);
-		});
 	}
 });
 IconTextWidget.HIGHLIGHTED = new Color(0.2, 1.0, 0.2);

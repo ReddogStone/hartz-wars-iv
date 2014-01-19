@@ -210,7 +210,7 @@ var Engine3D = (function() {
 				gl.uniform1iv(location, value);
 				break;
 			case 0x1406: // FLOAT
-				gl.uniform1fv(location, value);
+				gl.uniform1f(location, value);
 				break;
 		}
 	}

@@ -4,7 +4,7 @@ function HierarchicalView(engine, viewport) {
 	this._engine = engine;
 	this._viewport = viewport || new Viewport();
 	this._cam = {
-		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 1000),
+		camera: new Camera(0.5 * Math.PI, g_canvas.width / g_canvas.height, 0.01, 5000),
 		transformable: new Transformable(new Vecmath.Vector3(0, 60, 0.1)),
 		updateable: new BehaviorsUpdateable()
 	};
@@ -15,6 +15,13 @@ function HierarchicalView(engine, viewport) {
 	};
 	this._scene.spriteBatch = spriteBatch;
 	this._scene.addEntity(spriteBatchEntity);
+
+	var lineBatch = new LineBatchRenderable(engine, 'data/textures/line_patterns', 2);
+	var lineBatchEntity = {
+		renderable: lineBatch
+	};
+	this._scene.lineBatch = lineBatch;
+	this._scene.addEntity(lineBatchEntity);
 	
 	this._mouse = {x: 0, y: 0};
 	

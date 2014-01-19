@@ -135,7 +135,12 @@ var motherDialogTemplate = [
 			]}
 		]}
 	]},
-	function(scene, world) { scene.exit(); }	
+	function(scene, world) { scene.exit(); },
+	{right: ' '},
+	{right: ' '},
+	{right: ' '},
+	{right: ' '},
+	{right: ' '},
 ];
 
 /*motherDialogTemplate = [
@@ -193,8 +198,8 @@ function DialogOverviewController(engine, viewport) {
 	var view = this._view = new HierarchicalView(engine, viewport);
 
 //================ TEMP ================
-	var rootNode = new DialogNode(motherDialogTemplate);
-//	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
+//	var rootNode = new DialogNode(motherDialogTemplate);
+	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
 //	var containerNode = new ContainerNode(engine, [rootNode]);
 	this._nodeTree = new NodeTree(rootNode);
 	this._nodeTree.expandAll();

@@ -10,14 +10,6 @@ uniform vec3 uEndPoint1;
 uniform vec3 uEndPoint2;
 uniform vec2 uScreenSize;
 
-vec4 clipToNear(vec4 p1, vec3 dir) {
-	float deltaZ = -0.1 - p1.z;
-	if (deltaZ < 0.0) {
-		return vec4(p1.xyz + deltaZ / dir.z * dir, 1.0);
-	}
-	return p1;
-}
-
 void main() {
 	mat4 viewProj = uProjection * uView;
 	
@@ -25,8 +17,12 @@ void main() {
 	vec4 viewEnd2 = uView * vec4(uEndPoint2, 1.0);
 	
 	vec3 realDir = normalize(viewEnd2.xyz - viewEnd1.xyz);
-	viewEnd1 = clipToNear(viewEnd1, realDir);
-	viewEnd2 = clipToNear(viewEnd2, realDir);
+	if (viewEnd1.z > -0.1) {
+		viewEnd1.xyz = viewEnd1.xyz + (-0.1 - viewEnd1.z) / (realDir.z + 0.0000001) * realDir;
+	}
+	if (viewEnd2.z > -0.1) {
+		viewEnd2.xyz = viewEnd2.xyz + (-0.1 - viewEnd2.z) / (realDir.z + 0.0000001) * realDir;
+	}
 	
 	vec4 clipEnd1 = uProjection * viewEnd1;
 	vec4 clipEnd2 = uProjection * viewEnd2;

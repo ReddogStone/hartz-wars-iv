@@ -177,7 +177,6 @@ function PointSpriteBatchRenderable(engine, textureId, atlasSize) {
 			"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false}
 		}
 	}
-	var stride = 10;
 	var instanceDataDesc = {
 		"aWorldPos": { "components": 3, "type": "FLOAT", "normalized": false },
 		"aSize": { "components": 2, "type": "FLOAT", "normalized": false },
@@ -220,7 +219,7 @@ PointSpriteBatchRenderable.extends(Object, {
 		this._instancedRenderable.setSingleInstance(id, data);
 	},
 	setSpritePos: function(id, value) {
-		this._setSpriteComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.y; });
+		this._setSpriteComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
 	},
 	setSpriteSize: function(id, value) {
 		this._setSpriteComponent(id, function(data) { data[3] = value.x; data[4] = value.y; });
@@ -240,6 +239,102 @@ PointSpriteBatchRenderable.extends(Object, {
 	},
 	setParams: function(globalParams) {
 		globalParams.uTextureAtlasSize = this._atlasSize.toArray();
+		this.material.setParams(globalParams);
+	},
+	render: function(engine) {
+		this._instancedRenderable.render(engine);
+	}
+});
+
+function LineBatchRenderable(engine, textureId, patternCount) {
+	var mesh = {
+		"vertices": [
+			//x	 y	  tu   tv
+			0.0, -1.0, 0.0, 0.0,
+			1.0, -1.0, 1.0, 0.0,
+			0.0,  1.0, 0.0, 1.0 / patternCount,
+			1.0,  1.0, 1.0, 1.0 / patternCount],
+		"indices": [0, 1, 2, 2, 1, 3],
+		"description": {
+			"aPosition": { "components": 2, "type": "FLOAT", "normalized": false},
+			"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false}
+		}
+	}
+	var instanceDataDesc = {
+		"aEndPoint1": { "components": 3, "type": "FLOAT", "normalized": false },
+		"aEndPoint2": { "components": 3, "type": "FLOAT", "normalized": false },
+		"aColor": { "components": 4, "type": "FLOAT", "normalized": false },
+		"aWidth": { "components": 1, "type": "FLOAT", "normalized": false },
+		"aPatternIndex": { "components": 1, "type": "FLOAT", "normalized": false }
+	};
+
+	this._patternCount = patternCount;
+	this._instancedRenderable = new InstancedRenderable(engine, mesh, instanceDataDesc);
+	this.material = new LineInstMaterial(engine, engine.getTexture(textureId));
+
+	this._instanceData = [];
+	this._instanceData._dirty = false;
+	this._instanceIndices = [];
+}
+LineBatchRenderable.extends(Object, {
+	_setComponent: function(id, setter) {
+		var instancedRenderable = this._instancedRenderable;
+		var data = instancedRenderable.getSingleInstance(id);
+		setter(data);
+		instancedRenderable.setSingleInstance(id, data);		
+	},
+	addLine: function(endPoint1, endPoint2, color, width, patternIndex) {
+		var instancedRenderable = this._instancedRenderable;
+		var data = endPoint1.toArray().
+			concat(endPoint2.toArray()).
+			concat(color.toArray4()).
+			concat([width]).
+			concat([patternIndex]);
+		instancedRenderable.addSingleInstance(data);
+		return instancedRenderable.getInstanceCount() - 1;
+	},
+	getLineData: function(id) {
+		var data = this._instancedRenderable.getSingleInstance(id);
+		return {
+			endPoint1: new Vecmath.Vector3(data[0], data[1], data[2]),
+			endPoint2: new Vecmath.Vector3(data[3], data[4], data[5]),
+			color: new Color(data[6], data[7], data[8], data[9]),
+			width: data[10],
+			patternIndex: data[11]
+		};
+	},
+	setLineData: function(id, endPoint1, endPoint2, color, width, patternIndex) {
+		var data = endPoint1.toArray().
+			concat(endPoint2.toArray()).
+			concat(color.toArray4()).
+			concat([width]).
+			concat([patternIndex]);
+		this._instancedRenderable.setSingleInstance(id, data);
+	},
+	setEndPoint1: function(id, value) {
+		this._setComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
+	},
+	setEndPoint2: function(id, value) {
+		this._setComponent(id, function(data) { data[3] = value.x; data[4] = value.y; data[5] = value.z; });
+	},
+	setColor: function(id, value) {
+		this._setComponent(id, function(data) { 
+			data[6] = value.red; data[7] = value.green; data[8] = value.blue; data[9] = value.alpha;
+		});
+	},
+	setWidth: function(id, value) {
+		this._setComponent(id, function(data) { data[10] = value; });
+	},
+	setPatternIndex: function(id, value) {
+		this._setComponent(id, function(data) { data[11] = value; });
+	},
+
+	// renderable interface
+	prepare: function(engine) {
+		this._instancedRenderable.prepare(engine);
+	},
+	setParams: function(globalParams) {
+		globalParams.uPatternCount = this._patternCount;
 		this.material.setParams(globalParams);
 	},
 	render: function(engine) {

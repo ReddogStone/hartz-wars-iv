@@ -35,30 +35,32 @@ var Decorator = (function(module) {
 		};
 	};
 
-	function createLine(engine, from, to, type) {
+	function createLine(from, to, type) {
 		var pattern;
 		var alpha;
 		var width;
 		var color = BLUE;
 
 		if (type == 'horizontal') {
-			pattern = 'data/textures/line_pattern';
+			pattern = 0;
 			color.alpha = 0.8;
 			width = 10;
 		} else if (type == 'vertical') {
-			pattern = 'data/textures/full_line_pattern';
+			pattern = 1;
 			color.alpha = 0.3;
 			width = 3;
 		} else if (type == 'weak') {
-			pattern = 'data/textures/line_pattern';
+			pattern = 0;
 			color.alpha = 0.3;
 			width = 10;
 		}
 
-		var result = new LineRenderable(engine, pattern, from, to);
-		var mat = result.material;
-		mat.color = color;
-		mat.width = width;
+		var result = {};
+		result.from = from;
+		result.to = to;
+		result.color = color;
+		result.width = width;
+		result.patternIndex = pattern;
 		return result;
 	}
 
@@ -84,8 +86,8 @@ var Decorator = (function(module) {
 			for (var i = 0; i < children.length; ++i) {
 				var child = children[i];
 				var widget = child.node.widget;
-				widget.addLine(createLine(engine, rootTrans, widget.transformable, 'horizontal'));
-				widget.addLine(createLine(engine, bottomTrans, child.layout.bottomTrans, 'weak'));
+				widget.addLine(createLine(rootTrans, widget.transformable, 'horizontal'));
+				widget.addLine(createLine(bottomTrans, child.layout.bottomTrans, 'weak'));
 			}
 		} else {
 			var last = subtree;
@@ -96,7 +98,7 @@ var Decorator = (function(module) {
 					last.layout.bottomTrans :
 					last.node.widget.transformable;
 				var to = widget.transformable;
-				widget.addLine(createLine(engine, from, to, 'vertical'));
+				widget.addLine(createLine(from, to, 'vertical'));
 				last = child;
 			}
 			bottomTrans = (last.layout && last.layout.bottomTrans) ?

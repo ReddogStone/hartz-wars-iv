@@ -151,3 +151,15 @@ LineMaterial.extends(Material, {
 	}
 });
 
+function LineInstMaterial(engine, texture) {
+	Material.call(this, engine, 'line_instanced', BlendMode.PREMUL_ALPHA);
+	this._texture = texture;
+}
+LineInstMaterial.extends(Material, {
+	get texture() {
+		return this._texture;
+	},
+	setParams: function(globalParams) {
+		globalParams.uTexture = {texture: this._texture, sampler: 0};
+	}
+});
