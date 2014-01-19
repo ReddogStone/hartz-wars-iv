@@ -312,7 +312,7 @@ DialogNode.extends(Object, {
 				break;
 		}
 
-		this.widget = new IconTextWidget(engine, scene.spriteBatch, icon, iconSize, color, text, font, textOffset);
+		this.widget = new IconTextWidget(engine, scene, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {

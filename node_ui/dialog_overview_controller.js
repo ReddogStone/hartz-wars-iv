@@ -4,12 +4,7 @@ var otherTopicDialogTemplate = [
 	{options: [
 		{text: 'Nichts', consequence: [
 			{left: 'Nein, Mama. War schön mit dir zu reden.', wait: 1},
-			{right: 'OK. Dann meld dich mal wieder. Bis dann.', wait: 3},
-			{right: '*tuut*', wait: 1},
-			{right: '*tuut*', wait: 1},
-			{right: '*tuut*', wait: 1},
-			{right: '*tuut*', wait: 1},
-			{right: '*tuut*', wait: 1}
+			{right: 'OK. Dann meld dich mal wieder. Bis dann.', wait: 3}
 		]}
 	]}
 ];
@@ -135,15 +130,15 @@ var motherDialogTemplate = [
 			]}
 		]}
 	]},
-	function(scene, world) { scene.exit(); },
-	{right: ' '},
-	{right: ' '},
-	{right: ' '},
-	{right: ' '},
-	{right: ' '},
+	{right: '*tuut*', wait: 1},
+	{right: '*tuut*', wait: 1},
+	{right: '*tuut*', wait: 1},
+	{right: '*tuut*', wait: 1},
+	{right: '*tuut*', wait: 1},	
+	function(scene, world) { scene.exit(); }
 ];
 
-motherDialogTemplate = [
+/*motherDialogTemplate = [
 	{options: [
 		{text: 'Neue Arbeit läuft schlecht', consequence: [
 			[
@@ -198,9 +193,10 @@ function DialogOverviewController(engine, viewport) {
 	var view = this._view = new HierarchicalView(engine, viewport);
 
 //================ TEMP ================
-//	var rootNode = new DialogNode(motherDialogTemplate);
-	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
+	var rootNode = new DialogNode(motherDialogTemplate);
+//	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
 //	var containerNode = new ContainerNode(engine, [rootNode]);
+	this._selection = [];
 	this._nodeTree = new NodeTree(rootNode);
 	this._nodeTree.expandAll();
 
@@ -211,7 +207,33 @@ function DialogOverviewController(engine, viewport) {
 	
 	var self = this;
 	view.onSubtreeClicked = function(subtree) {
-		self._navigateToSubtree(subtree);
+		var selection = self._selection;
+		selection.forEach(function(selected) {
+			self._unselectSubtree(selected);
+		});
+		selection.clear();
+		selection.push(subtree);
+		self._selectSubtree(subtree);
+
+		self._navigateToSubtree(subtree);		
+	};
+	view.onSubtreeAction = function(subtree) {
+		self._view.hideSubtree(self._nodeTree.root);
+		self._selection.forEach(function(selected) {
+			if (selected.expanded) {
+				selected.collapse();
+			} else {
+				selected.expand();
+			}
+		});
+//		subtree = subtree.parent;
+
+		self._view.showSubtree(self._nodeTree.root);
+		self._selection.forEach(function(selected) {
+			self._selectSubtree(selected);
+		});
+
+		self._navigateToSubtree(self._nodeTree.root);
 	};
 	view.onLevelUp = function() {
 		var active = self._nodeTree.activeSubtree;
@@ -226,20 +248,34 @@ DialogOverviewController.extends(Object, {
 	get view() {
 		return this._view;
 	},
+	_selectSubtree: function(subtree) {
+		subtree.forEachNode(function(node) {
+			node.widget.setSelected(true);
+		});
+	},
+	_unselectSubtree: function(subtree) {
+		subtree.forEachNode(function(node) {
+			node.widget.setSelected(false);
+		});
+	},
 	_navigateToSubtree: function(subtree) {
 		var scene = this._scene;
 		this._nodeTree.navigateTo(subtree);
 		this._nodeTree.forEachNode(function(node) {
 			node.widget.setLayerIndex(2);
-			node.widget.setAttenuated(false);
 			node.widget.setAttenuated(true);
 		});
-		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
+		this._selection.forEach(function(selected) {
+			selected.children.forEach(function(child) {
+				child.node.widget.setAttenuated(false);
+			});
+		});
+/*		this._nodeTree.activeSubtree.node.widget.setLayerIndex(2);
 		this._nodeTree.activeSubtree.node.widget.setAttenuated(false);
 		this._nodeTree.activeSubtree.children.forEach(function(child) {
 			child.node.widget.setLayerIndex(2);
 			child.node.widget.setAttenuated(false);
-		});
+		}); */
 		
 		this._view.focusCamera(subtree);
 	},

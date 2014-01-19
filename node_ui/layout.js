@@ -55,7 +55,7 @@ var Layout = (function(module) {
 		var margin = Math.max(0.3 * length, 10);
 		length += margin * (subtree.children.length - 1);
 		
-		var offset = new Vecmath.Vector3((subtree.children.length == 1) ? 0 : -0.5 * length, 0, 3);
+		var offset = new Vecmath.Vector3(-0.5 * length, 0, 3);
 		
 		var xPos = 0;
 		subtree.children.forEach(function(child, index) {

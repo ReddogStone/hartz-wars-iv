@@ -114,6 +114,16 @@ InstancedRenderable.extends(Object, {
 		instanceData._dirty = true;
 		this.setInstanceCount(this._instanceCount + 1);
 	},
+	removeSingleInstance: function(index) {
+		var instanceDataLength = this._instanceDataLength;
+		var instanceVertexCount = this._instanceVertexCount;
+		var instanceData = this._instanceData;
+		var offset = index * instanceDataLength * instanceVertexCount;
+		instanceData.splice(offset, instanceDataLength * instanceVertexCount);
+		
+		instanceData._dirty = true;
+		this.setInstanceCount(this._instanceCount - 1);
+	},	
 	getSingleInstance: function(index) {
 		var instanceDataLength = this._instanceDataLength;
 		var instanceVertexCount = this._instanceVertexCount;
@@ -135,6 +145,11 @@ InstancedRenderable.extends(Object, {
 		
 		instanceData._dirty = true;
 	},
+	setComponent: function(id, setter) {
+		var data = this.getSingleInstance(id);
+		setter(data);
+		this.setSingleInstance(id, data);
+	},	
 	
 	// renderable interface
 	prepare: function(engine) {
@@ -158,6 +173,34 @@ InstancedRenderable.extends(Object, {
 		engine.setBuffers(this._vb, this._ib, this._instanceMesh.description);
 		engine.setVertexBuffer(this._instanceDataBuffer, this._instanceDataDesc);
 		engine.renderTriangles(this._indices.length, 0);
+	}
+});
+
+function IdMap() {
+	this._map = {};
+	this._list = [];
+	this._currentId = 0;
+}
+IdMap.extends(Object, {
+	newId: function() {
+		var id = this._currentId;
+		var index = this._list.length;
+		this._list.push(id);
+		this._map[id] = index;
+		++this._currentId;
+		return id;
+	},
+	removeId: function(id) {
+		var index = this._map[id];
+		this._list.splice(index, 1);
+		delete this._map[id];
+		for (var i = index; i < this._list.length; ++i) {
+			var idToUpdate = this._list[i];
+			this._map[idToUpdate] = i;
+		}
+	},
+	getIndex: function(id) {
+		return this._map[id];
 	}
 });
 
@@ -188,25 +231,23 @@ function PointSpriteBatchRenderable(engine, textureId, atlasSize) {
 	this.material = new PointSpriteInstMaterial(engine, engine.getTexture(textureId));
 	this._atlasSize = AtlasDesc.clone(atlasSize);
 
-	this._instanceData = [];
-	this._instanceData._dirty = false;
-	this._instanceIndices = [];
+	this._idMap = new IdMap();
 }
 PointSpriteBatchRenderable.extends(Object, {
-	_setSpriteComponent: function(id, setter) {
-		var instancedRenderable = this._instancedRenderable;
-		var data = instancedRenderable.getSingleInstance(id);
-		setter(data);
-		instancedRenderable.setSingleInstance(id, data);		
-	},
-	addSprite: function(pos, size, color, atlasIndex) {
+	add: function(pos, size, color, atlasIndex) {
 		var instancedRenderable = this._instancedRenderable;
 		var data = pos.toArray().concat(size.toArray()).concat(color.toArray4()).concat([atlasIndex]);
 		instancedRenderable.addSingleInstance(data);
-		return instancedRenderable.getInstanceCount() - 1;
+		return this._idMap.newId();
 	},
-	getSpriteData: function(id) {
-		var data = this._instancedRenderable.getSingleInstance(id);
+	remove: function(id) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.removeSingleInstance(index);
+		this._idMap.removeId(id);
+	},
+	get: function(id) {
+		var index = this._idMap.getIndex(id);
+		var data = this._instancedRenderable.getSingleInstance(index);
 		return {
 			pos: new Vecmath.Vector3(data[0], data[1], data[2]),
 			size: new Vecmath.Vector2(data[3], data[4]),
@@ -214,23 +255,29 @@ PointSpriteBatchRenderable.extends(Object, {
 			atlasIndex: data[9]
 		};
 	},
-	setSpriteData: function(id, pos, size, color, atlasIndex) {
+	set: function(id, pos, size, color, atlasIndex) {
+		var index = this._idMap.getIndex(id);
 		var data = pos.toArray().concat(size.toArray()).concat(color.toArray4()).concat([atlasIndex]);
-		this._instancedRenderable.setSingleInstance(id, data);
+		this._instancedRenderable.setSingleInstance(index, data);
 	},
-	setSpritePos: function(id, value) {
-		this._setSpriteComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
+	setPos: function(id, value) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(
+			index, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
 	},
-	setSpriteSize: function(id, value) {
-		this._setSpriteComponent(id, function(data) { data[3] = value.x; data[4] = value.y; });
+	setSize: function(id, value) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { data[3] = value.x; data[4] = value.y; });
 	},
-	setSpriteColor: function(id, value) {
-		this._setSpriteComponent(id, function(data) { 
+	setColor: function(id, value) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { 
 			data[5] = value.red; data[6] = value.green; data[7] = value.blue; data[8] = value.alpha;
 		});
 	},
-	setSpriteAtlasIndex: function(id, value) {
-		this._setSpriteComponent(id, function(data) { data[9] = value; });
+	setAtlasIndex: function(id, value) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { data[9] = value; });
 	},
 
 	// renderable interface
@@ -272,18 +319,10 @@ function LineBatchRenderable(engine, textureId, patternCount) {
 	this._instancedRenderable = new InstancedRenderable(engine, mesh, instanceDataDesc);
 	this.material = new LineInstMaterial(engine, engine.getTexture(textureId));
 
-	this._instanceData = [];
-	this._instanceData._dirty = false;
-	this._instanceIndices = [];
+	this._idMap = new IdMap();	
 }
 LineBatchRenderable.extends(Object, {
-	_setComponent: function(id, setter) {
-		var instancedRenderable = this._instancedRenderable;
-		var data = instancedRenderable.getSingleInstance(id);
-		setter(data);
-		instancedRenderable.setSingleInstance(id, data);		
-	},
-	addLine: function(endPoint1, endPoint2, color, width, patternIndex) {
+	add: function(endPoint1, endPoint2, color, width, patternIndex) {
 		var instancedRenderable = this._instancedRenderable;
 		var data = endPoint1.toArray().
 			concat(endPoint2.toArray()).
@@ -291,10 +330,16 @@ LineBatchRenderable.extends(Object, {
 			concat([width]).
 			concat([patternIndex]);
 		instancedRenderable.addSingleInstance(data);
-		return instancedRenderable.getInstanceCount() - 1;
+		return this._idMap.newId();
 	},
-	getLineData: function(id) {
-		var data = this._instancedRenderable.getSingleInstance(id);
+	remove: function(id) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.removeSingleInstance(index);
+		this._idMap.removeId(id);
+	},	
+	get: function(id) {
+		var index = this._idMap.getIndex(id);
+		var data = this._instancedRenderable.getSingleInstance(index);
 		return {
 			endPoint1: new Vecmath.Vector3(data[0], data[1], data[2]),
 			endPoint2: new Vecmath.Vector3(data[3], data[4], data[5]),
@@ -303,30 +348,38 @@ LineBatchRenderable.extends(Object, {
 			patternIndex: data[11]
 		};
 	},
-	setLineData: function(id, endPoint1, endPoint2, color, width, patternIndex) {
+	set: function(id, endPoint1, endPoint2, color, width, patternIndex) {
+		var index = this._idMap.getIndex(id);
 		var data = endPoint1.toArray().
 			concat(endPoint2.toArray()).
 			concat(color.toArray4()).
 			concat([width]).
 			concat([patternIndex]);
-		this._instancedRenderable.setSingleInstance(id, data);
+		this._instancedRenderable.setSingleInstance(index, data);
 	},
 	setEndPoint1: function(id, value) {
-		this._setComponent(id, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(
+			index, function(data) { data[0] = value.x; data[1] = value.y; data[2] = value.z; });
 	},
 	setEndPoint2: function(id, value) {
-		this._setComponent(id, function(data) { data[3] = value.x; data[4] = value.y; data[5] = value.z; });
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(
+			index, function(data) { data[3] = value.x; data[4] = value.y; data[5] = value.z; });
 	},
 	setColor: function(id, value) {
-		this._setComponent(id, function(data) { 
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { 
 			data[6] = value.red; data[7] = value.green; data[8] = value.blue; data[9] = value.alpha;
 		});
 	},
 	setWidth: function(id, value) {
-		this._setComponent(id, function(data) { data[10] = value; });
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { data[10] = value; });
 	},
 	setPatternIndex: function(id, value) {
-		this._setComponent(id, function(data) { data[11] = value; });
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) { data[11] = value; });
 	},
 
 	// renderable interface

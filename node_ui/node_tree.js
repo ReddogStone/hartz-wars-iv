@@ -4,6 +4,7 @@ function Subtree(node, parent) {
 	this._node = node;
 	this._parent = parent;
 	this._children = [];
+	this._expanded = false;
 }
 Subtree.extends(Object, {
 	get parent() {
@@ -13,17 +14,22 @@ Subtree.extends(Object, {
 		return this._node;
 	},
 	get children() {
-		return this._children;
+		if (this._expanded) {
+			return this._children;
+		}
+		return [];
 	},
 	get expanded() {
+		return this._expanded;
 		return (this._children.length > 0);
 	},
 	getSiblings: function() {
 		var result = [];
 		var parent = this._parent;
 		if (parent) {
-			for (var i = 0; i < parent._children.length; ++i) {
-				var sibling = parent._children[i];
+			var siblings = parent.children;
+			for (var i = 0; i < siblings.length; ++i) {
+				var sibling = siblings[i];
 				if (sibling !== this) {
 					result.push(sibling);
 				}
@@ -37,8 +43,9 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			for (var i = 0; i < current._children.length; ++i) {
-				stack.push(current._children[i]);
+			var children = current.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
 			result.push(current._node);
 		}
@@ -48,8 +55,9 @@ Subtree.extends(Object, {
 		var stack = this._children.slice(0);
 		while (stack.length > 0) {
 			var current = stack.shift();
-			for (var i = 0; i < current._children.length; ++i) {
-				stack.push(current._children[i]);
+			var children = current.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
 			callback.call(thisArg, current._node, current);
 		}
@@ -58,8 +66,9 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			for (var i = 0; i < current._children.length; ++i) {
-				stack.push(current._children[i]);
+			var children = current.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
 			callback.call(thisArg, current._node, current);
 		}
@@ -68,8 +77,9 @@ Subtree.extends(Object, {
 		var stack = this._children.slice(0);
 		while (stack.length > 0) {
 			var current = stack.shift();
-			for (var i = 0; i < current._children.length; ++i) {
-				stack.push(current._children[i]);
+			var children = current.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
 			callback.call(thisArg, current);
 		}		
@@ -78,8 +88,9 @@ Subtree.extends(Object, {
 		var stack = [this];
 		while (stack.length > 0) {
 			var current = stack.shift();
-			for (var i = 0; i < current._children.length; ++i) {
-				stack.push(current._children[i]);
+			var children = current.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
 			callback.call(thisArg, current);
 		}		
@@ -89,9 +100,10 @@ Subtree.extends(Object, {
 		var current = this;
 		while (childIndexStack.length > 0) {
 			var currentChildIndex = childIndexStack[childIndexStack.length - 1];
-			if (currentChildIndex < current._children.length) {
+			var children = current.children;
+			if (currentChildIndex < children.length) {
 				// go down
-				current = current._children[currentChildIndex];
+				current = children[currentChildIndex];
 				++childIndexStack[childIndexStack.length - 1];
 				childIndexStack.push(0);
 			} else {
@@ -105,13 +117,17 @@ Subtree.extends(Object, {
 		}
 	},
 	expand: function() {
-		var childNodes = this._node.createChildren();
-		for (var i = 0; i < childNodes.length; ++i) {
-			this._children.push(new Subtree(childNodes[i], this));
+		if (this._children.length == 0) {
+			var childNodes = this._node.createChildren();
+			for (var i = 0; i < childNodes.length; ++i) {
+				this._children.push(new Subtree(childNodes[i], this));
+			}
 		}
+		this._expanded = true;
 	},
 	collapse: function() {
-		this._children.clear();
+		this._expanded = false;
+//		this._children.clear();
 	}
 });
 Subtree.clone = function(value) {
@@ -178,8 +194,8 @@ NodeTree.extends(Object, {
 			}*/
 		} else {
 			// expand leaf
-			subtree.expand();
-			expanded = subtree;
+//			subtree.expand();
+//			expanded = subtree;
 			
 			// collapse siblings
 /*			subtree.getSiblings().forEach(function(sibling) {

@@ -58,7 +58,7 @@ IconTextWidget.extends(Object, {
 		this._iconSize = size;
 		
 		if (this._spriteId >= 0) {
-			this._spriteBatch.setSpriteSize(this._spriteId, size);
+			this._spriteBatch.setSize(this._spriteId, size);
 		}
 	},
 	addLine: function(lineDesc) {
@@ -80,7 +80,35 @@ IconTextWidget.extends(Object, {
 		}
 
 		if (this._spriteId >= 0) {
-			this._spriteBatch.setSpriteColor(this._spriteId, color);
+			this._spriteBatch.setColor(this._spriteId, color);
+		}
+
+		if (!this._attenuated) {
+			this._label.renderable.material.color = color;
+		}
+		
+		var lineBatch = this._lineBatch;
+		this._lines.forEach(function(lineDesc) {
+			color.alpha = lineDesc.color.alpha;
+			lineBatch.setColor(lineDesc._id, color);
+		});
+
+		if (!value && this._selected) {
+			this.setSelected(true);
+		}
+	},
+	setSelected: function(value) {
+		this._selected = value;
+
+		var color = Color.clone(this._color);
+		if (value) {
+			color.red += 0.8;
+			color.green += 0;
+			color.blue += 0;
+		}
+
+		if (this._spriteId >= 0) {
+			this._spriteBatch.setColor(this._spriteId, color);
 		}
 
 		if (!this._attenuated) {
@@ -97,7 +125,7 @@ IconTextWidget.extends(Object, {
 		if (!this._attenuated) {
 			this._color.alpha = value;
 			if (this._spriteId >= 0) {
-				this._spriteBatch.setSpriteColor(this._spriteId, this._color);
+				this._spriteBatch.setColor(this._spriteId, this._color);
 			}
 			this._label.renderable.material.color.alpha = value;
 		}
@@ -113,16 +141,25 @@ IconTextWidget.extends(Object, {
 		}
 	},
 	addToScene: function(scene) {
-		this._spriteId = this._spriteBatch.addSprite(this.transformable.pos, this._iconSize, this._color, this._atlasIndex);
 		scene.addEntity(this._label);
+		this._spriteId = 
+			this._spriteBatch.add(this.transformable.pos, this._iconSize, this._color, this._atlasIndex);
+
+		var lineBatch = this._lineBatch;
 		this._lines.forEach(function(lineDesc) {
-			lineDesc._id = scene.lineBatch.addLine(
+			lineDesc._id = lineBatch.add(
 				lineDesc.from.pos, lineDesc.to.pos, lineDesc.color, lineDesc.width, lineDesc.patternIndex);
 		});
 	},
 	removeFromScene: function(scene) {
-//		scene.removeEntity(this._sprite);
 		scene.removeEntity(this._label);
+		this._spriteBatch.remove(this._spriteId);
+
+		var lineBatch = this._lineBatch;
+		this._lines.forEach(function(lineDesc) {
+			lineBatch.remove(lineDesc._id);
+			delete lineDesc._id;
+		});
 	}
 });
 IconTextWidget.HIGHLIGHTED = new Color(0.2, 1.0, 0.2);

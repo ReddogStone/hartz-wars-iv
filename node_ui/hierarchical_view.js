@@ -106,14 +106,18 @@ HierarchicalView.extends(Object, {
 	},
 	showSubtree: function(subtree) {
 		var scene = this._scene;
-		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateOverview);
+		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
+		//Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
 		subtree.forEachNode(function(node) {
 			node.widget.addToScene(scene);
 		}, this);
 	},
 	hideSubtree: function(subtree) {
-		subtree.forEachNode(function(node) {
-			node.widget.removeFromScene(scene);
+		var scene = this._scene;
+		subtree.forEachSubtree(function(subtree) {
+			subtree.node.widget.removeFromScene(scene);
+			delete subtree.node.widget;
+			delete subtree.layout;
 		}, this);
 	},
 	update: function(delta) {
@@ -154,6 +158,11 @@ HierarchicalView.extends(Object, {
 	},
 	keyDown: function(event) {
 		switch (event.keyCode) {
+			case 17: // CTRL
+				if (this.onSubtreeAction) {
+					this.onSubtreeAction(this._highlighted);
+				}
+				break;
 			case 27: // ESCAPE
 				if (this.onLevelUp) {
 					this.onLevelUp();
