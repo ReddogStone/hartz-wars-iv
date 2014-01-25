@@ -157,6 +157,9 @@ IconTextWidget.extends(Object, {
 			lineBatch.remove(lineDesc._id);
 			delete lineDesc._id;
 		});
+	},
+	updatePos: function() {
+		this._spriteBatch.setPos(this._spriteId, this.transformable.pos);
 	}
 });
 IconTextWidget.HIGHLIGHTED = new Color(0.2, 1.0, 0.2);

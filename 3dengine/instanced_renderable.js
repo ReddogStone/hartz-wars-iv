@@ -357,6 +357,13 @@ LineBatchRenderable.extends(Object, {
 			concat([patternIndex]);
 		this._instancedRenderable.setSingleInstance(index, data);
 	},
+	setEndPoints: function(id, endPoint1, endPoint2) {
+		var index = this._idMap.getIndex(id);
+		this._instancedRenderable.setComponent(index, function(data) {
+			data[0] = endPoint1.x; data[1] = endPoint1.y; data[2] = endPoint1.z;
+			data[3] = endPoint2.x; data[4] = endPoint2.y; data[5] = endPoint2.z;
+		});
+	},
 	setEndPoint1: function(id, value) {
 		var index = this._idMap.getIndex(id);
 		this._instancedRenderable.setComponent(

@@ -96,22 +96,16 @@ HierarchicalView.extends(Object, {
 				this._highlighted = subtree;
 			}
 		}, this);
-		nodeTree.forEachNode(function(node) {
-			node.widget.setHighlighted(node == this._highlighted.node);
-			
-			var color = BLUE;
-			var line = node.line;
-			if (line) {
-				var lineColor = Color.clone(color);
-				lineColor.alpha = line.renderable.material.color.alpha;
-				line.renderable.material.color = lineColor;
-			}
+		nodeTree.forEachSubtree(function(child) {
+			var highlighted = (child == this._highlighted);
+			child.node.widget.setHighlighted(highlighted);
+			child.layout.setHighlighted(highlighted);
 		}, this);
 	},
 	showSubtree: function(subtree) {
 		var scene = this._scene;
-		//Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
-		Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
+		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
+		//Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
 		subtree.forEachSubtree(function(child) {
 			child.layout.addToScene(scene);
 			child.node.widget.addToScene(scene);
@@ -120,6 +114,7 @@ HierarchicalView.extends(Object, {
 	hideSubtree: function(subtree) {
 		var scene = this._scene;
 		subtree.forEachSubtree(function(subtree) {
+			subtree.layout.removeFromScene(scene);
 			subtree.node.widget.removeFromScene(scene);
 			delete subtree.node.widget;
 			delete subtree.layout;

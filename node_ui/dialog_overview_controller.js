@@ -138,10 +138,12 @@ var motherDialogTemplate = [
 	function(scene, world) { scene.exit(); }
 ];
 
-motherDialogTemplate = [
+/*motherDialogTemplate = [
 	{options: [
 		{text: 'Neue Arbeit läuft schlecht', consequence: [
 			[
+				{right: 'Du kommst schon noch rein.', wait: 1},
+				{right: 'Du kommst schon noch rein.', wait: 1},
 				{right: 'Du kommst schon noch rein.', wait: 1}
 			]
 		]},

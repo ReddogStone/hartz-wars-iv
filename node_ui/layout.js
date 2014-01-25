@@ -41,46 +41,6 @@ HalfCircleLayout.extends(Object, {
 var Layout = (function(module) {
 	var module = {};
 
-	function horizontalLinearLayout(subtree) {
-		var rootNode = subtree.node;
-		var rootTransformable = rootNode.widget.transformable;
-		
-		var length = 0;
-		var childWidths = [];
-		subtree.children.forEach(function(child) {
-			var width = child.layout.width;
-			childWidths.push(width);
-			length += width;
-		});
-		var margin = Math.max(0.3 * length, 10);
-		length += margin * (subtree.children.length - 1);
-		
-		var offset = new Vecmath.Vector3(-0.5 * length, 0, 3);
-		
-		var xPos = 0;
-		subtree.children.forEach(function(child, index) {
-			var widget = child.node.widget;
-			widget.transformable.pos = 
-				rootTransformable.pos.clone().add(new Vecmath.Vector3(xPos + 0.5 * childWidths[index], 0, 0).add(offset));
-			xPos += margin + childWidths[index];
-		});
-	}
-
-	function verticalLinearLayout(subtree) {
-		var rootNode = subtree.node;
-		var rootTransformable = rootNode.widget.transformable;
-		
-		var length = 0;
-
-		var offset = new Vecmath.Vector3(0, 0, 5);
-		// var last = subtree;
-		subtree.children.forEach(function(child) {
-			var widget = child.node.widget;
-			widget.transformable.pos = rootTransformable.pos.clone().add(new Vecmath.Vector3(0, 0, length).add(offset));
-			length += 3 + child.layout.height;
-		});
-	}
-
 	function calculateChildRect(subtree) {
 		if (subtree.children.length == 0) {
 			return {
@@ -153,7 +113,7 @@ var Layout = (function(module) {
 	}
 	FlatTreeLayout.extends(Object, {
 		apply: function(subtree) {
-			horizontalLinearLayout(subtree);
+			Distribution.horizontalLinear(subtree);
 
 			var rootTrans = subtree.transformable;
 			var children = subtree.children;
@@ -192,12 +152,42 @@ var Layout = (function(module) {
 	});
 
 	module.dialogTreeOverviewLayout = function(engine, scene, subtree, decorate) {
-		layoutSubtree(engine, scene, subtree, decorate, function(child) {
+		subtree.forEachSubtree(function(child) {
+			child.transformable = new Transformable();
+			child.offset = new Vecmath.Vector3();
+			child.node.createWidget(engine, scene, child);
+
 			if (child.node.type == 'parallel') {
-				horizontalLinearLayout(child);
+				child.layout = new DialogOverviewLayout.HorizontalDialogTreeLayout();
 			} else {
-				verticalLinearLayout(child);
-			}			
+				child.layout = new DialogOverviewLayout.VerticalDialogTreeLayout();
+			}
+		});
+		subtree.postOrderSubtrees(function(child) {
+			child.layout.apply(child);
+		});
+
+		var root = subtree;
+		while (root.parent) {
+			root = root.parent;
+			root.layout.apply(root);
+		}
+
+/*		subtree.forEachChildSubtree(function(child) {
+			if (child.parent) {
+				child.transformable.translate(child.parent.transformable.pos);
+			}
+		}); */
+		root.forEachSubtree(function(child) {
+			var offset = child.offset.clone();
+			if (child.parent) {
+				offset.add(child.parent.transformable.pos);
+			}
+			child.transformable.pos = offset;
+		});
+		root.forEachSubtree(function(child) {
+			child.layout.update(child.transformable);
+			child.node.widget.updatePos();
 		});
 	};
 
