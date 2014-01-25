@@ -104,8 +104,8 @@ HierarchicalView.extends(Object, {
 	},
 	showSubtree: function(subtree) {
 		var scene = this._scene;
-		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
-		//Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
+		//Layout.dialogTreeOverviewLayout(this._engine, scene, subtree);
+		Layout.treeOverviewLayout(this._engine, scene, subtree);
 		subtree.forEachSubtree(function(child) {
 			child.layout.addToScene(scene);
 			child.node.widget.addToScene(scene);

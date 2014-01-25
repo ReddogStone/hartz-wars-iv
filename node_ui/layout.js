@@ -39,79 +39,23 @@ HalfCircleLayout.extends(Object, {
 });
 
 var Layout = (function(module) {
-	var module = {};
-
-	function calculateChildRect(subtree) {
-		if (subtree.children.length == 0) {
-			return {
-				min: new Vecmath.Vector2(0, 0),
-				max: new Vecmath.Vector2(0, 0)
-			};
-		}
-
-		var minZ = 10000;
-		var maxZ = -10000;
-		var minX = 10000;
-		var maxX = -10000;
-		for (var i = 0; i < subtree.children.length; ++i) {
-			var child = subtree.children[i];
-			var childLayout = child.layout;
-			var childPos = child.node.widget.transformable.pos;
-			var center = childPos.clone().add(childLayout.center);
-			var childMinX = center.x - 0.5 * childLayout.width;
-			var childMaxX = center.x + 0.5 * childLayout.width;
-			var childMinZ = center.z - 0.5 * childLayout.height;
-			var childMaxZ = center.z + 0.5 * childLayout.height;
-			
-			minX = Math.min(minX, childMinX);
-			maxX = Math.max(maxX, childMaxX);
-			minZ = Math.min(minZ, childMinZ);
-			maxZ = Math.max(maxZ, childMaxZ);
-		}
-
-		return {
-			min: new Vecmath.Vector2(minX, minZ),
-			max: new Vecmath.Vector2(maxX, maxZ)
-		};
-	};
-
-	function createLine(from, to, type) {
-		var pattern;
-		var alpha;
-		var width;
-		var color = Color.clone(BLUE);
-
-		if (type == 'horizontal') {
-			pattern = 0;
-			color.alpha = 0.8;
-			width = 10;
-		} else if (type == 'vertical') {
-			pattern = 1;
-			color.alpha = 0.3;
-			width = 5;
-		} else if (type == 'weak') {
-			pattern = 0;
-			color.alpha = 0.3;
-			width = 10;
-		}
-
-		var result = {};
-		result.from = from;
-		result.to = to;
-		result.color = color;
-		result.width = width;
-		result.patternIndex = pattern;
-		return result;
-	}
-
 	function FlatTreeLayout() {
 		this.center = new Vecmath.Vector3();
 		this.width = 0;
 		this.height = 0;
-
-		this.line = null;
+		this.line = new Layout.LineDesc();
 	}
 	FlatTreeLayout.extends(Object, {
+		setHighlighted: function(value) {
+			if (this._lineBatch) {
+				this.line.highlight(this._lineBatch, value);
+			}
+		},
+		update: function(subtreeTransformable) {
+			if (this._lineBatch) {
+				this.line.update(this._lineBatch);
+			}
+		},
 		apply: function(subtree) {
 			Distribution.horizontalLinear(subtree);
 
@@ -119,12 +63,12 @@ var Layout = (function(module) {
 			var children = subtree.children;
 
 			// calculate layout info
-			var childRect = calculateChildRect(subtree);
+			var childRect = Layout.calculateChildRect(subtree);
 
 			// add lines
 			for (var i = 0; i < children.length; ++i) {
 				var child = children[i];
-				child.layout.line = createLine(rootTrans, child.transformable, 'horizontal');
+				child.layout.line.set(rootTrans, child.transformable, 'horizontal');
 			}
 
 			childRect.min.y = 0;
@@ -136,32 +80,22 @@ var Layout = (function(module) {
 			this.height = childRect.max.y - childRect.min.y;
 		},
 		addToScene: function(scene) {
-			var line = this.line;
-			if (line) {
-				line._id = 
-					scene.lineBatch.add(line.from.pos, line.to.pos, line.color, line.width, line.patternIndex);
-			}
+			var lineBatch = scene.lineBatch;
+			this.line.add(lineBatch);
+			this._lineBatch = lineBatch;
 		},
 		removeFromScene: function(scene) {
-			var line = this.line;
-			if (line) {
-				scene.lineBatch.remove(line._id);
-				delete line._id;
-			}
+			this.line.remove(this._lineBatch);
+			delete this._lineBatch;
 		}
 	});
 
-	module.dialogTreeOverviewLayout = function(engine, scene, subtree, decorate) {
+	function applyLayout(engine, scene, subtree, getSubtreeLayout) {
 		subtree.forEachSubtree(function(child) {
 			child.transformable = new Transformable();
 			child.offset = new Vecmath.Vector3();
 			child.node.createWidget(engine, scene, child);
-
-			if (child.node.type == 'parallel') {
-				child.layout = new DialogOverviewLayout.HorizontalDialogTreeLayout();
-			} else {
-				child.layout = new DialogOverviewLayout.VerticalDialogTreeLayout();
-			}
+			child.layout = getSubtreeLayout(child);
 		});
 		subtree.postOrderSubtrees(function(child) {
 			child.layout.apply(child);
@@ -173,11 +107,6 @@ var Layout = (function(module) {
 			root.layout.apply(root);
 		}
 
-/*		subtree.forEachChildSubtree(function(child) {
-			if (child.parent) {
-				child.transformable.translate(child.parent.transformable.pos);
-			}
-		}); */
 		root.forEachSubtree(function(child) {
 			var offset = child.offset.clone();
 			if (child.parent) {
@@ -189,28 +118,20 @@ var Layout = (function(module) {
 			child.layout.update(child.transformable);
 			child.node.widget.updatePos();
 		});
+	}
+
+	module.dialogTreeOverviewLayout = function(engine, scene, subtree) {
+		applyLayout(engine, scene, subtree, function(tree) {
+			if (tree.node.type == 'parallel') {
+				return new DialogOverviewLayout.HorizontalDialogTreeLayout();
+			}
+
+			return new DialogOverviewLayout.VerticalDialogTreeLayout();
+		});
 	};
 
-	module.treeOverviewLayout = function(engine, scene, subtree, decorate) {
-		subtree.forEachSubtree(function(child) {
-			child.transformable = new Transformable();
-			child.node.createWidget(engine, scene, child);
-			child.layout = new FlatTreeLayout();
-		});
-		subtree.postOrderSubtrees(function(child) {
-			child.layout.apply(child);
-		});
-		subtree.forEachSubtree(function(child) {
-			if (child.parent) {
-				child.transformable.translate(child.parent.transformable.pos);
-			}
-		});
-
-		var parent = subtree.parent;
-		while (parent) {
-			parent.layout.apply(parent);
-			parent = parent.parent;
-		}
+	module.treeOverviewLayout = function(engine, scene, subtree) {
+		applyLayout(engine, scene, subtree, function(tree) { return new FlatTreeLayout(); });
 	};
 
 	return module;

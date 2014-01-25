@@ -138,7 +138,7 @@ var motherDialogTemplate = [
 	function(scene, world) { scene.exit(); }
 ];
 
-/*motherDialogTemplate = [
+motherDialogTemplate = [
 	{options: [
 		{text: 'Neue Arbeit läuft schlecht', consequence: [
 			[
