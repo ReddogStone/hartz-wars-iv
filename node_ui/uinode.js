@@ -95,14 +95,14 @@ ReflectionNode.extends(Object, {
 	get depth() {
 		return this._depth;
 	},
-	createWidget: function(engine, scene) {
+	createWidget: function(engine, scene, subtree) {
 		var icon = TYPE_ICONS[this._subjectType];
 		var iconSize = 64;
 		var color = this._color;
 		var text = this._text;
 		var font = new Font('Helvetica', 9);
 		var textOffset = new Vecmath.Vector2(0.0, 10.0);
-		this.widget = new IconTextWidget(engine, scene, icon, iconSize, color, text, font, textOffset);
+		this.widget = new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {
@@ -140,7 +140,7 @@ FileSystemNode.extends(Object, {
 	get depth() {
 		return this._depth;
 	},
-	createWidget: function(engine, scene) {
+	createWidget: function(engine, scene, subtree) {
 		var path = this._path;
 		var fs = require('fs');
 		var stats = fs.lstatSync(path);
@@ -161,7 +161,7 @@ FileSystemNode.extends(Object, {
 
 		var font = new Font('Helvetica', 12);
 		var textOffset = new Vecmath.Vector2(0.0, -50.0);
-		this.widget = new IconTextWidget(engine, scene, icon, 64, BLUE, name, font, textOffset);
+		this.widget = new IconTextWidget(engine, scene, subtree, icon, 64, BLUE, name, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {
@@ -283,7 +283,7 @@ DialogNode.extends(Object, {
 	get depth() {
 		return this._depth;
 	},
-	createWidget: function(engine, scene) {
+	createWidget: function(engine, scene, subtree) {
 		var icon;
 		var iconSize = 64;
 		var color = BLUE;
@@ -320,7 +320,7 @@ DialogNode.extends(Object, {
 				break;
 		}
 
-		this.widget = new IconTextWidget(engine, scene, icon, iconSize, color, text, font, textOffset);
+		this.widget = new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {

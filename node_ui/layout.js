@@ -81,30 +81,146 @@ var Layout = (function(module) {
 		});
 	}
 
+	function calculateChildRect(subtree) {
+		if (subtree.children.length == 0) {
+			return {
+				min: new Vecmath.Vector2(0, 0),
+				max: new Vecmath.Vector2(0, 0)
+			};
+		}
+
+		var minZ = 10000;
+		var maxZ = -10000;
+		var minX = 10000;
+		var maxX = -10000;
+		for (var i = 0; i < subtree.children.length; ++i) {
+			var child = subtree.children[i];
+			var childLayout = child.layout;
+			var childPos = child.node.widget.transformable.pos;
+			var center = childPos.clone().add(childLayout.center);
+			var childMinX = center.x - 0.5 * childLayout.width;
+			var childMaxX = center.x + 0.5 * childLayout.width;
+			var childMinZ = center.z - 0.5 * childLayout.height;
+			var childMaxZ = center.z + 0.5 * childLayout.height;
+			
+			minX = Math.min(minX, childMinX);
+			maxX = Math.max(maxX, childMaxX);
+			minZ = Math.min(minZ, childMinZ);
+			maxZ = Math.max(maxZ, childMaxZ);
+		}
+
+		return {
+			min: new Vecmath.Vector2(minX, minZ),
+			max: new Vecmath.Vector2(maxX, maxZ)
+		};
+	};
+
+	function createLine(from, to, type) {
+		var pattern;
+		var alpha;
+		var width;
+		var color = Color.clone(BLUE);
+
+		if (type == 'horizontal') {
+			pattern = 0;
+			color.alpha = 0.8;
+			width = 10;
+		} else if (type == 'vertical') {
+			pattern = 1;
+			color.alpha = 0.3;
+			width = 5;
+		} else if (type == 'weak') {
+			pattern = 0;
+			color.alpha = 0.3;
+			width = 10;
+		}
+
+		var result = {};
+		result.from = from;
+		result.to = to;
+		result.color = color;
+		result.width = width;
+		result.patternIndex = pattern;
+		return result;
+	}
+
+	function FlatTreeLayout() {
+		this.center = new Vecmath.Vector3();
+		this.width = 0;
+		this.height = 0;
+
+		this.line = null;
+	}
+	FlatTreeLayout.extends(Object, {
+		apply: function(subtree) {
+			horizontalLinearLayout(subtree);
+
+			var rootTrans = subtree.transformable;
+			var children = subtree.children;
+
+			// calculate layout info
+			var childRect = calculateChildRect(subtree);
+
+			// add lines
+			for (var i = 0; i < children.length; ++i) {
+				var child = children[i];
+				child.layout.line = createLine(rootTrans, child.transformable, 'horizontal');
+			}
+
+			childRect.min.y = 0;
+
+			var center = childRect.min.clone().add(childRect.max).scale(0.5);
+
+			this.center = new Vecmath.Vector3(center.x, 0.0, center.y);
+			this.width = childRect.max.x - childRect.min.x;
+			this.height = childRect.max.y - childRect.min.y;
+		},
+		addToScene: function(scene) {
+			var line = this.line;
+			if (line) {
+				line._id = 
+					scene.lineBatch.add(line.from.pos, line.to.pos, line.color, line.width, line.patternIndex);
+			}
+		},
+		removeFromScene: function(scene) {
+			var line = this.line;
+			if (line) {
+				scene.lineBatch.remove(line._id);
+				delete line._id;
+			}
+		}
+	});
+
 	module.dialogTreeOverviewLayout = function(engine, scene, subtree, decorate) {
-		subtree.postOrderSubtrees(function(child) {
-			child.node.createWidget(engine, scene);
+		layoutSubtree(engine, scene, subtree, decorate, function(child) {
 			if (child.node.type == 'parallel') {
 				horizontalLinearLayout(child);
 			} else {
 				verticalLinearLayout(child);
-			}
-			child.layout = decorate(engine, scene, child);
-		});
-		subtree.forEachChildSubtree(function(child) {
-			child.node.widget.transformable.translate(child.parent.node.widget.transformable.pos);
+			}			
 		});
 	};
 
 	module.treeOverviewLayout = function(engine, scene, subtree, decorate) {
+		subtree.forEachSubtree(function(child) {
+			child.transformable = new Transformable();
+			child.node.createWidget(engine, scene, child);
+			child.layout = new FlatTreeLayout();
+		});
 		subtree.postOrderSubtrees(function(child) {
-			child.node.createWidget(engine, scene);
-			horizontalLinearLayout(child);
-			child.layout = decorate(engine, scene, child);
+			child.layout.apply(child);
 		});
-		subtree.forEachChildSubtree(function(child) {
-			child.node.widget.transformable.translate(child.parent.node.widget.transformable.pos);
+		subtree.forEachSubtree(function(child) {
+			if (child.parent) {
+				child.transformable.translate(child.parent.transformable.pos);
+			}
 		});
+
+		var parent = subtree.parent;
+		while (parent) {
+			parent.layout.apply(parent);
+			parent = parent.parent;
+		}
 	};
 
 	return module;

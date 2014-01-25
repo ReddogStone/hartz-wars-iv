@@ -144,5 +144,34 @@ var Decorator = (function(module) {
 		};
 	}
 
+	function TreeDecorator() {
+	};
+	TreeDecorator.decorate = function(engine, scene, subtree) {
+		var rootTrans = subtree.node.widget.transformable;
+		var children = subtree.children;
+
+		// calculate layout info
+		var childRect = calculateChildRect(subtree);
+
+		// add lines
+		for (var i = 0; i < children.length; ++i) {
+			var child = children[i];
+			var widget = child.node.widget;
+			widget.addLine(createLine(rootTrans, widget.transformable, 'horizontal'));
+		}
+
+		childRect.min.y = 0;
+
+		var center = childRect.min.clone().add(childRect.max).scale(0.5);
+
+		return {
+			center: new Vecmath.Vector3(center.x, 0.0, center.y),
+			width: childRect.max.x - childRect.min.x,
+			height: childRect.max.y - childRect.min.y
+		};
+	}
+
+	module.TreeDecorator = TreeDecorator;
+
 	return module;
 })(Decorator || {});

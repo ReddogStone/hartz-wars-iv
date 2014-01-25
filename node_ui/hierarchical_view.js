@@ -8,13 +8,9 @@ function HierarchicalView(engine, viewport) {
 		transformable: new Transformable(new Vecmath.Vector3(0, 60, 0.1)),
 		updateable: new BehaviorsUpdateable()
 	};
+
+	// scene
 	this._scene = new Scene();
-	var spriteBatch = new PointSpriteBatchRenderable(engine, 'data/textures/icon_atlas', new AtlasDesc(8, 8));
-	var spriteBatchEntity = {
-		renderable: spriteBatch
-	};
-	this._scene.spriteBatch = spriteBatch;
-	this._scene.addEntity(spriteBatchEntity);
 
 	var lineBatch = new LineBatchRenderable(engine, 'data/textures/line_patterns', 2);
 	var lineBatchEntity = {
@@ -22,7 +18,15 @@ function HierarchicalView(engine, viewport) {
 	};
 	this._scene.lineBatch = lineBatch;
 	this._scene.addEntity(lineBatchEntity);
-	
+
+	var spriteBatch = new PointSpriteBatchRenderable(engine, 'data/textures/icon_atlas', new AtlasDesc(8, 8));
+	var spriteBatchEntity = {
+		renderable: spriteBatch
+	};
+	this._scene.spriteBatch = spriteBatch;
+	this._scene.addEntity(spriteBatchEntity);
+
+	// mouse
 	this._mouse = {x: 0, y: 0};
 	
 	var self = this;
@@ -106,10 +110,11 @@ HierarchicalView.extends(Object, {
 	},
 	showSubtree: function(subtree) {
 		var scene = this._scene;
-		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
-		//Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
-		subtree.forEachNode(function(node) {
-			node.widget.addToScene(scene);
+		//Layout.dialogTreeOverviewLayout(this._engine, scene, subtree, Decorator.decorateDialogOverview);
+		Layout.treeOverviewLayout(this._engine, scene, subtree, Decorator.decorateTree);
+		subtree.forEachSubtree(function(child) {
+			child.layout.addToScene(scene);
+			child.node.widget.addToScene(scene);
 		}, this);
 	},
 	hideSubtree: function(subtree) {

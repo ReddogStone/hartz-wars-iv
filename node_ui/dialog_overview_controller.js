@@ -138,7 +138,7 @@ var motherDialogTemplate = [
 	function(scene, world) { scene.exit(); }
 ];
 
-/*motherDialogTemplate = [
+motherDialogTemplate = [
 	{options: [
 		{text: 'Neue Arbeit läuft schlecht', consequence: [
 			[
@@ -223,17 +223,16 @@ function DialogOverviewController(engine, viewport) {
 		self._navigateToSubtree(subtree);		
 	};
 	view.onSubtreeAction = function(subtree) {
-		self._view.hideSubtree(self._nodeTree.root);
 		self._selection.forEach(function(selected) {
+			self._view.hideSubtree(selected);
 			if (selected.expanded) {
 				selected.collapse();
 			} else {
 				selected.expand();
 			}
+			self._view.showSubtree(selected);
 		});
-//		subtree = subtree.parent;
 
-		self._view.showSubtree(self._nodeTree.root);
 		self._selection.forEach(function(selected) {
 			self._selectSubtree(selected);
 		});

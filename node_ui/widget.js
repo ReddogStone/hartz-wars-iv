@@ -15,7 +15,7 @@ function updateTransformables(widget, delta) {
 	}
 }
 
-function IconTextWidget(engine, scene, atlasIndex, iconSize, color, text, font, textOffset) {
+function IconTextWidget(engine, scene, subtree, atlasIndex, iconSize, color, text, font, textOffset) {
 	this._spriteBatch = scene.spriteBatch;
 	this._lineBatch = scene.lineBatch;
 	this._spriteId = -1;
@@ -32,14 +32,13 @@ function IconTextWidget(engine, scene, atlasIndex, iconSize, color, text, font, 
 	}
 	this._baseIconSize = this._iconSize.clone();
 
-	var transformable = new Transformable();
-	this.transformable = transformable;
+	this.transformable = subtree.transformable;
 	this._label = {
 		renderable: new TextRenderable(engine, text, font, color, textOffset),
-		transformable: transformable
+		transformable: this.transformable
 	};
 
-	this.updateable = {update: updateTransformables};
+//	this.updateable = {update: updateTransformables};
 	
 	this._lines = [];
 	this._childPoints = [];
