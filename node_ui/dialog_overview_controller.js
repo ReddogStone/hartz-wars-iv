@@ -215,18 +215,7 @@ function DialogOverviewController(engine, viewport) {
 	
 	var self = this;
 	view.onClicked = function(entity) {
-		var selection = self._selection;
-		if (selection.indexOf(entity) >= 0) {
-			self._view.focusCamera(entity);
-		}
-
-		selection.forEach(function(selected) {
-			self._unselect(selected);
-		});
-		selection.clear();
-		selection.push(entity);
 		self._select(entity);
-
 		self._navigate(entity);		
 	};
 	view.onAction = function(entity) {
@@ -249,9 +238,11 @@ function DialogOverviewController(engine, viewport) {
 	};
 	view.onLevelUp = function() {
 		var active = self._selection[0] || self._rootEntity;
-		if (active.parent) {
-			self._navigate(active.parent);
-			self._view.focusCamera(active.parent);
+		var parent = active.tree.parent;
+		if (parent) {
+			self._select(parent);
+			self._navigate(parent);
+			self._view.focusCamera(parent);
 		}
 	};
 //================ END TEMP ================	
@@ -262,6 +253,17 @@ DialogOverviewController.extends(Object, {
 		return this._view;
 	},
 	_select: function(entity) {
+		var selection = this._selection;
+		if (selection.indexOf(entity) >= 0) {
+			this._view.focusCamera(entity);
+		}
+
+		selection.forEach(function(selected) {
+			this._unselect(selected);
+		}, this);
+		selection.clear();
+		selection.push(entity);
+
 		Subtree.preOrder(entity, function(child) {
 			child.widget.setSelected(true);
 		});
