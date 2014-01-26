@@ -1,7 +1,6 @@
 'use strict';
 
-function Subtree(node, parent) {
-	this._node = node;
+function Subtree(parent) {
 	this._parent = parent;
 	this._children = [];
 	this._expanded = false;
@@ -9,9 +8,6 @@ function Subtree(node, parent) {
 Subtree.extends(Object, {
 	get parent() {
 		return this._parent;
-	},
-	get node() {
-		return this._node;
 	},
 	get children() {
 		if (this._expanded) {
@@ -30,77 +26,63 @@ Subtree.extends(Object, {
 			var siblings = parent.children;
 			for (var i = 0; i < siblings.length; ++i) {
 				var sibling = siblings[i];
-				if (sibling !== this) {
+				if (sibling.tree !== this) {
 					result.push(sibling);
 				}
 			}
 		}
 		return result;
 	},
-	// flat list of all nodes from this subtree
-	getNodeList: function() {
-		var result = [];
-		var stack = [this];
-		while (stack.length > 0) {
-			var current = stack.shift();
-			var children = current.children;
-			for (var i = 0; i < children.length; ++i) {
-				stack.push(children[i]);
+	expand: function(entity) {
+		if (this._children.length == 0) {
+			var childNodes = entity.node.createChildren();
+			for (var i = 0; i < childNodes.length; ++i) {
+				this._children.push({
+					node: childNodes[i],
+					tree: new Subtree(entity)
+				});
 			}
-			result.push(current._node);
 		}
+		this._expanded = true;
+	},
+	collapse: function() {
+		this._expanded = false;
+	},
+	destroy: function() {
+		this._children.clear();
+	}
+});
+Object.mixin(Subtree, {
+	clone: function(value) {
+		if (!value) {
+			return value;
+		}
+		
+		var result = new Subtree(value._node, value._parent);
+		result._children = value._children.slice(0);
 		return result;
 	},
-	forEachChildNode: function(callback, thisArg) {
-		var stack = this._children.slice(0);
+	preOrderChildren: function(entity, callback, thisArg) {
+		var stack = entity.tree.children.slice(0);
 		while (stack.length > 0) {
 			var current = stack.shift();
-			var children = current.children;
-			for (var i = 0; i < children.length; ++i) {
-				stack.push(children[i]);
-			}
-			callback.call(thisArg, current._node, current);
-		}
-	},
-	forEachNode: function(callback, thisArg) {
-		var stack = [this];
-		while (stack.length > 0) {
-			var current = stack.shift();
-			var children = current.children;
-			for (var i = 0; i < children.length; ++i) {
-				stack.push(children[i]);
-			}
-			callback.call(thisArg, current._node, current);
-		}
-	},
-	forEachChildSubtree: function(callback, thisArg) {
-		var stack = this._children.slice(0);
-		while (stack.length > 0) {
-			var current = stack.shift();
-			var children = current.children;
+			var children = current.tree.children;
 			for (var i = 0; i < children.length; ++i) {
 				stack.push(children[i]);
 			}
 			callback.call(thisArg, current);
 		}		
+	},	
+	preOrder: function(entity, callback, thisArg) {
+		callback.call(thisArg, entity);
+		Subtree.preOrderChildren(entity, callback, thisArg);
 	},
-	forEachSubtree: function(callback, thisArg) {
-		var stack = [this];
-		while (stack.length > 0) {
-			var current = stack.shift();
-			var children = current.children;
-			for (var i = 0; i < children.length; ++i) {
-				stack.push(children[i]);
-			}
-			callback.call(thisArg, current);
-		}		
-	},
-	postOrderSubtrees: function(callback, thisArg) {
+	postOrder: function(entity, callback, thisArg) {
 		var childIndexStack = [0];
-		var current = this;
+		var current = entity;
 		while (childIndexStack.length > 0) {
 			var currentChildIndex = childIndexStack[childIndexStack.length - 1];
-			var children = current.children;
+			var children = current.tree.children;
 			if (currentChildIndex < children.length) {
 				// go down
 				current = children[currentChildIndex];
@@ -111,34 +93,23 @@ Subtree.extends(Object, {
 				callback.call(thisArg, current);
 
 				// go up
-				current = current._parent;
+				current = current.tree._parent;
 				childIndexStack.pop();
 			}
-		}
+		}		
 	},
-	expand: function() {
-		if (this._children.length == 0) {
-			var childNodes = this._node.createChildren();
-			for (var i = 0; i < childNodes.length; ++i) {
-				this._children.push(new Subtree(childNodes[i], this));
+	expandAll: function(entity) {
+		var stack = [entity];
+		while (stack.length > 0) {
+			var current = stack.shift();
+			current.tree.expand(current);
+			var children = current.tree.children;
+			for (var i = 0; i < children.length; ++i) {
+				stack.push(children[i]);
 			}
-		}
-		this._expanded = true;
-	},
-	collapse: function() {
-		this._expanded = false;
-//		this._children.clear();
+		}		
 	}
 });
-Subtree.clone = function(value) {
-	if (!value) {
-		return value;
-	}
-	
-	var result = new Subtree(value._node, value._parent);
-	result._children = value._children.slice(0);
-	return result;
-}
 
 function NavigationResult(expanded, removed, activated) {
 	this.expanded = expanded;

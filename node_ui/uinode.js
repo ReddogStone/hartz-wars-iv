@@ -102,7 +102,7 @@ ReflectionNode.extends(Object, {
 		var text = this._text;
 		var font = new Font('Helvetica', 9);
 		var textOffset = new Vecmath.Vector2(0.0, 10.0);
-		this.widget = new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
+		return new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {
@@ -320,7 +320,7 @@ DialogNode.extends(Object, {
 				break;
 		}
 
-		this.widget = new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
+		return new IconTextWidget(engine, scene, subtree, icon, iconSize, color, text, font, textOffset);
 	},
 	createChildren: function() {
 		if (this._final) {

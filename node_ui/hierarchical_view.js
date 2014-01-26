@@ -44,36 +44,19 @@ function HierarchicalView(engine, viewport) {
 }
 
 HierarchicalView.extends(Object, {
-	_fadeIn: function(subtrees) {
-		var behavior = new ExpAttBehavior(1, 0.0, 1.0, function(entity, value) {
-			entity.widget.setAlpha(value);
-
-			var line = entity.line;
-			if (line) {
-				line.renderable.material.color.alpha = 0.4 * value;
-			}
-		});
-		
-		subtrees.forEach(function(subtree) {
-			var node = subtree.node;
-			node.updateable = new BehaviorsUpdateable();
-			node.updateable.addBehavior(behavior);
-			node.widget.setAlpha(0);
-		});
-	},	
-	focusCamera: function(subtree) {
+	focusCamera: function(entity) {
 		var camera = this._cam.camera;
 		var camTrans = this._cam.transformable;
 		
 		var targetPos = camera.getTargetPos();
 		var offset = camTrans.pos.clone().sub(targetPos);
 
-		var layout = subtree.layout;
-		this._nextCamTarget = layout.center.clone().add(subtree.node.widget.transformable.pos);
+		var layout = entity.layout;
+		this._nextCamTarget = layout.center.clone().add(entity.transformable.pos);
 		this._nextCamPos = this._nextCamTarget.clone().
 			add(offset.normalize().scale(5 + 0.5 * Math.max(layout.width, layout.height)));
 	},
-	highlightNode: function(nodeTree) {
+	highlightNode: function(rootEntity) {
 		var mouse = this._mouse;
 		var camera = this._cam.camera;
 		var view = camera.getView(this._cam.transformable);
@@ -87,38 +70,36 @@ HierarchicalView.extends(Object, {
 		var minDist = 10000000000.0;
 		this._highlighted = null;
 		
-		var activeSubtrees = nodeTree.getActiveSubtrees();
-		nodeTree.forEachSubtree(function(subtree) {
-			var node = subtree.node;
-			var dist = Vecmath.distPointRay(node.widget.transformable.pos, mouseRay);
+		Subtree.preOrder(rootEntity, function(child) {
+			var dist = Vecmath.distPointRay(child.transformable.pos, mouseRay);
 			if (dist < minDist) {
 				minDist = dist;
-				this._highlighted = subtree;
-			}
+				this._highlighted = child;
+			}			
 		}, this);
-		nodeTree.forEachSubtree(function(child) {
+		Subtree.preOrder(rootEntity, function(child) {
 			var highlighted = (child == this._highlighted);
-			child.node.widget.setHighlighted(highlighted);
+			child.widget.setHighlighted(highlighted);
 			child.layout.setHighlighted(highlighted);
 		}, this);
 	},
-	showSubtree: function(subtree) {
+	show: function(entity) {
 		var scene = this._scene;
-		Layout.dialogTreeOverviewLayout(this._engine, scene, subtree);
-		//Layout.treeOverviewLayout(this._engine, scene, subtree);
-		subtree.forEachSubtree(function(child) {
+		Layout.dialogTreeOverviewLayout(this._engine, scene, entity);
+		//Layout.treeOverviewLayout(this._engine, scene, entity);
+		Subtree.preOrder(entity, function(child) {
 			child.layout.addToScene(scene);
-			child.node.widget.addToScene(scene);
-		}, this);
+			child.widget.addToScene(scene);
+		});
 	},
-	hideSubtree: function(subtree) {
+	hide: function(entity) {
 		var scene = this._scene;
-		subtree.forEachSubtree(function(subtree) {
-			subtree.layout.removeFromScene(scene);
-			subtree.node.widget.removeFromScene(scene);
-			delete subtree.node.widget;
-			delete subtree.layout;
-		}, this);
+		Subtree.preOrder(entity, function(child) {
+			child.layout.removeFromScene(scene);
+			child.widget.removeFromScene(scene);
+			delete child.layout;
+			delete child.widget;
+		});
 	},
 	update: function(delta) {
 		this._cam.updateable.update(this._cam, delta);
@@ -152,15 +133,15 @@ HierarchicalView.extends(Object, {
 	},
 	mouseUp: function(event) {
 		var highlighted = this._highlighted;
-		if (this._click && highlighted && this.onSubtreeClicked) {
-			this.onSubtreeClicked(highlighted);
+		if (this._click && highlighted && this.onClicked) {
+			this.onClicked(highlighted);
 		}
 	},
 	keyDown: function(event) {
 		switch (event.keyCode) {
 			case 17: // CTRL
-				if (this.onSubtreeAction) {
-					this.onSubtreeAction(this._highlighted);
+				if (this.onAction) {
+					this.onAction(this._highlighted);
 				}
 				break;
 			case 27: // ESCAPE

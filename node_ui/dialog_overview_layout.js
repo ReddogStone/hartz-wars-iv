@@ -43,17 +43,17 @@ var Layout = (function(module) {
 		DialogTreeLayout.call(this);
 	}
 	HorizontalDialogTreeLayout.extends(DialogTreeLayout, {
-		apply: function(subtree) {
-			Distribution.horizontalLinear(subtree);
+		apply: function(entity) {
+			Distribution.horizontalLinear(entity);
 
-			var rootTrans = subtree.transformable;
-			var children = subtree.children;
+			var rootTrans = entity.transformable;
+			var children = entity.tree.children;
 
 			// calculate layout info
-			var childRect = Layout.calculateChildRect(subtree);
+			var childRect = Layout.calculateRect(children);
 
 			// add lines
-			if (subtree.children.length > 1) {
+			if (children.length > 1) {
 				childRect.max.y += childRect.min.y;
 			}
 			this._bottomOffset = new Vecmath.Vector3(0, 0, childRect.max.y);
@@ -77,22 +77,22 @@ var Layout = (function(module) {
 		DialogTreeLayout.call(this);
 	}
 	VerticalDialogTreeLayout.extends(DialogTreeLayout, {
-		apply: function(subtree) {
-			Distribution.verticalLinear(subtree);
+		apply: function(entity) {
+			Distribution.verticalLinear(entity);
 
-			var childRect = Layout.calculateChildRect(subtree);
+			var children = entity.tree.children;
+			var childRect = Layout.calculateRect(children);
 
-			var last = subtree;
-			var children = subtree.children;
+			var last = entity;
 			for (var i = 0; i < children.length; ++i) {
 				var child = children[i];
-				var from = (last == subtree) ? last.transformable : last.layout.bottomTrans;
+				var from = (last == entity) ? last.transformable : last.layout.bottomTrans;
 				var to = child.transformable;
 				child.layout.parentLine.set(from, to, 'vertical');
 				last = child;
 			}
 
-			if (subtree != last) {
+			if (entity != last) {
 				this._bottomOffset = last.layout._bottomOffset.clone().add(last.offset);
 			} else {
 				this._bottomOffset = new Vecmath.Vector3();

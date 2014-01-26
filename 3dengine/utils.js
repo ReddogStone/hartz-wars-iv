@@ -1,6 +1,6 @@
 'use strict';
 
-Object.defineProperty(Object, 'addProperties', {value: function(obj, properties) {
+Object.defineProperty(Object, 'mixin', {value: function(obj, properties) {
 	if (properties) {
 		var names = Object.keys(properties);
 		for (var i = 0; i < names.length; ++i) {
@@ -68,7 +68,7 @@ Object.defineProperty(Function.prototype, 'extends', {value: function(parent, me
     this.prototype = Object.create(parent.prototype);
     Object.defineProperty(this.prototype, 'constructor', {value: this});
 	
-	Object.addProperties(this.prototype, methods);
+	Object.mixin(this.prototype, methods);
 }});
 
 function padNumber(number, width) {

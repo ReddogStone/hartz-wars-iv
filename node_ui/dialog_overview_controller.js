@@ -198,53 +198,59 @@ function DialogOverviewController(engine, viewport) {
 	var rootNode = new DialogNode(motherDialogTemplate);
 //	var rootNode = new ReflectionNode(motherDialogTemplate, 'root');
 //	var containerNode = new ContainerNode(engine, [rootNode]);
+
+	var rootEntity = {
+		node: rootNode,
+		tree: new Subtree()
+	};
+	this._rootEntity = rootEntity;
+
 	this._selection = [];
-	this._nodeTree = new NodeTree(rootNode);
-	this._nodeTree.expandAll();
+	Subtree.expandAll(rootEntity);
 
-	view.showSubtree(this._nodeTree.root);
+	view.show(rootEntity);
 
-	var rootSubtree = this._nodeTree.root;
-	this._navigateToSubtree(rootSubtree);
-	this._view.focusCamera(rootSubtree);
+	this._navigate(rootEntity);
+	this._view.focusCamera(rootEntity);
 	
 	var self = this;
-	view.onSubtreeClicked = function(subtree) {
+	view.onClicked = function(entity) {
 		var selection = self._selection;
-		if (selection.indexOf(subtree) >= 0) {
-			self._view.focusCamera(subtree);
+		if (selection.indexOf(entity) >= 0) {
+			self._view.focusCamera(entity);
 		}
 
 		selection.forEach(function(selected) {
-			self._unselectSubtree(selected);
+			self._unselect(selected);
 		});
 		selection.clear();
-		selection.push(subtree);
-		self._selectSubtree(subtree);
+		selection.push(entity);
+		self._select(entity);
 
-		self._navigateToSubtree(subtree);		
+		self._navigate(entity);		
 	};
-	view.onSubtreeAction = function(subtree) {
+	view.onAction = function(entity) {
 		self._selection.forEach(function(selected) {
-			self._view.hideSubtree(selected);
-			if (selected.expanded) {
-				selected.collapse();
+			self._view.hide(selected);
+			var selTree = selected.tree;
+			if (selTree.expanded) {
+				selTree.collapse();
 			} else {
-				selected.expand();
+				selTree.expand(selected);
 			}
-			self._view.showSubtree(selected);
+			self._view.show(selected);
 		});
 
 		self._selection.forEach(function(selected) {
-			self._selectSubtree(selected);
+			self._select(selected);
 		});
 
-		self._navigateToSubtree(self._nodeTree.root);
+		self._navigate(self._rootEntity);
 	};
 	view.onLevelUp = function() {
-		var active = self._nodeTree.activeSubtree;
+		var active = self._selection[0] || self._rootEntity;
 		if (active.parent) {
-			self._navigateToSubtree(active.parent);
+			self._navigate(active.parent);
 			self._view.focusCamera(active.parent);
 		}
 	};
@@ -255,42 +261,43 @@ DialogOverviewController.extends(Object, {
 	get view() {
 		return this._view;
 	},
-	_selectSubtree: function(subtree) {
-		subtree.forEachNode(function(node) {
-			node.widget.setSelected(true);
+	_select: function(entity) {
+		Subtree.preOrder(entity, function(child) {
+			child.widget.setSelected(true);
 		});
 	},
-	_unselectSubtree: function(subtree) {
-		subtree.forEachNode(function(node) {
-			node.widget.setSelected(false);
+	_unselect: function(entity) {
+		Subtree.preOrder(entity, function(child) {
+			child.widget.setSelected(false);
 		});
 	},
-	_navigateToSubtree: function(subtree) {
+	_navigate: function(entity) {
 		var scene = this._scene;
-		this._nodeTree.navigateTo(subtree);
-		this._nodeTree.forEachNode(function(node) {
-			node.widget.setLayerIndex(2);
-			node.widget.setAttenuated(true);
+		Subtree.preOrder(this._rootEntity, function(child) {
+			child.widget.setLayerIndex(2);
+			child.widget.setAttenuated(true);
 		});
 		this._selection.forEach(function(selected) {
-			selected.node.widget.setAttenuated(false);
-			selected.children.forEach(function(child) {
-				child.node.widget.setAttenuated(false);
+			selected.widget.setAttenuated(false);
+			selected.tree.children.forEach(function(child) {
+				child.widget.setAttenuated(false);
 			});
 		});
 	},
 	update: function(delta) {
-		this._nodeTree.forEachNode(function(node) {
-			if (node.updateable) {
-				node.updateable.update(node, delta);
+		Subtree.preOrder(this._rootEntity, function(child) {
+			var nodeUpdateable = child.node.updateable;
+			var widgetUpdateable = child.widget.updateable;
+			if (nodeUpdateable) {
+				nodeUpdateable.update(node, delta);
 			}
-			if (node.widget.updateable) {
-				node.widget.updateable.update(node.widget, delta);
+			if (widgetUpdateable) {
+				widgetUpdateable.update(node.widget, delta);
 			}
 		});
 		
 		this._view.update(delta);
-		this._view.highlightNode(this._nodeTree);
+		this._view.highlightNode(this._rootEntity);
 	},
 	render: function(engine) {
 		this._view.render(engine);

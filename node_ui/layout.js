@@ -39,38 +39,38 @@ HalfCircleLayout.extends(Object, {
 });
 
 var Layout = (function(module) {
-	function applyLayout(engine, scene, subtree, getSubtreeLayout) {
-		subtree.forEachSubtree(function(child) {
+	function applyLayout(engine, scene, entity, getLayout) {
+		Subtree.preOrder(entity, function(child) {
 			child.transformable = new Transformable();
 			child.offset = new Vecmath.Vector3();
-			child.node.createWidget(engine, scene, child);
-			child.layout = getSubtreeLayout(child);
+			child.widget = child.node.createWidget(engine, scene, child);
+			child.layout = getLayout(child);
 		});
-		subtree.postOrderSubtrees(function(child) {
+		Subtree.postOrder(entity, function(child) {
 			child.layout.apply(child);
 		});
 
-		var root = subtree;
-		while (root.parent) {
-			root = root.parent;
+		var root = entity;
+		while (root.tree.parent) {
+			root = root.tree.parent;
 			root.layout.apply(root);
 		}
 
-		root.forEachSubtree(function(child) {
+		Subtree.preOrder(root, function(child) {
 			var offset = child.offset.clone();
-			if (child.parent) {
-				offset.add(child.parent.transformable.pos);
+			if (child.tree.parent) {
+				offset.add(child.tree.parent.transformable.pos);
 			}
 			child.transformable.pos = offset;
 		});
-		root.forEachSubtree(function(child) {
+		Subtree.preOrder(root, function(child) {
 			child.layout.update(child.transformable);
-			child.node.widget.updatePos();
+			child.widget.updatePos();
 		});
 	}
 
-	module.dialogTreeOverviewLayout = function(engine, scene, subtree) {
-		applyLayout(engine, scene, subtree, function(tree) {
+	module.dialogTreeOverviewLayout = function(engine, scene, entity) {
+		applyLayout(engine, scene, entity, function(tree) {
 			if (tree.node.type == 'parallel') {
 				return new Layout.HorizontalDialogTreeLayout();
 			}
@@ -79,8 +79,8 @@ var Layout = (function(module) {
 		});
 	};
 
-	module.treeOverviewLayout = function(engine, scene, subtree) {
-		applyLayout(engine, scene, subtree, function(tree) { return new Layout.FlatTreeLayout(); });
+	module.treeOverviewLayout = function(engine, scene, entity) {
+		applyLayout(engine, scene, entity, function(tree) { return new Layout.FlatTreeLayout(); });
 	};
 
 	return module;
