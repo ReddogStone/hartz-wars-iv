@@ -1,20 +1,5 @@
 'use strict';
 
-function updateTransformables(widget, delta) {
-	for (var i = 0; i < widget._childPoints.length; ++i) {
-		var childPoint = widget._childPoints[i];
-		childPoint.transformable.pos = widget.transformable.pos.clone().add(childPoint.offset);
-	}
-	var lineBatch = widget._lineBatch;
-	for (var i = 0; i < widget._lines.length; ++i) {
-		var line = widget._lines[i];
-		if (line._id !== undefined) {
-			lineBatch.setEndPoint1(line._id, line.from.pos);
-			lineBatch.setEndPoint2(line._id, line.to.pos);
-		}
-	}
-}
-
 function IconTextWidget(engine, scene, subtree, atlasIndex, iconSize, color, text, font, textOffset) {
 	this._spriteBatch = scene.spriteBatch;
 	this._lineBatch = scene.lineBatch;
@@ -37,11 +22,6 @@ function IconTextWidget(engine, scene, subtree, atlasIndex, iconSize, color, tex
 		renderable: new TextRenderable(engine, text, font, color, textOffset),
 		transformable: this.transformable
 	};
-
-//	this.updateable = {update: updateTransformables};
-	
-	this._lines = [];
-	this._childPoints = [];
 }
 IconTextWidget.extends(Object, {
 	get iconSize() {
@@ -59,12 +39,6 @@ IconTextWidget.extends(Object, {
 		if (this._spriteId >= 0) {
 			this._spriteBatch.setSize(this._spriteId, size);
 		}
-	},
-	addLine: function(lineDesc) {
-		this._lines.push(lineDesc);
-	},
-	addChildPoint: function(offset, transformable) {
-		this._childPoints.push({offset: offset, transformable: transformable});
 	},
 	setLayerIndex: function(value) {
 		var newSize = this._baseIconSize.clone().scale(1.0 / (value + 1));
@@ -86,12 +60,6 @@ IconTextWidget.extends(Object, {
 			this._label.renderable.material.color = color;
 		}
 		
-		var lineBatch = this._lineBatch;
-		this._lines.forEach(function(lineDesc) {
-			color.alpha = lineDesc.color.alpha;
-			lineBatch.setColor(lineDesc._id, color);
-		});
-
 		if (!value && this._selected) {
 			this.setSelected(true);
 		}
@@ -111,12 +79,6 @@ IconTextWidget.extends(Object, {
 		if (!this._attenuated) {
 			this._label.renderable.material.color = color;
 		}
-		
-		var lineBatch = this._lineBatch;
-		this._lines.forEach(function(lineDesc) {
-			color.alpha = lineDesc.color.alpha;
-			lineBatch.setColor(lineDesc._id, color);
-		});
 	},
 	setAlpha: function(value) {
 		if (!this._attenuated) {
@@ -141,25 +103,12 @@ IconTextWidget.extends(Object, {
 		scene.addEntity(this._label);
 		this._spriteId = 
 			this._spriteBatch.add(this.transformable.pos, this._iconSize, this._color, this._atlasIndex);
-
-		var lineBatch = this._lineBatch;
-		this._lines.forEach(function(lineDesc) {
-			lineDesc._id = lineBatch.add(
-				lineDesc.from.pos, lineDesc.to.pos, lineDesc.color, lineDesc.width, lineDesc.patternIndex);
-		});
 	},
 	removeFromScene: function(scene) {
 		scene.removeEntity(this._label);
 		this._spriteBatch.remove(this._spriteId);
-
-		var lineBatch = this._lineBatch;
-		this._lines.forEach(function(lineDesc) {
-			lineBatch.remove(lineDesc._id);
-			delete lineDesc._id;
-		});
 	},
 	updatePos: function() {
 		this._spriteBatch.setPos(this._spriteId, this.transformable.pos);
 	}
 });
-IconTextWidget.HIGHLIGHTED = new Color(0.2, 1.0, 0.2);

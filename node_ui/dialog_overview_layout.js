@@ -1,4 +1,4 @@
-var DialogOverviewLayout = (function(module) {
+var Layout = (function(module) {
 	'use strict';
 
 	function DialogTreeLayout() {
@@ -111,4 +111,4 @@ var DialogOverviewLayout = (function(module) {
 	module.VerticalDialogTreeLayout = VerticalDialogTreeLayout;
 
 	return module;
-})(DialogOverviewLayout || {});
+})(Layout || {});
